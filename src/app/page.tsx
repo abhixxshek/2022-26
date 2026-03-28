@@ -5,9 +5,8 @@ import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
 import { StudentCard } from "@/components/StudentCard";
 import { AddMemoryDialog } from "@/components/AddMemoryDialog";
-import { ChevronDown, MapPin, Heart, Coffee, Sun, Compass, Zap, Users, BookOpen, GraduationCap } from "lucide-react";
+import { ChevronDown, MapPin, Heart, Coffee, Users, Zap, GraduationCap, Star, BookOpen } from "lucide-react";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   return (
@@ -27,7 +26,7 @@ export default function Home() {
             <img 
               src="https://picsum.photos/seed/jnv-campus-main/1920/1080" 
               alt="JNV Campus" 
-              className="w-full h-full object-cover opacity-60"
+              className="w-full h-full object-cover opacity-60 grayscale"
               data-ai-hint="boarding school campus"
             />
           </motion.div>
@@ -41,14 +40,17 @@ export default function Home() {
           >
             <div className="flex items-center justify-center gap-4 mb-8">
               <span className="h-[1px] w-8 bg-primary/40" />
-              <p className="text-primary font-bold tracking-[0.6em] uppercase text-[10px] md:text-xs">Navodaya Vidyalaya | Batch 2018 - 2025</p>
+              <p className="text-primary font-black tracking-[0.6em] uppercase text-[10px] md:text-xs">
+                Batch of 2018 - 2025
+              </p>
               <span className="h-[1px] w-8 bg-primary/40" />
             </div>
             <h1 className="text-7xl md:text-[10rem] font-headline font-black mb-6 leading-none tracking-tighter text-gradient uppercase">
               SEVEN <span className="italic font-light">YEARS</span>
             </h1>
             <p className="text-lg md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed font-light font-body">
-              From the heavy metal <span className="text-primary font-bold italic">Trunk Boxes</span> of Class 6 to the emotional farewell of Class 12. Once a Navodayan, Always a Navodayan.
+              From the heavy metal <span className="text-primary font-bold italic">Trunk Boxes</span> of Class 6 to the final salute of Class 12. <br />
+              <span className="text-primary font-black uppercase tracking-widest text-sm mt-4 block">Once a Navodayan, Always a Navodayan.</span>
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
               <button 
@@ -81,17 +83,17 @@ export default function Home() {
               { 
                 icon: <Zap className="w-8 h-8 text-primary" />, 
                 title: "Morning PT", 
-                desc: "The collective groan at 5:30 AM, the rhythmic steps on the field, and the crisp morning air that defined our discipline." 
+                desc: "The 5:30 AM whistle. The rhythmic crunch of shoes on the field, the cold morning mist, and the discipline that built our foundation." 
               },
               { 
                 icon: <Coffee className="w-8 h-8 text-primary" />, 
                 title: "Sunday Special", 
-                desc: "The puri-sabji aroma that meant freedom. The one day the mess felt like a feast after a long week." 
+                desc: "The aroma of Puri-Sabji wafting through the corridors. The one day the mess felt like home after a week of standard fare." 
               },
               { 
                 icon: <Users className="w-8 h-8 text-primary" />, 
                 title: "House Brotherhood", 
-                desc: "Aravalli, Nilgiri, Shivalik, Udaygiri. Not just names, but identities we fought for in every inter-house meet." 
+                desc: "Aravalli, Nilgiri, Shivalik, Udaygiri. Not just dorms, but identities we protected with pride in every inter-house clash." 
               }
             ].map((feature, i) => (
               <motion.div 
@@ -100,9 +102,9 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="space-y-6"
+                className="space-y-6 group"
               >
-                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center">
+                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center group-hover:bg-primary transition-colors group-hover:text-black">
                   {feature.icon}
                 </div>
                 <h3 className="text-2xl font-black font-headline uppercase">{feature.title}</h3>
@@ -113,9 +115,9 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-20">
             {[
-              { val: "2555", label: "Nights in Dorms" },
+              { val: "2555", label: "Days in Hostel" },
               { val: "100+", label: "Mess Rituals" },
-              { val: "365", label: "Migration Days" },
+              { val: "365", label: "Migration Scheme" },
               { val: "∞", label: "Navodayan Spirit" }
             ].map((stat, i) => (
               <motion.div 
@@ -126,7 +128,7 @@ export default function Home() {
                 transition={{ delay: i * 0.1 }}
                 className="text-center"
               >
-                <h4 className="text-5xl md:text-7xl font-headline font-black text-primary mb-2">{stat.val}</h4>
+                <h4 className="text-5xl md:text-7xl font-headline font-black text-primary mb-2 tracking-tighter">{stat.val}</h4>
                 <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground">{stat.label}</p>
               </motion.div>
             ))}
@@ -139,7 +141,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto space-y-40">
           <div className="text-center mb-40">
             <h2 className="text-5xl md:text-7xl font-headline font-black mb-8 uppercase tracking-tighter">The 7-Year <span className="text-primary italic">Arc</span></h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light">From the first step in Class 6 to the final salute in Class 12.</p>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light">A journey through time: from the scared kid of Class 6 to the legacy of Class 12.</p>
           </div>
 
           {YEAR_DATA.map((year, index) => (
@@ -155,7 +157,7 @@ export default function Home() {
                     {year.subtitle}
                   </p>
                   <h2 className="text-6xl md:text-9xl font-headline font-black mb-10 tracking-tighter uppercase">{year.title}</h2>
-                  <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-light">
+                  <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-light font-body">
                     {year.description}
                   </p>
                 </motion.div>
@@ -180,21 +182,21 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-20 text-left">
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">The Batch 18-25</p>
-              <p className="text-muted-foreground leading-relaxed font-light">
-                Once a Navodayan, Always a Navodayan. This digital yearbook is a sacred space for the Batch of 2018-2025.
+              <p className="text-muted-foreground leading-relaxed font-light font-body">
+                Once a Navodayan, Always a Navodayan. This digital yearbook is a sacred space for our collective memories.
               </p>
             </div>
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">Quick Links</p>
-              <ul className="space-y-4 text-sm font-medium">
-                <li><Link href="/gallery" className="hover:text-primary transition-colors">Moments Gallery</Link></li>
+              <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">Explore</p>
+              <ul className="space-y-4 text-sm font-black uppercase tracking-widest">
+                <li><Link href="/gallery" className="hover:text-primary transition-colors">The Gallery</Link></li>
                 <li><Link href="/auth" className="hover:text-primary transition-colors">Join the Batch</Link></li>
-                <li><Link href="/profile" className="hover:text-primary transition-colors">Your Profile</Link></li>
+                <li><Link href="/profile" className="hover:text-primary transition-colors">Your Legacy</Link></li>
               </ul>
             </div>
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">The Motto</p>
-              <p className="italic text-muted-foreground text-sm font-light leading-relaxed">
+              <p className="italic text-muted-foreground text-sm font-light leading-relaxed font-body">
                 "Pragati Shila Hum Navodaya Ho... <br />
                 National Integration Through Education."
               </p>
@@ -203,8 +205,8 @@ export default function Home() {
           <div className="mt-40 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 text-[10px] uppercase font-black tracking-widest text-muted-foreground/50">
             <p>© 2025 JNV MEMORIES | BATCH OF 2018-2025</p>
             <div className="flex gap-10">
-              <span className="flex items-center gap-2"><MapPin className="w-3 h-3" /> All India Alumni</span>
-              <span className="flex items-center gap-2"><Heart className="w-3 h-3" /> Forever Bound</span>
+              <span className="flex items-center gap-2"><MapPin className="w-3 h-3 text-primary" /> All India Alumni</span>
+              <span className="flex items-center gap-2"><Heart className="w-3 h-3 text-primary" /> Forever Bound</span>
             </div>
           </div>
         </div>
