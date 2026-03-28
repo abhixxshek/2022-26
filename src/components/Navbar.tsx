@@ -3,8 +3,9 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 
@@ -26,6 +27,7 @@ const JNVLogo = () => (
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
   const { user } = useUser();
   const db = useFirestore();
 
@@ -44,6 +46,13 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const navLinks = [
+    { name: "The Journey", href: "/" },
+    { name: "Yearbook", href: "/yearbook" },
+    { name: "Media Vault", href: "/gallery" },
+    { name: "The Wall", href: "/wall" },
+  ];
 
   return (
     <nav
@@ -64,27 +73,46 @@ export function Navbar() {
 
         <div className="flex items-center gap-12">
           <div className="hidden md:flex items-center gap-10">
-            <Link href="/" className="text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary pb-1">
-              The Journey
-            </Link>
-            <Link href="/yearbook" className="text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white transition-all">
-              Yearbook
-            </Link>
-            <Link href="/gallery" className="text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white transition-all">
-              Media Vault
-            </Link>
-            <Link href="/wall" className="text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white transition-all">
-              The Wall
-            </Link>
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link 
+                  key={link.href} 
+                  href={link.href} 
+                  className={cn(
+                    "text-[10px] font-bold uppercase tracking-widest transition-all",
+                    isActive 
+                      ? "text-primary border-b border-primary pb-1" 
+                      : "text-white/60 hover:text-white"
+                  )}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
             
             {isAdmin && (
-              <Link href="/admin" className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 hover:scale-105 transition-all">
+              <Link 
+                href="/admin" 
+                className={cn(
+                  "text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all",
+                  pathname === "/admin" ? "text-primary" : "text-primary/60"
+                )}
+              >
                 <ShieldCheck className="w-3 h-3" /> Admin Panel
               </Link>
             )}
           </div>
           
-          <Link href="/auth" className="px-8 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
+          <Link 
+            href="/auth" 
+            className={cn(
+              "px-8 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border",
+              pathname === "/auth" || pathname === "/profile"
+                ? "bg-primary text-black border-primary" 
+                : "bg-white/10 hover:bg-white/20 border-white/20 text-white"
+            )}
+          >
             {user ? "PROFILE" : "ARCHIVE ENTRY"}
           </Link>
         </div>
