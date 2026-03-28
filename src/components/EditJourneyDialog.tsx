@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit3, Save, ImageIcon, Camera } from "lucide-react";
+import { Edit3, Save, ImageIcon, Camera, Loader2 } from "lucide-react";
 import { doc } from "firebase/firestore";
 import { useFirestore } from "@/firebase";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
@@ -26,15 +26,38 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
   const [subtitle, setSubtitle] = useState(yearData.subtitle);
   const [description, setDescription] = useState(yearData.description);
   const [imageUrl, setImageUrl] = useState(yearData.imageUrl || "");
+  const [isReading, setIsReading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const db = useFirestore();
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      toast({
+        variant: "destructive",
+        title: "File Too Large",
+        description: "Please select an image smaller than 1MB."
+      });
+      return;
+    }
+
+    setIsReading(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setImageUrl(event.target?.result as string);
+      setIsReading(false);
+      toast({
+        title: "Visual Record Updated",
+        description: "The new class photo has been prepared."
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handlePickFromGallery = () => {
-    const randomId = Math.floor(Math.random() * 2000);
-    setImageUrl(`https://picsum.photos/seed/${randomId}/800/800`);
-    toast({
-      title: "Visual Selected",
-      description: "A new record from the gallery has been queued."
-    });
+    fileInputRef.current?.click();
   };
 
   const handleUpdate = () => {
@@ -49,8 +72,8 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
     });
 
     toast({
-      title: "Archive Updated",
-      description: `The record for ${subtitle.split('|')[0]} has been refined.`,
+      title: "Archive Refined",
+      description: `The history of ${subtitle.split('|')[0]} has been updated.`,
     });
   };
 
@@ -70,7 +93,14 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
         </DialogHeader>
 
         <div className="space-y-8 py-6">
-          {/* Image Preview & Edit */}
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            className="hidden" 
+            accept="image/*" 
+            onChange={handleFileChange} 
+          />
+
           <div className="space-y-3">
             <label className="text-[9px] font-black uppercase tracking-widest text-primary">Class Visual</label>
             <div className="relative aspect-video rounded-2xl overflow-hidden bg-white/5 border border-white/10 group">
@@ -78,15 +108,19 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
                 <img src={imageUrl} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt="Year Preview" />
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white/10 gap-2">
-                  <Camera className="w-8 h-8" />
-                  <p className="text-[9px] font-black uppercase tracking-widest">No Visual Attached</p>
+                  {isReading ? <Loader2 className="w-8 h-8 animate-spin" /> : <Camera className="w-8 h-8" />}
+                  <p className="text-[9px] font-black uppercase tracking-widest">
+                    {isReading ? "Processing..." : "No Visual Attached"}
+                  </p>
                 </div>
               )}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Button onClick={handlePickFromGallery} className="bg-white text-black font-black uppercase text-[10px] tracking-widest rounded-full hover:bg-primary">
-                  <ImageIcon className="w-3 h-3 mr-2" /> Change from Gallery
-                </Button>
-              </div>
+              {!isReading && (
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Button onClick={handlePickFromGallery} className="bg-white text-black font-black uppercase text-[10px] tracking-widest rounded-full hover:bg-primary">
+                    <ImageIcon className="w-3 h-3 mr-2" /> Change Photo
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -101,7 +135,7 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[9px] font-black uppercase tracking-widest text-primary">Time Lapse (e.g. 2018-19)</label>
+              <label className="text-[9px] font-black uppercase tracking-widest text-primary">Academic Range</label>
               <Input 
                 value={subtitle} 
                 onChange={(e) => setSubtitle(e.target.value)}
@@ -123,7 +157,11 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
         </div>
 
         <DialogFooter>
-          <Button onClick={handleUpdate} className="w-full bg-white text-black font-black uppercase tracking-[0.4em] py-8 rounded-full hover:bg-primary transition-all shadow-xl shadow-white/5">
+          <Button 
+            onClick={handleUpdate} 
+            disabled={isReading}
+            className="w-full bg-white text-black font-black uppercase tracking-[0.4em] py-8 rounded-full hover:bg-primary transition-all shadow-xl shadow-white/5 disabled:opacity-50"
+          >
             <Save className="w-4 h-4 mr-2" /> Commit Changes
           </Button>
         </DialogFooter>

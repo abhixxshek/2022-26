@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Save, ImageIcon, Trash2 } from "lucide-react";
+import { Save, ImageIcon, Trash2, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
@@ -20,6 +20,7 @@ export default function ProfilePage() {
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const studentRef = useMemoFirebase(() => {
     if (!db || !user) return null;
@@ -33,6 +34,7 @@ export default function ProfilePage() {
   const [fullBio, setFullBio] = useState("");
   const [house, setHouse] = useState("");
   const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
+  const [isReading, setIsReading] = useState(false);
   const [batchId] = useState("batch-2018-2025");
 
   useEffect(() => {
@@ -55,6 +57,32 @@ export default function ProfilePage() {
     setFullBio(prev => prev + emoji);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      toast({
+        variant: "destructive",
+        title: "File Too Large",
+        description: "Please select an identity photo smaller than 1MB."
+      });
+      return;
+    }
+
+    setIsReading(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setProfilePhotoUrl(event.target?.result as string);
+      setIsReading(false);
+      toast({
+        title: "Identity Photo Selected",
+        description: "Your new visual identity has been queued."
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSave = () => {
     if (!studentRef || !user) return;
     
@@ -75,7 +103,7 @@ export default function ProfilePage() {
       shortBio,
       fullBio,
       house,
-      profilePhotoUrl: profilePhotoUrl || `https://picsum.photos/seed/${user.uid}/400/500`,
+      profilePhotoUrl: profilePhotoUrl || "",
     };
 
     setDocumentNonBlocking(studentRef, updatedData, { merge: true });
@@ -85,13 +113,8 @@ export default function ProfilePage() {
     });
   };
 
-  const handlePhotoUploadFromGallery = () => {
-    const randomId = Math.floor(Math.random() * 1000);
-    setProfilePhotoUrl(`https://picsum.photos/seed/${randomId}/400/500`);
-    toast({
-      title: "Photo Added from Gallery",
-      description: "Your selected identity photo has been queued for synchronization."
-    });
+  const handleTriggerFilePicker = () => {
+    fileInputRef.current?.click();
   };
 
   if (isUserLoading || isDocLoading) return null;
@@ -106,6 +129,14 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              accept="image/*" 
+              onChange={handleFileChange} 
+            />
+
             <div className="flex items-center justify-between mb-12">
               <div>
                 <h1 className="text-5xl font-headline font-black uppercase tracking-tighter mb-2">My <span className="text-primary">Legacy</span></h1>
@@ -117,32 +148,40 @@ export default function ProfilePage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-              {/* Photo Section */}
               <div className="md:col-span-1 space-y-6">
                 <Card className="bg-black/40 backdrop-blur-xl border-white/5 overflow-hidden rounded-[2.5rem] relative group">
                   <div className="aspect-[4/5] relative bg-[#111]">
-                    <img 
-                      src={profilePhotoUrl || `https://picsum.photos/seed/${user?.uid}/400/500`} 
-                      className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
-                      alt="Profile"
-                    />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-4 p-6">
-                      <Button 
-                        onClick={handlePhotoUploadFromGallery}
-                        className="w-full bg-white text-black hover:bg-primary transition-colors rounded-full font-black text-[10px] uppercase tracking-widest h-12"
-                      >
-                        <ImageIcon className="w-3 h-3 mr-2" /> Select Identity Photo
-                      </Button>
-                      {profilePhotoUrl && (
+                    {profilePhotoUrl ? (
+                      <img 
+                        src={profilePhotoUrl} 
+                        className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+                        alt="Profile"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-white/10 gap-4">
+                        {isReading ? <Loader2 className="w-10 h-10 animate-spin" /> : <Camera className="w-10 h-10" />}
+                        <p className="text-[10px] font-black uppercase tracking-widest">No Identity Photo</p>
+                      </div>
+                    )}
+                    {!isReading && (
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-4 p-6">
                         <Button 
-                          variant="destructive" 
-                          onClick={() => setProfilePhotoUrl("")} 
-                          className="w-full rounded-full font-black text-[10px] uppercase tracking-widest h-12"
+                          onClick={handleTriggerFilePicker}
+                          className="w-full bg-white text-black hover:bg-primary transition-colors rounded-full font-black text-[10px] uppercase tracking-widest h-12"
                         >
-                          <Trash2 className="w-3 h-3 mr-2" /> Reset Photo
+                          <ImageIcon className="w-3 h-3 mr-2" /> Open Gallery
                         </Button>
-                      )}
-                    </div>
+                        {profilePhotoUrl && (
+                          <Button 
+                            variant="destructive" 
+                            onClick={() => setProfilePhotoUrl("")} 
+                            className="w-full rounded-full font-black text-[10px] uppercase tracking-widest h-12"
+                          >
+                            <Trash2 className="w-3 h-3 mr-2" /> Remove Photo
+                          </Button>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <CardContent className="pt-6 pb-8 text-center">
                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-2">ARCHIVE IDENTITY</p>
@@ -150,14 +189,8 @@ export default function ProfilePage() {
                     <p className="text-[9px] text-primary font-black uppercase tracking-[0.4em] mt-2">{house ? `${house} House` : "Unassigned Dormitory"}</p>
                   </CardContent>
                 </Card>
-                <div className="text-center px-4">
-                  <p className="text-[9px] font-bold text-white/10 uppercase tracking-[0.2em] leading-relaxed">
-                    Identity photos represent your 7-year legacy. Choose a visual that defines your journey.
-                  </p>
-                </div>
               </div>
 
-              {/* Data Section */}
               <div className="md:col-span-2 space-y-12">
                 <section className="space-y-6">
                   <div className="flex items-center gap-4 mb-4">
@@ -212,7 +245,7 @@ export default function ProfilePage() {
                     <EmojiPicker onEmojiSelect={addEmoji} />
                   </div>
                   <Textarea 
-                    placeholder="Tell your Navodaya story... the early morning whistles, the mess rushes, the midnight preps, and the bonds that will never break." 
+                    placeholder="Tell your Navodaya story..." 
                     className="bg-white/[0.03] border-white/10 min-h-[300px] rounded-[2rem] p-8 focus:ring-primary/20 transition-all text-lg leading-relaxed font-light font-serif italic text-white"
                     value={fullBio}
                     onChange={(e) => setFullBio(e.target.value)}
