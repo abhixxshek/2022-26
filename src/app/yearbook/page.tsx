@@ -11,7 +11,13 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const HOUSES = ["All Houses", "Aravalli", "Nilgiri", "Shivalik", "Udaygiri"];
+const HOUSES = [
+  { name: "All Houses", color: "bg-white/5 text-white/40 border-white/10" },
+  { name: "Aravalli", color: "bg-aravalli/10 text-aravalli border-aravalli/20", active: "bg-aravalli text-white border-aravalli shadow-aravalli/20" },
+  { name: "Nilgiri", color: "bg-nilgiri/10 text-nilgiri border-nilgiri/20", active: "bg-nilgiri text-white border-nilgiri shadow-nilgiri/20" },
+  { name: "Shivalik", color: "bg-shivalik/10 text-shivalik border-shivalik/20", active: "bg-shivalik text-white border-shivalik shadow-shivalik/20" },
+  { name: "Udaygiri", color: "bg-udaygiri/10 text-udaygiri border-udaygiri/20", active: "bg-udaygiri text-black border-udaygiri shadow-udaygiri/20" },
+];
 
 export default function YearbookPage() {
   const { user, isUserLoading } = useUser();
@@ -74,19 +80,19 @@ export default function YearbookPage() {
               />
             </div>
 
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex flex-wrap justify-center gap-3">
               {HOUSES.map((house) => (
                 <button
-                  key={house}
-                  onClick={() => setActiveHouse(house)}
+                  key={house.name}
+                  onClick={() => setActiveHouse(house.name)}
                   className={cn(
                     "px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border",
-                    activeHouse === house 
-                      ? "bg-primary text-black border-primary shadow-lg shadow-primary/20" 
-                      : "bg-white/5 text-white/40 border-white/10 hover:border-white/20 hover:text-white"
+                    activeHouse === house.name 
+                      ? (house.active || "bg-primary text-black border-primary shadow-lg shadow-primary/20") 
+                      : house.color
                   )}
                 >
-                  {house}
+                  {house.name}
                 </button>
               ))}
             </div>

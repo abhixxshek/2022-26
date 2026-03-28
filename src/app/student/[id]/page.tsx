@@ -7,6 +7,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowLeft, Quote, Star, BookOpen, Home, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export default function StudentProfile() {
   const { id } = useParams();
@@ -25,6 +26,13 @@ export default function StudentProfile() {
       </div>
     );
   }
+
+  const houseColorClass = {
+    Aravalli: "text-aravalli border-aravalli/30 bg-aravalli/5",
+    Nilgiri: "text-nilgiri border-nilgiri/30 bg-nilgiri/5",
+    Shivalik: "text-shivalik border-shivalik/30 bg-shivalik/5",
+    Udaygiri: "text-udaygiri border-udaygiri/30 bg-udaygiri/5",
+  }[student.house];
 
   return (
     <div className="bg-[#050505] text-foreground min-h-screen">
@@ -49,8 +57,8 @@ export default function StudentProfile() {
             </button>
             <div className="flex items-center gap-10">
               <Badge variant="outline" className="border-primary/20 text-primary px-6 py-2 uppercase font-black text-[9px] tracking-[0.5em] rounded-full">BATCH 2018-2025</Badge>
-              <div className="hidden md:flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.5em] text-white/20">
-                <Home className="w-4 h-4 text-primary" />
+              <div className={cn("hidden md:flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.5em] px-6 py-2 rounded-full border", houseColorClass)}>
+                <Home className="w-4 h-4" />
                 {student.house} House
               </div>
             </div>
