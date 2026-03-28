@@ -121,7 +121,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The Journey Section - Widescreen Layout */}
+      {/* The Journey Section - Static Timeline */}
       <section id="journey" className="py-60 px-6 relative bg-background overflow-hidden">
         <div className="max-w-[1600px] mx-auto relative px-12">
           <div className="text-center mb-48 space-y-6">
@@ -200,6 +200,7 @@ export default function Home() {
                           <h3 className="text-5xl md:text-8xl font-serif text-white mb-10 tracking-tighter leading-none">
                             {year.title}
                           </h3>
+                          {/* Minimal Typography for Description */}
                           <p className="text-white/60 text-[8px] md:text-[10px] leading-relaxed font-light font-serif italic tracking-tight max-w-2xl">
                             "{year.description}"
                           </p>
