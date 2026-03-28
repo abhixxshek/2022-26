@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -57,16 +56,16 @@ export function Navbar() {
           </div>
         </Link>
 
-        <div className="flex items-center gap-16">
-          <Link href="/gallery" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 hover:text-primary transition-all">
+        <div className="flex items-center gap-12">
+          <Link href="/gallery" className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40 hover:text-primary transition-all">
             Archive
           </Link>
           {user ? (
-            <Link href="/profile" className="px-8 py-3 bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.4em] transition-all">
+            <Link href="/profile" className="px-8 py-3 bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-full text-[9px] font-black uppercase tracking-[0.4em] transition-all">
               My Legacy
             </Link>
           ) : (
-            <Link href="/auth" className="px-8 py-3 bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.4em] transition-all">
+            <Link href="/auth" className="px-8 py-3 bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-full text-[9px] font-black uppercase tracking-[0.4em] transition-all">
               Portal Access
             </Link>
           )}
