@@ -53,7 +53,11 @@ export default function ProfilePage() {
     }
   }, [studentData]);
 
-  const addEmoji = (emoji: string) => {
+  const addEmojiToShortBio = (emoji: string) => {
+    setShortBio(prev => prev + emoji);
+  };
+
+  const addEmojiToFullBio = (emoji: string) => {
     setFullBio(prev => prev + emoji);
   };
 
@@ -224,9 +228,12 @@ export default function ProfilePage() {
                 </section>
 
                 <section className="space-y-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="h-[1px] w-8 bg-primary/40" />
-                    <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">The Short Definition</label>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <span className="h-[1px] w-8 bg-primary/40" />
+                      <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">The Short Definition</label>
+                    </div>
+                    <EmojiPicker onEmojiSelect={addEmojiToShortBio} />
                   </div>
                   <Input 
                     placeholder="One line that defines your JNV life..." 
@@ -242,7 +249,7 @@ export default function ProfilePage() {
                       <span className="h-[1px] w-8 bg-primary/40" />
                       <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">The Full Narrative</label>
                     </div>
-                    <EmojiPicker onEmojiSelect={addEmoji} />
+                    <EmojiPicker onEmojiSelect={addEmojiToFullBio} />
                   </div>
                   <Textarea 
                     placeholder="Tell your Navodaya story..." 

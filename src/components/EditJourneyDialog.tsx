@@ -10,6 +10,7 @@ import { doc } from "firebase/firestore";
 import { useFirestore } from "@/firebase";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
+import { EmojiPicker } from "@/components/EmojiPicker";
 
 interface EditJourneyDialogProps {
   yearData: {
@@ -58,6 +59,10 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
 
   const handlePickFromGallery = () => {
     fileInputRef.current?.click();
+  };
+
+  const addEmoji = (emoji: string) => {
+    setDescription(prev => prev + emoji);
   };
 
   const handleUpdate = () => {
@@ -146,7 +151,10 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[9px] font-black uppercase tracking-widest text-primary">Historical Account</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[9px] font-black uppercase tracking-widest text-primary">Historical Account</label>
+              <EmojiPicker onEmojiSelect={addEmoji} />
+            </div>
             <Textarea 
               value={description} 
               onChange={(e) => setDescription(e.target.value)}
