@@ -13,7 +13,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile 
 } from "firebase/auth";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { Lock, Mail, User, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function AuthPage() {
@@ -28,6 +28,10 @@ export default function AuthPage() {
 
   const STUDENT_KEY = "JNVRTM25";
   const ADMIN_KEY = "JNVRTM18";
+  
+  // Strict Admin Credentials
+  const MASTER_ADMIN_EMAIL = "primeparam07@gmail.com";
+  const MASTER_ADMIN_NAME = "name param";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +47,21 @@ export default function AuthPage() {
         description: `Please use the official Batch '25 or Admin key.`,
       });
       return;
+    }
+
+    // Explicit Admin Credential Verification
+    if (isAdminEntry) {
+      const isCorrectEmail = email.trim().toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
+      const isCorrectName = name.trim() === MASTER_ADMIN_NAME;
+      
+      if (!isCorrectEmail || !isCorrectName) {
+        toast({
+          variant: "destructive",
+          title: "Unauthorized Admin Identity",
+          description: "Admin access keys must be paired with specific master administrator credentials.",
+        });
+        return;
+      }
     }
 
     if (!name.trim() || !email.trim()) {
@@ -89,7 +108,7 @@ export default function AuthPage() {
         description: `Welcome to the Archive, ${name}.`,
       });
       
-      // Conditional Redirect: Admin to Dashboard, Student to Profile
+      // Direct Redirection for Admin
       if (isAdminEntry) {
         router.push("/admin");
       } else {

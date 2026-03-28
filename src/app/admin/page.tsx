@@ -21,6 +21,9 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [isAuthorizing, setIsAuthorizing] = useState(true);
 
+  // Strictly authorized master admin email
+  const MASTER_ADMIN_EMAIL = "primeparam07@gmail.com";
+
   const studentRef = useMemoFirebase(() => {
     if (!db || !user) return null;
     return doc(db, "students", user.uid);
@@ -28,8 +31,8 @@ export default function AdminDashboard() {
 
   const { data: studentData, isLoading: isRoleLoading } = useDoc(studentRef);
   
-  // Explicitly check for admin role
-  const isAdmin = studentData?.role === "admin";
+  // Explicitly check for admin role AND the authorized master email
+  const isAdmin = studentData?.role === "admin" && user?.email?.toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
 
   useEffect(() => {
     // Only proceed once we are sure the data has finished fetching
@@ -38,15 +41,15 @@ export default function AdminDashboard() {
         // User is not even logged in
         router.push("/auth");
       } else if (!isAdmin) {
-        // Logged in but profile doesn't have the admin role
+        // Logged in but not authorized for this specific portal
         toast({
           variant: "destructive",
-          title: "Access Denied",
-          description: "You do not have administrative privileges for this archive."
+          title: "Unauthorized Access",
+          description: "This portal is restricted to the master administrator account."
         });
         router.push("/");
       } else {
-        // User is authorized as admin
+        // User is authorized
         setIsAuthorizing(false);
       }
     }
@@ -92,7 +95,7 @@ export default function AdminDashboard() {
       <div className="bg-[#050505] min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
           <Loader2 className="w-8 h-8 text-primary mx-auto animate-spin mb-4" />
-          <p className="text-[10px] uppercase font-black tracking-[0.4em] text-white/20">Verifying Admin Credentials</p>
+          <p className="text-[10px] uppercase font-black tracking-[0.4em] text-white/20">Verifying Master Credentials</p>
         </div>
       </div>
     );
@@ -110,7 +113,7 @@ export default function AdminDashboard() {
                 <ShieldAlert className="w-8 h-8 text-primary" />
                 <h1 className="text-5xl font-black uppercase tracking-tighter">Admin <span className="text-primary">Control</span></h1>
               </div>
-              <p className="text-white/40 uppercase font-black text-[10px] tracking-[0.5em]">Moderation Portal | Batch '25 Archive</p>
+              <p className="text-white/40 uppercase font-black text-[10px] tracking-[0.5em]">Moderation Portal | Master Access</p>
             </div>
             <Button 
               variant="outline" 

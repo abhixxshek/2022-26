@@ -6,7 +6,6 @@ import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
 import { Loader2, Database } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, writeBatch, doc } from "firebase/firestore";
 import { EditJourneyDialog } from "@/components/EditJourneyDialog";
@@ -53,7 +52,7 @@ export default function Home() {
     <div className="bg-[#050505] text-foreground min-h-screen selection:bg-primary/30 overflow-x-hidden font-body">
       <Navbar />
       
-      {/* Cinematic Hero Section */}
+      {/* Cinematic Hero Section with Centered Logo */}
       <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image 
@@ -115,7 +114,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The Journey Section - Static Timeline */}
+      {/* The Journey Section - Bold Archival Typography */}
       <section id="journey" className="py-60 px-6 relative bg-background overflow-hidden">
         <div className="max-w-[1600px] mx-auto relative px-12">
           <div className="text-center mb-48 space-y-6">
@@ -194,7 +193,7 @@ export default function Home() {
                           <h3 className="text-5xl md:text-8xl font-serif text-white mb-10 tracking-tighter leading-none">
                             {year.title}
                           </h3>
-                          <p className="text-white/60 text-lg md:text-3xl leading-relaxed font-light font-serif italic tracking-tight max-w-4xl">
+                          <p className="text-white/60 text-xl md:text-3xl leading-relaxed font-light font-serif italic tracking-tight max-w-4xl">
                             "{year.description}"
                           </p>
                         </div>
