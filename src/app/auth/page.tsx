@@ -5,8 +5,6 @@ import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAuth, useFirestore, useUser } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
@@ -15,8 +13,9 @@ import {
   createUserWithEmailAndPassword,
   updateProfile 
 } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { Lock, Mail, User, ArrowRight, ShieldCheck } from "lucide-react";
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export default function AuthPage() {
   const [name, setName] = useState("");
@@ -65,7 +64,6 @@ export default function AuthPage() {
 
     setIsSubmitting(true);
     try {
-      // Use the key as the password for simplicity as requested
       let userCredential;
       try {
         userCredential = await signInWithEmailAndPassword(auth, email, formattedKey);
@@ -78,21 +76,22 @@ export default function AuthPage() {
         }
       }
 
-      // Initialize or update Student record in Firestore
+      // Initialize or update Student record in Firestore (Non-blocking)
       const studentRef = doc(db, "students", userCredential.user.uid);
+      
+      // We check if doc exists before setting, but without awaiting the mutation
       const studentDoc = await getDoc(studentRef);
-
       if (!studentDoc.exists()) {
-        await setDoc(studentRef, {
+        setDocumentNonBlocking(studentRef, {
           id: userCredential.user.uid,
           name: name,
           email: email,
           role: isAdminEntry ? "admin" : "student",
-          house: "Aravalli", // Default house
+          house: "Aravalli", 
           shortBio: isAdminEntry ? "Archive Administrator" : "Member of Batch '25",
           batchId: "batch-2018-2025",
           createdAt: serverTimestamp(),
-        });
+        }, { merge: true });
       }
 
       toast({

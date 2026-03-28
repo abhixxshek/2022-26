@@ -104,7 +104,7 @@ export default function Home() {
               className="mb-12"
             >
               <h2 className="text-xl md:text-3xl font-black uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-primary/60 drop-shadow-[0_0_15px_rgba(255,191,0,0.3)] px-4">
-                JAWAHAR NAVODAYA VIDYALAYA KALUKHEDA , RATLAM-1
+                JAWAHAR NAVODAYA VIDYALAYA RATLAM
               </h2>
             </motion.div>
 
@@ -195,7 +195,6 @@ export default function Home() {
                               fill
                               className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
                             />
-                            {/* Hover Overlay */}
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <Camera className="w-16 h-16 text-white/80" />
                             </div>
@@ -219,10 +218,10 @@ export default function Home() {
                               <EditJourneyDialog yearData={year} />
                             </div>
                           )}
-                          <h3 className="text-6xl md:text-8xl font-serif text-white mb-10 tracking-tighter">
+                          <h3 className="text-5xl md:text-8xl font-serif text-white mb-10 tracking-tighter leading-none">
                             {year.title}
                           </h3>
-                          <p className="text-white/60 text-[11px] md:text-xs leading-relaxed font-light font-serif italic tracking-tight max-w-2xl">
+                          <p className="text-white/60 text-[9px] md:text-[11px] leading-relaxed font-light font-serif italic tracking-tight max-w-2xl">
                             "{year.description}"
                           </p>
                         </div>
