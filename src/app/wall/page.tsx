@@ -3,32 +3,20 @@
 
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
-import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, limit } from "firebase/firestore";
-import { Heart } from "lucide-react";
+import { Heart, Loader2 } from "lucide-react";
 import { AddMemoryDialog } from "@/components/AddMemoryDialog";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 
 export default function WallPage() {
-  const { user, isUserLoading } = useUser();
   const db = useFirestore();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push("/auth");
-    }
-  }, [user, isUserLoading, router]);
 
   const memoriesQuery = useMemoFirebase(() => {
-    if (!db || !user) return null;
+    if (!db) return null;
     return query(collection(db, "memories"), orderBy("uploadedAt", "desc"), limit(50));
-  }, [db, user]);
+  }, [db]);
 
   const { data: memories, isLoading } = useCollection(memoriesQuery);
-
-  if (isUserLoading) return null;
 
   return (
     <div className="bg-[#0a0a0b] min-h-screen text-foreground selection:bg-primary/20">
@@ -75,7 +63,7 @@ export default function WallPage() {
             </motion.div>
           </div>
 
-          {isLoading || isUserLoading ? (
+          {isLoading ? (
             <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="h-64 bg-white/5 animate-pulse rounded-sm" />
@@ -102,7 +90,7 @@ export default function WallPage() {
                       
                       <div className="pt-6 border-t border-black/10">
                         <p className="text-[11px] font-black uppercase tracking-[0.2em] text-black">
-                          {memory.studentName || "Anonymous"}
+                          {memory.studentName || "Anonymous Navodayan"}
                         </p>
                         {memory.classYearLabel && (
                           <p className="text-[9px] font-bold text-black/40 uppercase tracking-widest mt-1">
@@ -115,7 +103,7 @@ export default function WallPage() {
                 </motion.div>
               ))}
               
-              {memories?.length === 0 && (
+              {memories?.length === 0 && !isLoading && (
                 <div className="col-span-full py-40 text-center">
                   <p className="text-white/10 font-black uppercase tracking-[0.5em] text-xl">
                     The wall is waiting for its first mark.

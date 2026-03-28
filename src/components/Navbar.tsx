@@ -4,10 +4,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { useUser, useAuth, useDoc, useMemoFirebase, useFirestore } from "@/firebase";
-import { initiateSignOut } from "@/firebase/non-blocking-login";
-import { LogOut, ShieldCheck } from "lucide-react";
-import { doc } from "firebase/firestore";
+import { ShieldCheck } from "lucide-react";
 
 const JNVLogo = () => (
   <svg 
@@ -27,16 +24,6 @@ const JNVLogo = () => (
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const { user } = useUser();
-  const auth = useAuth();
-  const db = useFirestore();
-
-  const studentRef = useMemoFirebase(() => {
-    if (!db || !user) return null;
-    return doc(db, "students", user.uid);
-  }, [db, user]);
-
-  const { data: studentData } = useDoc(studentRef);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,10 +32,6 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const handleSignOut = () => {
-    initiateSignOut(auth);
-  };
 
   return (
     <nav
@@ -81,31 +64,14 @@ export function Navbar() {
             <Link href="/wall" className="text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white transition-all">
               The Wall
             </Link>
-            {studentData?.role === "admin" && (
-              <Link href="/admin" className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 hover:scale-105 transition-all">
-                <ShieldCheck className="w-3 h-3" /> Admin Panel
-              </Link>
-            )}
+            <Link href="/admin" className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 hover:scale-105 transition-all">
+              <ShieldCheck className="w-3 h-3" /> Admin Panel
+            </Link>
           </div>
           
-          {user ? (
-            <div className="flex items-center gap-4">
-              <Link href="/profile" className="px-8 py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
-                My Legacy
-              </Link>
-              <button 
-                onClick={handleSignOut}
-                className="p-2.5 text-white/40 hover:text-white transition-colors"
-                title="Sign Out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <Link href="/auth" className="px-8 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
-              SIGN IN
-            </Link>
-          )}
+          <Link href="/auth" className="px-8 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
+            ARCHIVE ENTRY
+          </Link>
         </div>
       </div>
     </nav>

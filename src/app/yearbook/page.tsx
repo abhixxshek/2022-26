@@ -1,14 +1,14 @@
+
 "use client";
 
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
-import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
 import { StudentCard } from "@/components/StudentCard";
-import { Users, Search } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Search, Loader2 } from "lucide-react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const HOUSES = [
@@ -20,22 +20,14 @@ const HOUSES = [
 ];
 
 export default function YearbookPage() {
-  const { user, isUserLoading } = useUser();
   const db = useFirestore();
-  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeHouse, setActiveHouse] = useState("All Houses");
 
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push("/auth");
-    }
-  }, [user, isUserLoading, router]);
-
   const studentsQuery = useMemoFirebase(() => {
-    if (!db || !user) return null;
+    if (!db) return null;
     return query(collection(db, "students"), orderBy("name"));
-  }, [db, user]);
+  }, [db]);
 
   const { data: students, isLoading } = useCollection(studentsQuery);
 
@@ -45,8 +37,6 @@ export default function YearbookPage() {
     const matchesHouse = activeHouse === "All Houses" || s.house === activeHouse;
     return matchesSearch && matchesHouse;
   });
-
-  if (isUserLoading) return null;
 
   return (
     <div className="bg-[#050505] min-h-screen text-foreground selection:bg-primary/20">
@@ -99,7 +89,7 @@ export default function YearbookPage() {
           </div>
 
           {/* Grid */}
-          {isLoading || isUserLoading ? (
+          {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="aspect-[3/4] bg-white/5 animate-pulse rounded-2xl" />
@@ -116,7 +106,7 @@ export default function YearbookPage() {
                   quote: student.fullBio
                 }} />
               ))}
-              {filteredStudents?.length === 0 && (
+              {filteredStudents?.length === 0 && !isLoading && (
                 <div className="col-span-full py-40 text-center">
                   <p className="text-white/10 font-black uppercase tracking-[0.5em] text-xl">No records found in the archive.</p>
                 </div>

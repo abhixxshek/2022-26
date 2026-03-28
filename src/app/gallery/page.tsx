@@ -6,24 +6,17 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Camera, ArrowUpDown, X, Loader2 } from "lucide-react";
 import { useEffect, useState, Suspense } from "react";
-import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, where } from "firebase/firestore";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AddPhotoDialog } from "@/components/AddPhotoDialog";
 import { Button } from "@/components/ui/button";
 
 function GalleryContent() {
-  const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filterClass, setFilterClass] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push("/auth");
-    }
-  }, [user, isUserLoading, router]);
 
   useEffect(() => {
     const classParam = searchParams.get("class");
@@ -36,7 +29,7 @@ function GalleryContent() {
   }, [searchParams]);
 
   const photosQuery = useMemoFirebase(() => {
-    if (!db || !user) return null;
+    if (!db) return null;
     
     const baseCollection = collection(db, "photos");
     
@@ -49,15 +42,13 @@ function GalleryContent() {
     }
 
     return query(baseCollection, orderBy("uploadedAt", "desc"));
-  }, [db, user, filterClass]);
+  }, [db, filterClass]);
 
   const { data: photos, isLoading } = useCollection(photosQuery);
 
   const clearFilter = () => {
     router.push("/gallery");
   };
-
-  if (isUserLoading) return null;
 
   return (
     <main className="pt-40 pb-32 px-6">

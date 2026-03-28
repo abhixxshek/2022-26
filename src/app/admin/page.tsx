@@ -1,12 +1,11 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
-import { useUser, useFirestore, useCollection, useDoc, useMemoFirebase } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, doc } from "firebase/firestore";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Users, BookOpen, Camera, Trash2, ShieldAlert, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,38 +14,26 @@ import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
 
 export default function AdminDashboard() {
-  const { user, isUserLoading } = useUser();
   const db = useFirestore();
-  const router = useRouter();
 
-  const studentDocRef = useMemoFirebase(() => {
-    if (!db || !user) return null;
-    return doc(db, "students", user.uid);
-  }, [db, user]);
+  const studentsQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return query(collection(db, "students"), orderBy("name"));
+  }, [db]);
 
-  const { data: studentData, isLoading: isDocLoading } = useDoc(studentDocRef);
+  const memoriesQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return query(collection(db, "memories"), orderBy("uploadedAt", "desc"));
+  }, [db]);
 
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push("/auth");
-    }
-    if (!isDocLoading && studentData && studentData.role !== "admin") {
-      router.push("/");
-      toast({ 
-        variant: "destructive", 
-        title: "Access Denied", 
-        description: "You do not have administrative privileges." 
-      });
-    }
-  }, [user, isUserLoading, studentData, isDocLoading, router]);
+  const photosQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return query(collection(db, "photos"), orderBy("uploadedAt", "desc"));
+  }, [db]);
 
-  const studentsQuery = useMemoFirebase(() => query(collection(db, "students"), orderBy("name")), [db]);
-  const memoriesQuery = useMemoFirebase(() => query(collection(db, "memories"), orderBy("uploadedAt", "desc")), [db]);
-  const photosQuery = useMemoFirebase(() => query(collection(db, "photos"), orderBy("uploadedAt", "desc")), [db]);
-
-  const { data: students } = useCollection(studentsQuery);
-  const { data: memories } = useCollection(memoriesQuery);
-  const { data: photos } = useCollection(photosQuery);
+  const { data: students, isLoading: isStudentsLoading } = useCollection(studentsQuery);
+  const { data: memories, isLoading: isMemoriesLoading } = useCollection(memoriesQuery);
+  const { data: photos, isLoading: isPhotosLoading } = useCollection(photosQuery);
 
   const handleDelete = (collectionName: string, id: string) => {
     if (!confirm(`Are you sure you want to permanently remove this ${collectionName.slice(0, -1)}?`)) return;
@@ -59,13 +46,7 @@ export default function AdminDashboard() {
     });
   };
 
-  if (isUserLoading || isDocLoading || !studentData || studentData.role !== "admin") {
-    return (
-      <div className="h-screen flex items-center justify-center bg-black">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const isLoading = isStudentsLoading || isMemoriesLoading || isPhotosLoading;
 
   return (
     <div className="bg-[#050505] min-h-screen text-foreground">
@@ -95,27 +76,29 @@ export default function AdminDashboard() {
             </TabsList>
 
             <TabsContent value="students" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {students?.map((s) => (
-                  <Card key={s.id} className="bg-black/40 border-white/5 overflow-hidden group">
-                    <CardHeader className="flex flex-row items-center justify-between p-6">
-                      <div className="space-y-1">
-                        <CardTitle className="text-lg font-bold">{s.name}</CardTitle>
-                        <CardDescription className="text-[10px] uppercase font-black tracking-widest text-primary">{s.house} House | {s.role}</CardDescription>
-                      </div>
-                      {s.id !== user.uid && (
+              {isLoading ? (
+                <div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {students?.map((s) => (
+                    <Card key={s.id} className="bg-black/40 border-white/5 overflow-hidden group">
+                      <CardHeader className="flex flex-row items-center justify-between p-6">
+                        <div className="space-y-1">
+                          <CardTitle className="text-lg font-bold">{s.name}</CardTitle>
+                          <CardDescription className="text-[10px] uppercase font-black tracking-widest text-primary">{s.house} House</CardDescription>
+                        </div>
                         <Button variant="ghost" size="icon" onClick={() => handleDelete("students", s.id)} className="text-white/20 hover:text-destructive transition-colors">
                           <Trash2 className="w-4 h-4" />
                         </Button>
-                      )}
-                    </CardHeader>
-                    <CardContent className="px-6 pb-6">
-                      <p className="text-[10px] text-white/40 font-mono mb-4">{s.email}</p>
-                      <p className="text-xs line-clamp-2 text-white/60">{s.shortBio}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      </CardHeader>
+                      <CardContent className="px-6 pb-6">
+                        <p className="text-[10px] text-white/40 font-mono mb-4">{s.email}</p>
+                        <p className="text-xs line-clamp-2 text-white/60">{s.shortBio}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="memories" className="space-y-6">
