@@ -149,9 +149,9 @@ export default function AuthPage() {
                     <label className="text-[9px] font-black uppercase tracking-widest text-primary ml-1 flex items-center gap-2">
                       <User className="w-3 h-3" /> Full Name
                     </label>
-                    <Input 
+                    <input 
                       placeholder="Enter your name" 
-                      className="bg-white/[0.03] border-white/10 h-14 rounded-2xl px-6 focus:ring-primary/20 text-white"
+                      className="w-full bg-white/[0.03] border border-white/10 h-14 rounded-2xl px-6 focus:outline-none focus:ring-1 focus:ring-primary/40 text-white placeholder:text-white/10"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
@@ -162,10 +162,10 @@ export default function AuthPage() {
                     <label className="text-[9px] font-black uppercase tracking-widest text-primary ml-1 flex items-center gap-2">
                       <Mail className="w-3 h-3" /> Institutional Email
                     </label>
-                    <Input 
+                    <input 
                       type="email"
                       placeholder="email@example.com" 
-                      className="bg-white/[0.03] border-white/10 h-14 rounded-2xl px-6 focus:ring-primary/20 text-white"
+                      className="w-full bg-white/[0.03] border border-white/10 h-14 rounded-2xl px-6 focus:outline-none focus:ring-1 focus:ring-primary/40 text-white placeholder:text-white/10"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -176,10 +176,10 @@ export default function AuthPage() {
                     <label className="text-[9px] font-black uppercase tracking-widest text-primary ml-1 flex items-center gap-2">
                       <Lock className="w-3 h-3" /> Access Key
                     </label>
-                    <Input 
+                    <input 
                       type="text"
                       placeholder="ENTER KEY" 
-                      className="bg-white/[0.03] border-white/10 h-14 rounded-2xl px-6 focus:ring-primary/20 text-white uppercase tracking-widest"
+                      className="w-full bg-white/[0.03] border border-white/10 h-14 rounded-2xl px-6 focus:outline-none focus:ring-1 focus:ring-primary/40 text-white uppercase tracking-widest placeholder:text-white/10"
                       value={accessKey}
                       onChange={(e) => setAccessKey(e.target.value)}
                       required

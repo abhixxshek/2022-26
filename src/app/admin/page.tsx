@@ -32,7 +32,11 @@ export default function AdminDashboard() {
     }
     if (!isDocLoading && studentData && studentData.role !== "admin") {
       router.push("/");
-      toast({ variant: "destructive", title: "Access Denied", description: "You do not have administrative privileges." });
+      toast({ 
+        variant: "destructive", 
+        title: "Access Denied", 
+        description: "You do not have administrative privileges." 
+      });
     }
   }, [user, isUserLoading, studentData, isDocLoading, router]);
 
@@ -45,11 +49,14 @@ export default function AdminDashboard() {
   const { data: photos } = useCollection(photosQuery);
 
   const handleDelete = (collectionName: string, id: string) => {
-    if (!confirm("Are you absolutely sure? This action is permanent in the archive.")) return;
+    if (!confirm(`Are you sure you want to permanently remove this ${collectionName.slice(0, -1)}?`)) return;
     
     const docRef = doc(db, collectionName, id);
     deleteDocumentNonBlocking(docRef);
-    toast({ title: "Archived Record Removed", description: "The data has been permanently deleted from the archive." });
+    toast({ 
+      title: "Record Removed", 
+      description: "The item has been successfully deleted from the archive." 
+    });
   };
 
   if (isUserLoading || isDocLoading || !studentData || studentData.role !== "admin") {
@@ -71,19 +78,19 @@ export default function AdminDashboard() {
               <ShieldAlert className="w-8 h-8 text-primary" />
               <h1 className="text-5xl font-black uppercase tracking-tighter">Admin <span className="text-primary">Control</span></h1>
             </div>
-            <p className="text-white/40 uppercase font-black text-[10px] tracking-[0.5em]">Batch '25 Archive Management Portal</p>
+            <p className="text-white/40 uppercase font-black text-[10px] tracking-[0.5em]">Moderation Portal | Batch '25 Archive</p>
           </motion.div>
 
           <Tabs defaultValue="students" className="space-y-12">
             <TabsList className="bg-white/5 border border-white/10 p-1 h-14 rounded-full">
-              <TabsTrigger value="students" className="rounded-full px-8 h-full text-[10px] font-black uppercase tracking-widest gap-2">
+              <TabsTrigger value="students" className="rounded-full px-8 h-full text-[10px] font-black uppercase tracking-widest gap-2 data-[state=active]:bg-primary data-[state=active]:text-black">
                 <Users className="w-3 h-3" /> Students ({students?.length || 0})
               </TabsTrigger>
-              <TabsTrigger value="memories" className="rounded-full px-8 h-full text-[10px] font-black uppercase tracking-widest gap-2">
-                <BookOpen className="w-3 h-3" /> Memories ({memories?.length || 0})
+              <TabsTrigger value="memories" className="rounded-full px-8 h-full text-[10px] font-black uppercase tracking-widest gap-2 data-[state=active]:bg-primary data-[state=active]:text-black">
+                <BookOpen className="w-3 h-3" /> Wall ({memories?.length || 0})
               </TabsTrigger>
-              <TabsTrigger value="photos" className="rounded-full px-8 h-full text-[10px] font-black uppercase tracking-widest gap-2">
-                <Camera className="w-3 h-3" /> Photos ({photos?.length || 0})
+              <TabsTrigger value="photos" className="rounded-full px-8 h-full text-[10px] font-black uppercase tracking-widest gap-2 data-[state=active]:bg-primary data-[state=active]:text-black">
+                <Camera className="w-3 h-3" /> Vault ({photos?.length || 0})
               </TabsTrigger>
             </TabsList>
 
