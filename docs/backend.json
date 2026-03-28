@@ -1,0 +1,366 @@
+{
+  "entities": {
+    "Student": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Student",
+      "type": "object",
+      "description": "Represents a student user in the Navodaya Memories yearbook, storing their profile information.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Student entity. This ID typically comes from an external authentication system."
+        },
+        "batchId": {
+          "type": "string",
+          "description": "Reference to the Batch the student belongs to. (Relationship: Batch 1:N Student)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name of the student."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the student, used for identification (not authentication).",
+          "format": "email"
+        },
+        "profilePhotoUrl": {
+          "type": "string",
+          "description": "URL to the student's profile picture.",
+          "format": "uri"
+        },
+        "shortBio": {
+          "type": "string",
+          "description": "A brief, introductory biography of the student, suitable for card views."
+        },
+        "fullBio": {
+          "type": "string",
+          "description": "A comprehensive biography providing more details about the student, displayed on their detailed profile page."
+        }
+      },
+      "required": [
+        "id",
+        "batchId",
+        "name",
+        "email",
+        "profilePhotoUrl",
+        "shortBio"
+      ]
+    },
+    "Batch": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Batch",
+      "type": "object",
+      "description": "Represents a group of students belonging to a specific academic batch or graduation period.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Batch entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the batch, e.g., 'Batch 2018-2025'."
+        },
+        "startYear": {
+          "type": "number",
+          "description": "The academic year when the batch started their journey (e.g., Class 6)."
+        },
+        "endYear": {
+          "type": "number",
+          "description": "The academic year when the batch concluded their journey (e.g., Class 12)."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "startYear",
+        "endYear"
+      ]
+    },
+    "Memory": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Memory",
+      "type": "object",
+      "description": "A personal recollection or story contributed by a student, detailing a specific event or experience.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Memory entity."
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Reference to the Student who contributed this memory. (Relationship: Student 1:N Memory)"
+        },
+        "title": {
+          "type": "string",
+          "description": "A concise title for the memory."
+        },
+        "description": {
+          "type": "string",
+          "description": "The detailed text content of the memory."
+        },
+        "classYearLabel": {
+          "type": "string",
+          "description": "The academic class year this memory pertains to (e.g., 'Class 6', 'Class 12')."
+        },
+        "eventDate": {
+          "type": "string",
+          "description": "The specific date when the remembered event occurred.",
+          "format": "date"
+        },
+        "uploadedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the memory was uploaded to the platform.",
+          "format": "date-time"
+        },
+        "photoIds": {
+          "type": "array",
+          "description": "References to Photos associated with this specific memory. (Relationship: Memory 1:N Photo, a memory can have multiple photos).",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "studentId",
+        "title",
+        "description",
+        "classYearLabel",
+        "uploadedAt"
+      ]
+    },
+    "Quote": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Quote",
+      "type": "object",
+      "description": "A significant quote, often personal or inspirational, attributed to a student.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Quote entity."
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Reference to the Student to whom this quote is attributed. (Relationship: Student 1:N Quote)"
+        },
+        "text": {
+          "type": "string",
+          "description": "The full text of the quote."
+        },
+        "author": {
+          "type": "string",
+          "description": "The person who originally said or wrote the quote. Could be the student or someone else."
+        },
+        "context": {
+          "type": "string",
+          "description": "Optional context or background information for the quote."
+        }
+      },
+      "required": [
+        "id",
+        "studentId",
+        "text"
+      ]
+    },
+    "Highlight": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Highlight",
+      "type": "object",
+      "description": "A noteworthy achievement, event, or experience of a student during their academic journey.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Highlight entity."
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Reference to the Student to whom this highlight belongs. (Relationship: Student 1:N Highlight)"
+        },
+        "title": {
+          "type": "string",
+          "description": "A concise title for the highlight or achievement."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the highlight, achievement, or significant event."
+        },
+        "classYearLabel": {
+          "type": "string",
+          "description": "The academic class year this highlight pertains to (e.g., 'Class 6', 'Class 12')."
+        },
+        "date": {
+          "type": "string",
+          "description": "The date when the highlight occurred.",
+          "format": "date"
+        }
+      },
+      "required": [
+        "id",
+        "studentId",
+        "title",
+        "description",
+        "classYearLabel"
+      ]
+    },
+    "Photo": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Photo",
+      "type": "object",
+      "description": "An image asset, potentially linked to a memory or student profile, stored for the gallery.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Photo entity."
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL where the image file is stored.",
+          "format": "uri"
+        },
+        "caption": {
+          "type": "string",
+          "description": "A brief caption or description for the photo."
+        },
+        "uploadedByStudentId": {
+          "type": "string",
+          "description": "Reference to the Student who uploaded this photo. (Relationship: Student 1:N Photo)"
+        },
+        "uploadedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the photo was uploaded.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "url",
+        "caption",
+        "uploadedByStudentId",
+        "uploadedAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/batches/{batchId}",
+        "definition": {
+          "entityName": "Batch",
+          "schema": {
+            "$ref": "#/backend/entities/Batch"
+          },
+          "description": "Collection for academic batches, defining a group of students for a specific period. This data is generally public for authenticated users.",
+          "params": [
+            {
+              "name": "batchId",
+              "description": "Unique identifier for the academic batch."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/students/{studentId}",
+        "definition": {
+          "entityName": "Student",
+          "schema": {
+            "$ref": "#/backend/entities/Student"
+          },
+          "description": "Main collection for student profiles. The document ID (`studentId`) matches the Firebase Authentication UID. Includes denormalized 'batchId' for efficient batch-specific student queries.",
+          "params": [
+            {
+              "name": "studentId",
+              "description": "Unique identifier for the student, matching their Firebase Authentication UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/students/{studentId}/memories/{memoryId}",
+        "definition": {
+          "entityName": "Memory",
+          "schema": {
+            "$ref": "#/backend/entities/Memory"
+          },
+          "description": "Subcollection under a student's profile storing their personal memories. Includes denormalized 'studentId' for authorization independence.",
+          "params": [
+            {
+              "name": "studentId",
+              "description": "The unique identifier of the student who owns this memory."
+            },
+            {
+              "name": "memoryId",
+              "description": "Unique identifier for the specific memory."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/students/{studentId}/quotes/{quoteId}",
+        "definition": {
+          "entityName": "Quote",
+          "schema": {
+            "$ref": "#/backend/entities/Quote"
+          },
+          "description": "Subcollection under a student's profile storing their attributed quotes. Includes denormalized 'studentId' for authorization independence.",
+          "params": [
+            {
+              "name": "studentId",
+              "description": "The unique identifier of the student to whom this quote is attributed."
+            },
+            {
+              "name": "quoteId",
+              "description": "Unique identifier for the specific quote."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/students/{studentId}/highlights/{highlightId}",
+        "definition": {
+          "entityName": "Highlight",
+          "schema": {
+            "$ref": "#/backend/entities/Highlight"
+          },
+          "description": "Subcollection under a student's profile storing their highlights and achievements. Includes denormalized 'studentId' for authorization independence.",
+          "params": [
+            {
+              "name": "studentId",
+              "description": "The unique identifier of the student to whom this highlight belongs."
+            },
+            {
+              "name": "highlightId",
+              "description": "Unique identifier for the specific highlight."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/students/{studentId}/photos/{photoId}",
+        "definition": {
+          "entityName": "Photo",
+          "schema": {
+            "$ref": "#/backend/entities/Photo"
+          },
+          "description": "Subcollection under a student's profile for photos they have uploaded. Includes denormalized 'uploadedByStudentId' for authorization independence.",
+          "params": [
+            {
+              "name": "studentId",
+              "description": "The unique identifier of the student who uploaded this photo."
+            },
+            {
+              "name": "photoId",
+              "description": "Unique identifier for the specific photo."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to be secure, scalable, and debuggable, adhering strictly to the core design principles and strategy mandates. \n\n**Authorization Independence:** This is primarily achieved by structuring student-owned data (Memories, Quotes, Highlights, Photos) as subcollections directly under the respective `student` document (e.g., `/students/{studentId}/memories/{memoryId}`). Each document in these subcollections explicitly includes a denormalized `studentId` (or `uploadedByStudentId` for photos) field. This allows security rules to evaluate ownership simply by comparing `request.auth.uid` with the `{studentId}` wildcard in the path and the `studentId` field within the document itself, without needing any expensive or complex `get()` operations on parent documents. The `batchId` is denormalized directly onto the `Student` document, allowing for batch-specific queries without traversing parent hierarchies.\n\n**QAPs (Rules are not Filters):** The structure facilitates secure `list` operations through consistent structural segregation and explicit ownership. All documents within a given collection (e.g., `/students`, `/batches`) or subcollection (e.g., `/students/{studentId}/memories`) share a homogeneous security posture. \n*   For `batches`, read access is granted to all authenticated users, making batch listings straightforward. \n*   For `students`, the primary collection `/students/{studentId}` allows for direct queries (e.g., to list all students in a specific batch using `where('batchId', '==', batchId)`). Read access to student profiles and their subcollections (Memories, Quotes, Highlights, Photos) is granted to all authenticated users, consistent with a yearbook concept where profiles are public within the app. Write access to a student's profile and their personal content is strictly limited to the owning student (`request.auth.uid == studentId`). \n*   By denormalizing the `studentId` into subcollection documents and leveraging path-based ownership, rules can guarantee that `list` operations only return data that the user is authorized to see based on the query, rather than filtering results post-query, thus fulfilling the QAPs principle.\n\nThis design prioritizes clear ownership, eliminates hierarchical authorization dependencies, and supports efficient querying and rule evaluation, making the system robust and easy to maintain."
+  }
+}

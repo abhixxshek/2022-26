@@ -1,0 +1,142 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES
+     * 
+     * Core Philosophy:
+     * This ruleset implements a "Yearbook" security model. All authenticated students
+     * can browse batches, profiles, and memories (Read Access), but modifications are
+     * strictly limited to the owner of the data (Write Access).
+     * 
+     * Data Structure:
+     * - Top-level collections: /batches/ (Academic groups) and /students/ (Profiles).
+     * - Sub-collections: Personal content like memories, quotes, and photos are nested 
+     *   directly under the student's profile for clear ownership boundaries.
+     * 
+     * Key Security Decisions:
+     * 1. Authenticated Access Only: To protect student privacy, anonymous or unauthenticated 
+     *    reads are disallowed. Users must be signed in to view any yearbook content.
+     * 2. Strict Self-Management: Students can only create and manage their own profiles 
+     *    and sub-content. The rules enforce that the `studentId` in the path matches 
+     *    the authenticated user's UID.
+     * 3. Denormalized Ownership: Relational fields (like `studentId` or `batchId`) are 
+     *    enforced at the time of creation and made immutable during updates to maintain 
+     *    data integrity without expensive cross-document lookups.
+     * 4. Relational Integrity: On creation, we ensure the internal data fields (e.g., `id`) 
+     *    perfectly match the document path to prevent spoofing or orphaned records.
+     */
+
+    // --- Helper Functions ---
+
+    /** Checks if the request is from a signed-in user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** Checks if the current user's UID matches the provided userId. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** Checks if the document exists and the current user is the owner. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** Validates that a specific field in the incoming data matches the owner's ID. */
+    function isValidOwnership(userId, fieldName) {
+      return request.resource.data[fieldName] == userId;
+    }
+
+    /** Prevents a specific field from being modified during an update. */
+    function isImmutable(fieldName) {
+      return request.resource.data[fieldName] == resource.data[fieldName];
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for Academic Batches. Read-only for students; management via Admin/System only.
+     * @path /batches/{batchId}
+     * @allow (get, list) If the user is signed in.
+     * @deny (create, update, delete) For all client-side requests.
+     * @principle System-managed collection with public authenticated read access.
+     */
+    match /batches/{batchId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Rules for Student Profiles. Users can only create and edit their own profiles.
+     * @path /students/{studentId}
+     * @allow (create) If the studentId matches the Auth UID and the internal 'id' matches the path.
+     * @deny (update) If trying to change the profile of another student or modify the internal 'id'.
+     * @principle Enforces path-based ownership and data-to-path consistency.
+     */
+    match /students/{studentId} {
+      allow get, list: if isSignedIn();
+      allow create: if isOwner(studentId) && isValidOwnership(studentId, 'id');
+      allow update: if isExistingOwner(studentId) && isImmutable('id');
+      allow delete: if isExistingOwner(studentId);
+    }
+
+    /**
+     * @description Rules for Student Memories. Sub-collection nested under the owner.
+     * @path /students/{studentId}/memories/{memoryId}
+     * @allow (create) If the student matches the parent path and the internal 'studentId' is correct.
+     * @deny (delete) If the user is not the owner of the parent student profile.
+     * @principle Ownership-based write access with public authenticated visibility.
+     */
+    match /students/{studentId}/memories/{memoryId} {
+      allow get, list: if isSignedIn();
+      allow create: if isOwner(studentId) && isValidOwnership(studentId, 'studentId');
+      allow update: if isExistingOwner(studentId) && isImmutable('studentId');
+      allow delete: if isExistingOwner(studentId);
+    }
+
+    /**
+     * @description Rules for Student Quotes.
+     * @path /students/{studentId}/quotes/{quoteId}
+     * @allow (list) For any authenticated user to view the yearbook.
+     * @deny (create) If the internal 'studentId' field does not match the authenticated user.
+     * @principle Ensures quotes are attributed correctly to the authenticated author.
+     */
+    match /students/{studentId}/quotes/{quoteId} {
+      allow get, list: if isSignedIn();
+      allow create: if isOwner(studentId) && isValidOwnership(studentId, 'studentId');
+      allow update: if isExistingOwner(studentId) && isImmutable('studentId');
+      allow delete: if isExistingOwner(studentId);
+    }
+
+    /**
+     * @description Rules for Student Highlights/Achievements.
+     * @path /students/{studentId}/highlights/{highlightId}
+     * @allow (update) Only by the owner, provided they don't change ownership fields.
+     * @deny (create) If attempted by a user other than the student specified in the path.
+     * @principle Restricts record modification to the specific student owner.
+     */
+    match /students/{studentId}/highlights/{highlightId} {
+      allow get, list: if isSignedIn();
+      allow create: if isOwner(studentId) && isValidOwnership(studentId, 'studentId');
+      allow update: if isExistingOwner(studentId) && isImmutable('studentId');
+      allow delete: if isExistingOwner(studentId);
+    }
+
+    /**
+     * @description Rules for Student Photos.
+     * @path /students/{studentId}/photos/{photoId}
+     * @allow (create) Validates 'uploadedByStudentId' matches the authenticated user.
+     * @deny (list) To unauthenticated users.
+     * @principle Secures personal media uploads to the specific student's profile.
+     */
+    match /students/{studentId}/photos/{photoId} {
+      allow get, list: if isSignedIn();
+      allow create: if isOwner(studentId) && isValidOwnership(studentId, 'uploadedByStudentId');
+      allow update: if isExistingOwner(studentId) && isImmutable('uploadedByStudentId');
+      allow delete: if isExistingOwner(studentId);
+    }
+  }
+}
