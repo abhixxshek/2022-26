@@ -13,9 +13,8 @@ import {
   createUserWithEmailAndPassword,
   updateProfile 
 } from "firebase/auth";
-import { doc, getDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { Lock, Mail, User, ArrowRight, ShieldCheck } from "lucide-react";
-import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export default function AuthPage() {
   const [name, setName] = useState("");
@@ -59,9 +58,11 @@ export default function AuthPage() {
     try {
       let userCredential;
       try {
+        // Attempt login using the key as password
         userCredential = await signInWithEmailAndPassword(auth, email, formattedKey);
       } catch (err: any) {
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email' || err.code === 'auth/user-disabled' || err.code === 'auth/wrong-password') {
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email' || err.code === 'auth/wrong-password') {
+          // If login fails, create a new record
           userCredential = await createUserWithEmailAndPassword(auth, email, formattedKey);
           await updateProfile(userCredential.user, { displayName: name });
         } else {
@@ -69,13 +70,14 @@ export default function AuthPage() {
         }
       }
 
+      // Explicitly set/update the role in Firestore before redirecting
       const studentRef = doc(db, "students", userCredential.user.uid);
       const studentDoc = await getDoc(studentRef);
       
-      // Update or Set the record with the correct role based on the key used
       const role = isAdminEntry ? "admin" : (studentDoc.exists() ? studentDoc.data()?.role : "student");
 
-      setDocumentNonBlocking(studentRef, {
+      // We await this specific write to prevent race conditions during the subsequent redirect
+      await setDoc(studentRef, {
         id: userCredential.user.uid,
         name: name,
         email: email,

@@ -7,7 +7,7 @@ import { useFirestore, useCollection, useMemoFirebase, useUser, useDoc } from "@
 import { collection, query, orderBy, doc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Users, BookOpen, Camera, Trash2, ShieldAlert, Loader2, Lock } from "lucide-react";
+import { Users, BookOpen, Camera, Trash2, ShieldAlert, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -26,23 +26,30 @@ export default function AdminDashboard() {
   }, [db, user]);
 
   const { data: studentData, isLoading: isRoleLoading } = useDoc(studentRef);
+  
+  // Explicitly check for admin role
   const isAdmin = studentData?.role === "admin";
 
   useEffect(() => {
-    // Only check authorization when both user session and role data have finished loading
+    // Wait until both user session and role data have finished loading
     if (!isUserLoading && !isRoleLoading) {
-      if (!isAdmin) {
+      if (user && !isAdmin) {
+        // If logged in but not an admin, redirect
         toast({
           variant: "destructive",
           title: "Access Denied",
           description: "You do not have administrative privileges for this archive."
         });
         router.push("/");
+      } else if (!user) {
+        // Not logged in at all
+        router.push("/auth");
       } else {
+        // User is authorized
         setIsAuthorizing(false);
       }
     }
-  }, [isAdmin, isUserLoading, isRoleLoading, router]);
+  }, [isAdmin, isUserLoading, isRoleLoading, user, router]);
 
   const studentsQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -73,8 +80,6 @@ export default function AdminDashboard() {
       description: "The item has been successfully deleted from the archive." 
     });
   };
-
-  const isLoading = isStudentsLoading || isMemoriesLoading || isPhotosLoading || isUserLoading || isRoleLoading || isAuthorizing;
 
   if (isAuthorizing) {
     return (
