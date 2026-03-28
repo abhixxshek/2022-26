@@ -4,31 +4,30 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V15 - Google Auth Ready)
-     * Using 'read' shorthand to explicitly cover both 'get' and 'list' operations
-     * for all authenticated students.
+     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V16 - Advanced Registration)
+     * Explicitly separated read operations for robust archive browsing.
      */
 
     match /students/{studentId} {
-      allow read: if request.auth != null;
+      allow get, list: if request.auth != null;
       allow write: if request.auth != null && request.auth.uid == studentId;
     }
 
     match /memories/{memoryId} {
-      allow read: if request.auth != null;
+      allow get, list: if request.auth != null;
       allow create: if request.auth != null && request.resource.data.studentId == request.auth.uid;
       allow update, delete: if request.auth != null && resource.data.studentId == request.auth.uid;
     }
 
     match /photos/{photoId} {
-      // Explicitly allow read (get/list) for authenticated students to browse gallery
-      allow read: if request.auth != null;
+      // Explicitly allow get and list for authenticated students to browse the visual vault
+      allow get, list: if request.auth != null;
       allow create: if request.auth != null && request.resource.data.uploadedByStudentId == request.auth.uid;
       allow update, delete: if request.auth != null && resource.data.uploadedByStudentId == request.auth.uid;
     }
 
     match /journey/{yearId} {
-      allow read: if true; // Publicly viewable milestones
+      allow read: if true; // Publicly viewable milestones for legacy
       allow write: if request.auth != null; // Authenticated students can maintain history
     }
   }
