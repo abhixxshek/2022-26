@@ -24,77 +24,77 @@ export interface YearSectionData {
 
 export const YEAR_DATA: YearSectionData[] = [
   {
-    id: "class-6-2018",
-    title: "2018: The Awakening",
-    subtitle: "Class 6 - Entry into the Gates",
-    description: "The year of the heavy steel Trunk Box and the oversized uniforms. From crying for home to finding a second family in the dormitories.",
+    id: "juniors",
+    title: "The Genesis",
+    subtitle: "2018-2020 | Class 6 & 7",
+    description: "The sound of oversized trunks hitting the dormitory floor. We were small children lost in a massive campus, crying for home, eventually finding it in each other.",
     students: [
       {
         id: "aryan-sharma",
         name: "Aryan Sharma",
-        bio: "The boy who carried the smallest trunk but the biggest dreams. Aravalli House's first chess champion.",
+        bio: "The kid who always managed to get extra paneer from the mess. Our unofficial Aravalli House strategist.",
         photo: "https://picsum.photos/seed/student1/400/500",
         classYear: "6",
         house: "Aravalli",
-        quote: "We came as strangers with trunk boxes; we left as brothers with memories.",
-        highlights: ["First House Trophy", "Midnight snacks", "Navodaya Entrance Day"],
+        quote: "We didn't know we were making memories, we just thought we were having fun.",
+        highlights: ["Best Bedmaker Award", "Inter-House Debate 2018", "Morning PT Captain"],
         memories: [
-          { title: "The First Night", description: "30 boys in one hall. The sound of muffled sobs turned into whispers of friendship by midnight.", image: "https://picsum.photos/seed/m1/800/600" }
+          { title: "First Night", description: "30 kids in one hall, all pretending to be asleep while actually sobbing for home.", image: "https://picsum.photos/seed/m1/800/600" }
         ]
       },
       {
         id: "priya-verma",
         name: "Priya Verma",
-        bio: "Nilgiri's star athlete. She never missed a morning PT in seven years.",
+        bio: "Nilgiri's silent powerhouse. Her track records from Class 7 still stand today.",
         photo: "https://picsum.photos/seed/student2/400/500",
-        classYear: "6",
+        classYear: "7",
         house: "Nilgiri",
-        quote: "The whistle at 5:30 AM was our alarm for life.",
-        highlights: ["100m Sprint Gold", "Morning PT Captain"],
+        quote: "The gates of JNV open to a world you never want to leave.",
+        highlights: ["100m Sprint Gold", "Science Exhibition Runner-up"],
         memories: [
-          { title: "Mess Rituals", description: "The struggle for the extra piece of paneer on Sundays. Mess food is a vibe.", image: "https://picsum.photos/seed/m2/800/600" }
+          { title: "Sunday Specials", description: "The collective rush to the mess when the smell of Puri-Sabji hit the dorms.", image: "https://picsum.photos/seed/m2/800/600" }
         ]
       }
     ]
   },
   {
-    id: "class-9-2021",
-    title: "2021: The Great Migration",
-    subtitle: "Class 9 - Crossing Borders",
-    description: "Packing bags for a different state. Learning a new language, tasting different spices, and proving that JNV spirit knows no borders.",
+    id: "migration",
+    title: "The Great Migration",
+    subtitle: "2021-2022 | Class 9",
+    description: "Leaving our home JNV to stay in another state for a year. Learning a new language, surviving a 40-hour train journey, and becoming true Indians.",
     students: [
       {
         id: "rahul-das",
         name: "Rahul Das",
-        bio: "The musician who bridged the gap between states through his guitar during the Migration year.",
+        bio: "Shivalik's best singer. He learned to sing in three different regional languages during the Migration year.",
         photo: "https://picsum.photos/seed/student3/400/500",
         classYear: "9",
         house: "Shivalik",
-        quote: "Migration taught me that 'home' is a feeling, not a place.",
-        highlights: ["Migration Award", "Cultural Exchange Lead"],
+        quote: "Migration is the soul of Navodaya.",
+        highlights: ["Cultural Ambassador", "Best Singer 2021"],
         memories: [
-          { title: "The 36-Hour Train", description: "Singing songs across the sleeper coach. Migration was the best lesson in geography.", image: "https://picsum.photos/seed/m3/800/600" }
+          { title: "The Train Journey", description: "Singing 'Hum Navodaya Ho' at 2 AM in a sleeper coach while passing through the Ghats.", image: "https://picsum.photos/seed/m3/800/600" }
         ]
       }
     ]
   },
   {
-    id: "class-12-2025",
-    title: "2025: The Final Salute",
-    subtitle: "Class 12 - Seniority & Farewell",
-    description: "The transition from being the 'juniors' to the 'pillars of the school'. Final preps, late-night tea in the dorm, and the emotional walk through the gates.",
+    id: "legends",
+    title: "The Last Salute",
+    subtitle: "2023-2025 | Class 11 & 12",
+    description: "The transition from being the 'babies' to the 'Legends'. Late-night studies, farewell tears, and the realization that the seven years are finally ending.",
     students: [
       {
         id: "sneha-reddy",
         name: "Sneha Reddy",
-        bio: "Udaygiri's Head Girl. From the first roll call to the last, she led with grace.",
+        bio: "Udaygiri's Head Girl. From the first roll call to the last, she led the batch with grace and strength.",
         photo: "https://picsum.photos/seed/student4/400/500",
         classYear: "12",
         house: "Udaygiri",
-        quote: "JNV didn't just give us education; it gave us a backbone.",
-        highlights: ["National Debate Winner", "School Captain"],
+        quote: "Seven years, one home, a lifetime of bonds.",
+        highlights: ["School Captain", "National Volleyball Player"],
         memories: [
-          { title: "The Last Night", description: "We didn't sleep. We sat on the dormitory roof, watching the campus lights one last time.", image: "https://picsum.photos/seed/m4/800/600" }
+          { title: "The Final Walk", description: "Looking back at the academic block one last time after the last exam.", image: "https://picsum.photos/seed/m4/800/600" }
         ]
       }
     ]
