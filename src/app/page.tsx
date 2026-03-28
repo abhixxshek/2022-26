@@ -4,20 +4,17 @@
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
-import { Camera, ChevronRight, Loader2, Database } from "lucide-react";
-import Link from "next/link";
+import { Camera, Loader2, Database } from "lucide-react";
 import Image from "next/image";
 import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, orderBy, writeBatch, doc } from "firebase/firestore";
 import { EditJourneyDialog } from "@/components/EditJourneyDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { user } = useUser();
   const db = useFirestore();
-  const router = useRouter();
 
   const journeyQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -47,15 +44,6 @@ export default function Home() {
       toast({ title: "Timeline Initialized", description: "The 7-year legacy framework has been committed to Firestore." });
     } catch (e) {
       toast({ variant: "destructive", title: "Initialization Failed", description: "Check permissions." });
-    }
-  };
-
-  const handleOpenGallery = (subtitle: string) => {
-    const classMatch = subtitle.match(/Class (\d+)/);
-    if (classMatch) {
-      router.push(`/gallery?class=${classMatch[1]}`);
-    } else {
-      router.push("/gallery");
     }
   };
 
@@ -184,10 +172,7 @@ export default function Home() {
                         transition={{ duration: 0.8 }}
                         className={`flex justify-center ${isEven ? 'md:justify-end' : 'md:justify-start'}`}
                       >
-                        <div 
-                          className="polaroid -rotate-2 transition-all hover:rotate-0 duration-700 max-w-[800px] w-full cursor-pointer group shadow-[0_30px_100px_-20px_rgba(0,0,0,0.7)]"
-                          onClick={() => handleOpenGallery(year.subtitle)}
-                        >
+                        <div className="polaroid -rotate-2 transition-all hover:rotate-0 duration-700 max-w-[800px] w-full group shadow-[0_30px_100px_-20px_rgba(0,0,0,0.7)]">
                           <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
                             <Image 
                               src={year.imageUrl || `https://picsum.photos/seed/${year.id}/1200/900`}
@@ -232,22 +217,6 @@ export default function Home() {
               })
             )}
           </div>
-        </div>
-      </section>
-
-      {/* Gallery Teaser */}
-      <section className="py-60 px-6 text-center bg-[#020202]">
-        <div className="max-w-4xl mx-auto">
-          <Camera className="w-10 h-10 text-primary mx-auto mb-12 opacity-30" />
-          <h2 className="text-5xl md:text-7xl font-serif text-white mb-12">
-            Captured In Time.
-          </h2>
-          <Link href="/gallery" className="inline-flex items-center gap-4 group">
-            <span className="text-[10px] font-black uppercase tracking-[0.6em] text-white/30 group-hover:text-primary transition-all">
-              View Visual Archive
-            </span>
-            <ChevronRight className="w-4 h-4 text-white/10 group-hover:text-primary transition-all group-hover:translate-x-1" />
-          </Link>
         </div>
       </section>
 
