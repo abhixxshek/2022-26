@@ -51,7 +51,6 @@ export default function Home() {
   };
 
   const handleOpenGallery = (subtitle: string) => {
-    // Extract class number from subtitle (e.g., "2018-19 | Class 6")
     const classMatch = subtitle.match(/Class (\d+)/);
     if (classMatch) {
       router.push(`/gallery?class=${classMatch[1]}`);
@@ -98,7 +97,6 @@ export default function Home() {
               </span>
             </h1>
 
-            {/* School Name with Beautiful Colors */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -184,7 +182,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* Vertical Line */}
           <div className="timeline-line" />
 
           <div className="space-y-64 relative">
@@ -199,13 +196,13 @@ export default function Home() {
                 
                 return (
                   <div key={year.id} className="relative flex items-center justify-center">
-                    {/* Year Range Marker (Time Lapse) */}
-                    <div className="timeline-marker w-20 h-20 text-[11px] leading-tight text-center px-1">
-                      {academicYearRange}
+                    <div className="timeline-marker w-24 h-24 text-[11px] leading-tight text-center px-1 flex flex-col items-center justify-center">
+                      <span className="block opacity-40 mb-1">Class</span>
+                      <span className="text-lg font-black">{year.subtitle.match(/Class (\d+)/)?.[1]}</span>
+                      <span className="block text-[8px] opacity-40 mt-1">{academicYearRange}</span>
                     </div>
 
                     <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32 w-full items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
-                      {/* Image Side */}
                       <motion.div 
                         initial={{ opacity: 0, x: isEven ? -50 : 50 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -236,7 +233,6 @@ export default function Home() {
                         </div>
                       </motion.div>
 
-                      {/* Text Side */}
                       <motion.div 
                         initial={{ opacity: 0, x: isEven ? 50 : -50 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -290,7 +286,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-24 px-12 border-t border-white/5 bg-black/50">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
           <div className="flex flex-col items-center md:items-start gap-4">

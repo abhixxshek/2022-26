@@ -4,15 +4,15 @@
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Camera, ArrowUpDown, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Camera, ArrowUpDown, X, Loader2 } from "lucide-react";
+import { useEffect, useState, Suspense } from "react";
 import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, orderBy, where } from "firebase/firestore";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AddPhotoDialog } from "@/components/AddPhotoDialog";
 import { Button } from "@/components/ui/button";
 
-export default function GalleryPage() {
+function GalleryContent() {
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const router = useRouter();
@@ -28,7 +28,6 @@ export default function GalleryPage() {
   useEffect(() => {
     const classParam = searchParams.get("class");
     if (classParam) {
-      // Expecting format like "Class 10" or just "10"
       const formatted = classParam.startsWith("Class") ? classParam : `Class ${classParam}`;
       setFilterClass(formatted);
     } else {
@@ -61,98 +60,106 @@ export default function GalleryPage() {
   if (isUserLoading) return null;
 
   return (
+    <main className="pt-40 pb-32 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col mb-24">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h1 className="text-6xl md:text-8xl font-serif text-white mb-6">
+              The Archive
+            </h1>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+              <div className="space-y-4">
+                <p className="text-lg text-white/40 max-w-xl font-light leading-relaxed">
+                  A cinematic collection of fleeting moments, frozen in time. From the first lecture to the final goodbye of Batch '25.
+                </p>
+                {filterClass && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">FILTERED BY:</span>
+                    <button 
+                      onClick={clearFilter}
+                      className="flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-primary/20 transition-all"
+                    >
+                      {filterClass}
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-4">
+                <Button 
+                  variant="outline" 
+                  className="bg-transparent border-white/10 text-white/60 hover:text-white hover:bg-white/5 rounded-full px-6 h-12 text-[10px] font-black uppercase tracking-widest gap-3"
+                >
+                  <ArrowUpDown className="w-4 h-4 text-primary" />
+                  Newest First
+                </Button>
+                <AddPhotoDialog />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="aspect-[4/3] bg-white/5 animate-pulse rounded-3xl" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {photos?.map((img: any, idx) => (
+              <motion.div
+                key={img.id}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: idx * 0.05 }}
+                className="relative group rounded-3xl overflow-hidden border border-white/5 bg-[#111] aspect-[4/3] cursor-pointer"
+              >
+                <Image 
+                  src={img.url} 
+                  alt={img.caption || "Archive Photo"}
+                  fill
+                  className="object-cover transition-all duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 p-8 flex flex-col justify-end">
+                  <p className="text-primary text-[10px] font-black uppercase tracking-widest mb-2">
+                    {img.classYearLabel || "ARCHIVE RECORD"}
+                  </p>
+                  <h3 className="text-xl font-bold font-headline text-white line-clamp-2">{img.caption}</h3>
+                </div>
+              </motion.div>
+            ))}
+            
+            {photos?.length === 0 && !isLoading && (
+              <div className="col-span-full py-40 text-center border border-dashed border-white/5 rounded-3xl">
+                <Camera className="w-12 h-12 text-white/5 mx-auto mb-6" />
+                <p className="text-white/20 font-black uppercase tracking-[0.5em] text-sm">
+                  {filterClass ? `No photos found for ${filterClass}.` : "The archive is currently empty."}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+
+export default function GalleryPage() {
+  return (
     <div className="bg-[#0c0c0c] text-foreground min-h-screen selection:bg-primary/20">
       <Navbar />
-
-      <main className="pt-40 pb-32 px-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Header Section */}
-          <div className="flex flex-col mb-24">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <h1 className="text-6xl md:text-8xl font-serif text-white mb-6">
-                The Archive
-              </h1>
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-                <div className="space-y-4">
-                  <p className="text-lg text-white/40 max-w-xl font-light leading-relaxed">
-                    A cinematic collection of fleeting moments, frozen in time. From the first lecture to the final goodbye of Batch '25.
-                  </p>
-                  {filterClass && (
-                    <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">FILTERED BY:</span>
-                      <button 
-                        onClick={clearFilter}
-                        className="flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-primary/20 transition-all"
-                      >
-                        {filterClass}
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-4">
-                  <Button 
-                    variant="outline" 
-                    className="bg-transparent border-white/10 text-white/60 hover:text-white hover:bg-white/5 rounded-full px-6 h-12 text-[10px] font-black uppercase tracking-widest gap-3"
-                  >
-                    <ArrowUpDown className="w-4 h-4 text-primary" />
-                    Newest First
-                  </Button>
-                  <AddPhotoDialog />
-                </div>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Visual Grid */}
-          {isLoading || isUserLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="aspect-[4/3] bg-white/5 animate-pulse rounded-3xl" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {photos?.map((img: any, idx) => (
-                <motion.div
-                  key={img.id}
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: idx * 0.05 }}
-                  className="relative group rounded-3xl overflow-hidden border border-white/5 bg-[#111] aspect-[4/3] cursor-pointer"
-                >
-                  <Image 
-                    src={img.url} 
-                    alt={img.caption || "Archive Photo"}
-                    fill
-                    className="object-cover transition-all duration-700 group-hover:scale-105"
-                  />
-                  {/* Subtle hover overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 p-8 flex flex-col justify-end">
-                    <p className="text-primary text-[10px] font-black uppercase tracking-widest mb-2">
-                      {img.classYearLabel || "ARCHIVE RECORD"}
-                    </p>
-                    <h3 className="text-xl font-bold font-headline text-white line-clamp-2">{img.caption}</h3>
-                  </div>
-                </motion.div>
-              ))}
-              
-              {photos?.length === 0 && !isLoading && (
-                <div className="col-span-full py-40 text-center border border-dashed border-white/5 rounded-3xl">
-                  <Camera className="w-12 h-12 text-white/5 mx-auto mb-6" />
-                  <p className="text-white/20 font-black uppercase tracking-[0.5em] text-sm">
-                    {filterClass ? `No photos found for ${filterClass}.` : "The archive is currently empty."}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+      <Suspense fallback={
+        <div className="flex h-screen items-center justify-center">
+          <Loader2 className="w-10 h-10 animate-spin text-primary" />
         </div>
-      </main>
+      }>
+        <GalleryContent />
+      </Suspense>
     </div>
   );
 }

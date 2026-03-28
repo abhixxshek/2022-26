@@ -26,7 +26,7 @@ export function AddPhotoDialog() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 1024 * 1024) { // 1MB limit for Firestore Base64 strings
+    if (file.size > 1024 * 1024) { 
       toast({
         variant: "destructive",
         title: "File Too Large",
