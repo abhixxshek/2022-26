@@ -1,4 +1,3 @@
-
 "use client";
 
 import { motion } from "framer-motion";
@@ -36,7 +35,7 @@ export default function Home() {
         title: year.title,
         subtitle: year.subtitle,
         description: year.description,
-        imageUrl: year.students[0]?.memories[0]?.image || `https://picsum.photos/seed/${year.id}/800/800`
+        imageUrl: year.students?.[0]?.memories?.[0]?.image || `https://picsum.photos/seed/${year.id}/800/800`
       });
     });
 
@@ -79,15 +78,27 @@ export default function Home() {
               A Seven Year Legacy
             </div>
             
-            <h1 className="text-8xl md:text-[14rem] font-black mb-12 leading-none tracking-tighter uppercase flex flex-col items-center">
+            <h1 className="text-8xl md:text-[14rem] font-black mb-4 leading-none tracking-tighter uppercase flex flex-col items-center">
               <span className="block">BATCH</span>
               <span className="font-serif font-light text-white italic normal-case tracking-tight -mt-4 md:-mt-12 block">
                 2018—2025
               </span>
             </h1>
 
+            {/* School Name with Beautiful Colors */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, duration: 1 }}
+              className="mb-12"
+            >
+              <h2 className="text-xl md:text-3xl font-black uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-primary/60 drop-shadow-[0_0_15px_rgba(255,191,0,0.3)] px-4">
+                JAWAHAR NAVODAYA VIDHYALAYA KALUKHEDA , RATLAM-1
+              </h2>
+            </motion.div>
+
             <p className="text-white/30 text-[10px] md:text-xs max-w-md mx-auto leading-relaxed font-black uppercase tracking-[0.5em] mb-20">
-              The Digital Archive of Jawahar Navodaya Vidyalaya.
+              The Digital Archive of the Navodaya Family.
               <br />
               Once a Navodayan, Always a Navodayan.
             </p>
@@ -95,7 +106,7 @@ export default function Home() {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1, duration: 1 }}
+              transition={{ delay: 1.2, duration: 1 }}
             >
               <button 
                 onClick={() => document.getElementById('journey')?.scrollIntoView({ behavior: 'smooth' })}
@@ -192,7 +203,7 @@ export default function Home() {
                         <div className="polaroid -rotate-3 transition-transform hover:rotate-0 duration-500 max-w-[320px]">
                           <div className="relative aspect-square w-full overflow-hidden bg-muted">
                             <Image 
-                              src={year.imageUrl || year.students?.[0]?.memories?.[0]?.image || `https://picsum.photos/seed/${year.id}/800/800`}
+                              src={year.imageUrl || `https://picsum.photos/seed/${year.id}/800/800`}
                               alt={year.title}
                               fill
                               className="object-cover grayscale"
