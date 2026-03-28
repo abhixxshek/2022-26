@@ -5,9 +5,8 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ShieldCheck, User, LogOut } from "lucide-react";
-import { useUser, useFirestore, useDoc, useMemoFirebase, useAuth, initiateSignOut } from "@/firebase";
-import { doc } from "firebase/firestore";
+import { User, LogOut } from "lucide-react";
+import { useUser, useAuth, initiateSignOut } from "@/firebase";
 import Image from "next/image";
 
 export function Navbar() {
@@ -16,15 +15,6 @@ export function Navbar() {
   const router = useRouter();
   const { user } = useUser();
   const auth = useAuth();
-  const db = useFirestore();
-
-  const studentRef = useMemoFirebase(() => {
-    if (!db || !user) return null;
-    return doc(db, "students", user.uid);
-  }, [db, user]);
-
-  const { data: studentData } = useDoc(studentRef);
-  const isAdmin = studentData?.role === "admin";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -88,18 +78,6 @@ export function Navbar() {
                 </Link>
               );
             })}
-            
-            {isAdmin && (
-              <Link 
-                href="/admin" 
-                className={cn(
-                  "text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all",
-                  pathname === "/admin" ? "text-primary" : "text-primary/60"
-                )}
-              >
-                <ShieldCheck className="w-3 h-3" /> Admin Panel
-              </Link>
-            )}
           </div>
           
           <div className="flex items-center gap-4">

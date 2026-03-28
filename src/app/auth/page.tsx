@@ -27,41 +27,19 @@ export default function AuthPage() {
   const router = useRouter();
 
   const STUDENT_KEY = "JNVRTM25";
-  const ADMIN_KEY = "JNVRTM18";
-  
-  // Strict Admin Credentials
-  const MASTER_ADMIN_EMAIL = "primeparam07@gmail.com";
-  const MASTER_ADMIN_NAME = "name param";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const formattedKey = accessKey.trim().toUpperCase();
-    const isAdminEntry = formattedKey === ADMIN_KEY;
-    const isStudentEntry = formattedKey === STUDENT_KEY;
 
-    if (!isAdminEntry && !isStudentEntry) {
+    if (formattedKey !== STUDENT_KEY) {
       toast({
         variant: "destructive",
         title: "Invalid Access Key",
-        description: `Please use the official Batch '25 or Admin key.`,
+        description: `Please use the official Batch '25 key.`,
       });
       return;
-    }
-
-    // Explicit Admin Credential Verification
-    if (isAdminEntry) {
-      const isCorrectEmail = email.trim().toLowerCase() === MASTER_ADMIN_EMAIL.toLowerCase();
-      const isCorrectName = name.trim() === MASTER_ADMIN_NAME;
-      
-      if (!isCorrectEmail || !isCorrectName) {
-        toast({
-          variant: "destructive",
-          title: "Unauthorized Admin Identity",
-          description: "Admin access keys must be paired with specific master administrator credentials.",
-        });
-        return;
-      }
     }
 
     if (!name.trim() || !email.trim()) {
@@ -76,23 +54,17 @@ export default function AuthPage() {
     setIsSubmitting(true);
     try {
       let userCredential;
-      // We use a internal shared password to allow "double-time" email usage
-      // (switching roles or names with the same email).
       const SHARED_INTERNAL_PASSWORD = "NAVODAYA_ARCHIVE_SYSTEM_PWD";
 
       try {
-        // Attempt login using the internal shared password
         userCredential = await signInWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
       } catch (err: any) {
         if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email' || err.code === 'auth/wrong-password') {
-          // If login fails or user exists with a different legacy password, we try to create/re-access
           try {
             userCredential = await createUserWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
             await updateProfile(userCredential.user, { displayName: name });
           } catch (createErr: any) {
             if (createErr.code === 'auth/email-already-in-use') {
-              // If email exists but password was different (legacy), we inform them
-              // In an MVP, we'll try to sign in with the key as password as a fallback for legacy accounts
               userCredential = await signInWithEmailAndPassword(auth, email, formattedKey);
             } else {
               throw createErr;
@@ -103,31 +75,22 @@ export default function AuthPage() {
         }
       }
 
-      // Explicitly set the role based on the key entered
-      const role = isAdminEntry ? "admin" : "student";
-
-      // PERSIST THE ROLE before redirecting to ensure permission checks pass on destination pages
       const studentRef = doc(db, "students", userCredential.user.uid);
       await setDoc(studentRef, {
         id: userCredential.user.uid,
         name: name,
         email: email,
-        role: role,
+        role: "student",
         batchId: "batch-2018-2025",
         lastActive: serverTimestamp(),
       }, { merge: true });
 
       toast({
-        title: isAdminEntry ? "Admin Authorized" : "Access Authorized",
+        title: "Access Authorized",
         description: `Welcome to the Archive, ${name}.`,
       });
       
-      // Direct Redirection for Admin
-      if (isAdminEntry) {
-        router.push("/admin");
-      } else {
-        router.push("/profile");
-      }
+      router.push("/profile");
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -159,7 +122,7 @@ export default function AuthPage() {
             
             <div className="pt-12 pb-8 text-center px-10">
               <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                <ShieldCheck className="w-8 h-8" />
+                <Lock className="w-8 h-8" />
               </div>
               <h2 className="text-3xl font-serif italic text-white mb-2">Archive Entry</h2>
               <p className="text-[10px] uppercase font-black tracking-[0.3em] text-white/30">

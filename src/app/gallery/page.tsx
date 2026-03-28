@@ -4,16 +4,19 @@
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Camera, ArrowUpDown, X, Loader2 } from "lucide-react";
+import { Camera, ArrowUpDown, X, Loader2, Trash2 } from "lucide-react";
 import { useEffect, useState, Suspense } from "react";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, where } from "firebase/firestore";
+import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
+import { collection, query, orderBy, where, doc } from "firebase/firestore";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AddPhotoDialog } from "@/components/AddPhotoDialog";
 import { Button } from "@/components/ui/button";
+import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { toast } from "@/hooks/use-toast";
 
 function GalleryContent() {
   const db = useFirestore();
+  const { user } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filterClass, setFilterClass] = useState<string | null>(null);
@@ -48,6 +51,17 @@ function GalleryContent() {
 
   const clearFilter = () => {
     router.push("/gallery");
+  };
+
+  const handleDelete = (id: string) => {
+    if (!confirm("Are you sure you want to permanently remove this photo from the archive?")) return;
+    
+    const docRef = doc(db, "photos", id);
+    deleteDocumentNonBlocking(docRef);
+    toast({ 
+      title: "Photo Removed", 
+      description: "The item has been successfully deleted." 
+    });
   };
 
   return (
@@ -116,6 +130,22 @@ function GalleryContent() {
                   fill
                   className="object-cover transition-all duration-700 group-hover:scale-105"
                 />
+                
+                {/* Delete Button for all users */}
+                {user && (
+                  <Button 
+                    variant="destructive" 
+                    size="icon" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(img.id);
+                    }} 
+                    className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
+
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 p-8 flex flex-col justify-end">
                   <p className="text-primary text-[10px] font-black uppercase tracking-widest mb-2">
                     {img.classYearLabel || "ARCHIVE RECORD"}

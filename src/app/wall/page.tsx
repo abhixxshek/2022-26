@@ -3,13 +3,17 @@
 
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy, limit } from "firebase/firestore";
-import { Heart, Loader2 } from "lucide-react";
+import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
+import { collection, query, orderBy, limit, doc } from "firebase/firestore";
+import { Heart, Loader2, Trash2 } from "lucide-react";
 import { AddMemoryDialog } from "@/components/AddMemoryDialog";
+import { Button } from "@/components/ui/button";
+import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { toast } from "@/hooks/use-toast";
 
 export default function WallPage() {
   const db = useFirestore();
+  const { user } = useUser();
 
   const memoriesQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -18,13 +22,23 @@ export default function WallPage() {
 
   const { data: memories, isLoading } = useCollection(memoriesQuery);
 
+  const handleDelete = (id: string) => {
+    if (!confirm("Are you sure you want to remove this memory from the wall?")) return;
+    
+    const docRef = doc(db, "memories", id);
+    deleteDocumentNonBlocking(docRef);
+    toast({ 
+      title: "Memory Removed", 
+      description: "The item has been successfully deleted." 
+    });
+  };
+
   return (
     <div className="bg-[#0a0a0b] min-h-screen text-foreground selection:bg-primary/20">
       <Navbar />
 
       <main className="pt-48 pb-32 px-6">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
           <div className="text-center mb-24 space-y-6">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -79,10 +93,21 @@ export default function WallPage() {
                   transition={{ delay: idx * 0.05 }}
                   className="relative break-inside-avoid group"
                 >
-                  {/* Tape Effect */}
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-3 w-16 h-8 bg-white/10 backdrop-blur-sm z-20 shadow-sm opacity-80" />
                   
-                  <div className="bg-[#f0e6d2] p-8 md:p-10 shadow-[5px_15px_30px_rgba(0,0,0,0.3)] transform transition-all duration-500 hover:-translate-y-2 hover:rotate-1">
+                  <div className="bg-[#f0e6d2] p-8 md:p-10 shadow-[5px_15px_30px_rgba(0,0,0,0.3)] transform transition-all duration-500 hover:-translate-y-2 hover:rotate-1 relative">
+                    {/* Delete Button for all users */}
+                    {user && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleDelete(memory.id)} 
+                        className="absolute top-2 right-2 text-black/20 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                    
                     <div className="space-y-6">
                       <p className="text-black/80 text-xl font-serif italic leading-relaxed">
                         "{memory.description}"
@@ -115,7 +140,6 @@ export default function WallPage() {
         </div>
       </main>
 
-      {/* Background Decor */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0%,transparent_100%)]" />
       </div>
