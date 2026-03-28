@@ -1,9 +1,10 @@
+
 "use client";
 
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
-import { Zap, Coffee, Users, ScrollText, Camera, ChevronRight, Loader2, Database } from "lucide-react";
+import { Zap, Coffee, Users, ScrollText, Camera, ChevronRight, Loader2, Database, Eye } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
@@ -11,10 +12,12 @@ import { collection, query, orderBy, writeBatch, doc } from "firebase/firestore"
 import { EditJourneyDialog } from "@/components/EditJourneyDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { user } = useUser();
   const db = useFirestore();
+  const router = useRouter();
 
   const journeyQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -44,6 +47,16 @@ export default function Home() {
       toast({ title: "Timeline Initialized", description: "The 7-year legacy framework has been committed to Firestore." });
     } catch (e) {
       toast({ variant: "destructive", title: "Initialization Failed", description: "Check permissions." });
+    }
+  };
+
+  const handleOpenGallery = (subtitle: string) => {
+    // Extract class number from subtitle (e.g., "2018-19 | Class 6")
+    const classMatch = subtitle.match(/Class (\d+)/);
+    if (classMatch) {
+      router.push(`/gallery?class=${classMatch[1]}`);
+    } else {
+      router.push("/gallery");
     }
   };
 
@@ -200,14 +213,22 @@ export default function Home() {
                         transition={{ duration: 0.8 }}
                         className={`flex justify-center ${isEven ? 'md:justify-end' : 'md:justify-start'}`}
                       >
-                        <div className="polaroid -rotate-3 transition-transform hover:rotate-0 duration-500 max-w-[320px]">
+                        <div 
+                          className="polaroid -rotate-3 transition-transform hover:rotate-0 duration-500 max-w-[320px] cursor-pointer group"
+                          onClick={() => handleOpenGallery(year.subtitle)}
+                        >
                           <div className="relative aspect-square w-full overflow-hidden bg-muted">
                             <Image 
                               src={year.imageUrl || `https://picsum.photos/seed/${year.id}/800/800`}
                               alt={year.title}
                               fill
-                              className="object-cover grayscale"
+                              className="object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-110"
                             />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="text-[10px] font-black uppercase tracking-widest text-white border border-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
+                                Open Vault
+                              </span>
+                            </div>
                           </div>
                           <div className="polaroid-caption">
                             {year.title} 🕊️
@@ -235,9 +256,13 @@ export default function Home() {
                           <p className="text-white/40 text-sm leading-relaxed font-light font-serif italic">
                             "{year.description}"
                           </p>
-                          <div className="mt-4 text-[9px] font-black uppercase tracking-widest text-primary/40">
-                            {year.subtitle}
-                          </div>
+                          <button 
+                            onClick={() => handleOpenGallery(year.subtitle)}
+                            className="mt-6 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-primary hover:text-white transition-colors group"
+                          >
+                            <Eye className="w-3 h-3 transition-transform group-hover:scale-125" />
+                            View Records for {year.subtitle.split('|')[1].trim()}
+                          </button>
                         </div>
                       </motion.div>
                     </div>

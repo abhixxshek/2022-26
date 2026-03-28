@@ -1,9 +1,11 @@
+
 "use client";
 
 import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Camera, ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useUser } from "@/firebase";
@@ -13,6 +15,7 @@ import { EmojiPicker } from "@/components/EmojiPicker";
 
 export function AddPhotoDialog() {
   const [caption, setCaption] = useState("");
+  const [classYear, setClassYear] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
   const [isReading, setIsReading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,11 +58,11 @@ export function AddPhotoDialog() {
 
   const handleUpload = () => {
     if (!user) return;
-    if (!previewUrl || !caption) {
+    if (!previewUrl || !caption || !classYear) {
       toast({
         variant: "destructive",
         title: "Incomplete Record",
-        description: "Please select a photo and add a caption."
+        description: "Please select a photo, choose a class, and add a caption."
       });
       return;
     }
@@ -68,6 +71,7 @@ export function AddPhotoDialog() {
     const photoData = {
       url: previewUrl,
       caption,
+      classYearLabel: `Class ${classYear}`,
       uploadedByStudentId: user.uid,
       uploadedAt: new Date().toISOString(),
       createdAt: serverTimestamp(),
@@ -77,10 +81,11 @@ export function AddPhotoDialog() {
     
     toast({
       title: "Committed to Vault",
-      description: "Your visual record has been successfully archived."
+      description: `Your record for Class ${classYear} has been archived.`
     });
     
     setCaption("");
+    setClassYear("");
     setPreviewUrl("");
   };
 
@@ -95,7 +100,7 @@ export function AddPhotoDialog() {
         <DialogHeader>
           <DialogTitle className="text-2xl font-serif italic">Add to Vault</DialogTitle>
           <DialogDescription className="text-[10px] font-black uppercase tracking-widest text-white/30">
-            Select a photo from your gallery to contribute to the archive.
+            Select a photo and identify which class year it belongs to.
           </DialogDescription>
         </DialogHeader>
 
@@ -129,16 +134,32 @@ export function AddPhotoDialog() {
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="text-[10px] font-black uppercase tracking-wider text-primary">Caption & Expression</label>
-              <EmojiPicker onEmojiSelect={addEmoji} />
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-wider text-primary">Class Identification</label>
+              <Select onValueChange={setClassYear} value={classYear}>
+                <SelectTrigger className="bg-white/5 border-white/10 text-white h-12">
+                  <SelectValue placeholder="Which class year?" />
+                </SelectTrigger>
+                <SelectContent className="bg-black text-white border-white/10">
+                  {[6, 7, 8, 9, 10, 11, 12].map(y => (
+                    <SelectItem key={y} value={y.toString()}>Class {y}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <Textarea 
-              placeholder="Describe this moment..." 
-              className="bg-white/5 border-white/10 h-24 rounded-xl p-4 focus:ring-primary/20 text-white font-serif italic"
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-            />
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] font-black uppercase tracking-wider text-primary">Caption & Expression</label>
+                <EmojiPicker onEmojiSelect={addEmoji} />
+              </div>
+              <Textarea 
+                placeholder="Describe this moment..." 
+                className="bg-white/5 border-white/10 h-24 rounded-xl p-4 focus:ring-primary/20 text-white font-serif italic"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+              />
+            </div>
           </div>
 
           <Button 

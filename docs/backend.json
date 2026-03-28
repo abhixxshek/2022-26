@@ -116,6 +116,10 @@
           "type": "string",
           "description": "A brief caption for the photo."
         },
+        "classYearLabel": {
+          "type": "string",
+          "description": "The academic class year this photo belongs to (e.g., 'Class 10')."
+        },
         "uploadedByStudentId": {
           "type": "string",
           "description": "Reference to the Student who uploaded this photo."
@@ -130,6 +134,7 @@
         "id",
         "url",
         "caption",
+        "classYearLabel",
         "uploadedByStudentId",
         "uploadedAt"
       ]
