@@ -5,7 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
 import { StudentCard } from "@/components/StudentCard";
 import { AddMemoryDialog } from "@/components/AddMemoryDialog";
-import { ChevronDown, GraduationCap, MapPin, Calendar, Heart } from "lucide-react";
+import { ChevronDown, GraduationCap, MapPin, Heart, BookOpen, Coffee, Sun } from "lucide-react";
 
 export default function Home() {
   return (
@@ -38,19 +38,19 @@ export default function Home() {
           >
             <div className="flex items-center justify-center gap-3 mb-6">
               <span className="h-px w-12 bg-primary/50" />
-              <p className="text-primary font-bold tracking-[0.4em] uppercase text-xs">The Seven Year Bond</p>
+              <p className="text-primary font-bold tracking-[0.4em] uppercase text-xs">Batch 2018 - 2025</p>
               <span className="h-px w-12 bg-primary/50" />
             </div>
             <h1 className="text-6xl md:text-9xl font-headline font-bold mb-8 leading-tight">
-              Life at <span className="text-primary italic">Navodaya</span>
+              The <span className="text-primary italic">Navodayan</span> Way
             </h1>
             <p className="text-lg md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed font-light">
-              From the first Trunk Box in Class 6 to the Migration trains in Class 9, 
-              and the final emotional salute in Class 12. We didn't just study here; we grew up together.
+              Seven years of shared dormitory beds, 5:30 AM whistles, and migration stories. 
+              Relive the journey from being Class 6 juniors to the Class 12 legends.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <button className="px-10 py-5 bg-primary text-primary-foreground rounded-full font-bold text-lg hover:scale-105 transition-all shadow-xl shadow-primary/20">
-                Explore the Yearbook
+                Explore the Batch
               </button>
               <AddMemoryDialog />
             </div>
@@ -65,6 +65,29 @@ export default function Home() {
         >
           <ChevronDown className="w-8 h-8 text-primary" />
         </motion.div>
+      </section>
+
+      {/* Timeline Section */}
+      <section className="py-20 px-6 bg-card/30">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="flex flex-col items-center text-center p-8 glass rounded-3xl">
+              <Sun className="w-12 h-12 text-accent mb-6" />
+              <h3 className="text-2xl font-bold mb-4 font-headline">The 5:30 AM Routine</h3>
+              <p className="text-muted-foreground font-light">From PT grounds to the morning assembly, the discipline that built us.</p>
+            </div>
+            <div className="flex flex-col items-center text-center p-8 glass rounded-3xl">
+              <Coffee className="w-12 h-12 text-primary mb-6" />
+              <h3 className="text-2xl font-bold mb-4 font-headline">Dorm Life</h3>
+              <p className="text-muted-foreground font-light">Late night tea, shared secrets, and the unbreakable bond of House brotherhood.</p>
+            </div>
+            <div className="flex flex-col items-center text-center p-8 glass rounded-3xl">
+              <BookOpen className="w-12 h-12 text-accent mb-6" />
+              <h3 className="text-2xl font-bold mb-4 font-headline">Study Prep</h3>
+              <p className="text-muted-foreground font-light">Intense prep classes and group studies that made boards feel like a breeze.</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Year Sections */}
@@ -84,7 +107,7 @@ export default function Home() {
               >
                 <div className="flex items-center gap-2 text-accent font-bold mb-6 uppercase tracking-widest text-sm">
                   <Heart className="w-4 h-4 fill-accent" />
-                  <span>The Navodayan Spirit</span>
+                  <span>{year.subtitle}</span>
                 </div>
                 <h2 className="text-5xl md:text-7xl font-headline font-bold mb-8">{year.title}</h2>
                 <p className="text-xl text-muted-foreground leading-relaxed font-light">{year.description}</p>
@@ -106,29 +129,25 @@ export default function Home() {
         </section>
       ))}
 
-      {/* Stats Section - JNV Style */}
+      {/* JNV Memories Stats */}
       <section className="py-40 bg-primary/5 border-y border-white/5 relative">
-        <div className="absolute inset-0 opacity-10 pointer-events-none overflow-hidden">
-          <div className="absolute top-10 left-10 text-[10rem] font-bold text-primary">JNV</div>
-          <div className="absolute bottom-10 right-10 text-[10rem] font-bold text-primary">FAMILY</div>
-        </div>
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-16 text-center">
             <motion.div whileHover={{ scale: 1.1 }}>
-              <p className="text-5xl md:text-8xl font-headline font-bold text-primary mb-4">4</p>
-              <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">Houses, One Home</p>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.1 }}>
               <p className="text-5xl md:text-8xl font-headline font-bold text-primary mb-4">7</p>
-              <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">Golden Years</p>
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">Years Together</p>
             </motion.div>
             <motion.div whileHover={{ scale: 1.1 }}>
-              <p className="text-5xl md:text-8xl font-headline font-bold text-primary mb-4">24/7</p>
-              <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">Together Always</p>
+              <p className="text-5xl md:text-8xl font-headline font-bold text-primary mb-4">2555</p>
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">Days of Hostel Life</p>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.1 }}>
+              <p className="text-5xl md:text-8xl font-headline font-bold text-primary mb-4">1</p>
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">Migration Journey</p>
             </motion.div>
             <motion.div whileHover={{ scale: 1.1 }}>
               <p className="text-5xl md:text-8xl font-headline font-bold text-primary mb-4">∞</p>
-              <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">Brotherhood</p>
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">Lifetime Bonds</p>
             </motion.div>
           </div>
         </div>
@@ -143,25 +162,23 @@ export default function Home() {
               <span className="font-headline font-bold tracking-tight text-xl">JNV MEMORIES</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs font-light">
-              A tribute to the corridors where we learned that friends are the family we choose. 
-              Dedicated to the Class of 2026.
+              Dedicated to the Batch of 2018-2025. This is our story, etched in the corridors of the campus we called home.
             </p>
           </div>
           
           <div className="grid grid-cols-2 gap-10">
             <div className="space-y-6">
-              <p className="font-bold text-xs uppercase tracking-[0.3em] text-primary">Platform</p>
+              <p className="font-bold text-xs uppercase tracking-[0.3em] text-primary">Explore</p>
               <ul className="text-sm text-muted-foreground space-y-3 font-light">
                 <li><a href="#" className="hover:text-primary transition-colors">House Records</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Gallery</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Alumni Network</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Migration Diary</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Alumni</a></li>
               </ul>
             </div>
             <div className="space-y-6">
               <p className="font-bold text-xs uppercase tracking-[0.3em] text-primary">About</p>
               <ul className="text-sm text-muted-foreground space-y-3 font-light">
-                <li><a href="#" className="hover:text-primary transition-colors">Our History</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Navodaya Spirit</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">The Spirit</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Contact</a></li>
               </ul>
             </div>
@@ -175,9 +192,9 @@ export default function Home() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-24 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
-          <p>© 2024 JNV Memories. Built with pride by a Navodayan.</p>
+          <p>© 2025 JNV Memories | Batch 2018-2025.</p>
           <div className="flex gap-8">
-            <div className="flex items-center gap-2"><GraduationCap className="w-3 h-3 text-primary" /> Alumni Approved</div>
+            <div className="flex items-center gap-2"><GraduationCap className="w-3 h-3 text-primary" /> Alumni Network</div>
             <div className="flex items-center gap-2"><MapPin className="w-3 h-3 text-primary" /> Across India</div>
           </div>
         </div>

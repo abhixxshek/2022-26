@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
@@ -6,7 +5,7 @@ import { ALL_STUDENTS } from "@/lib/data";
 import { Navbar } from "@/components/Navbar";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowLeft, Quote, Star, Camera, BookOpen } from "lucide-react";
+import { ArrowLeft, Quote, Star, BookOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function StudentProfile() {
@@ -45,7 +44,7 @@ export default function StudentProfile() {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <Badge variant="outline" className="border-primary text-primary px-3 py-1">Class of 2026</Badge>
+            <Badge variant="outline" className="border-primary text-primary px-3 py-1">Batch 2018-2025</Badge>
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
@@ -85,7 +84,7 @@ export default function StudentProfile() {
             >
               <div>
                 <h1 className="text-5xl md:text-7xl font-headline font-bold mb-4">{student.name}</h1>
-                <p className="text-primary font-bold text-xl uppercase tracking-widest mb-6">Class {student.classYear} Journey</p>
+                <p className="text-primary font-bold text-xl uppercase tracking-widest mb-6">{student.house} House | Class {student.classYear} Journey</p>
                 <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
                   {student.bio}
                 </p>
@@ -95,7 +94,7 @@ export default function StudentProfile() {
               <section>
                 <div className="flex items-center gap-2 mb-8">
                   <Star className="w-5 h-5 text-accent" />
-                  <h2 className="text-2xl font-headline font-bold">Memorable Highlights</h2>
+                  <h2 className="text-2xl font-headline font-bold">Hostel & School Highlights</h2>
                 </div>
                 <div className="flex flex-wrap gap-4">
                   {student.highlights.map((highlight, idx) => (
@@ -114,7 +113,7 @@ export default function StudentProfile() {
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-5 h-5 text-primary" />
-                    <h2 className="text-2xl font-headline font-bold">Personal Memories</h2>
+                    <h2 className="text-2xl font-headline font-bold">Personal Stories</h2>
                   </div>
                   <Badge variant="secondary">{student.memories.length} Stories</Badge>
                 </div>
