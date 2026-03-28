@@ -16,7 +16,7 @@ export default function Home() {
       
       {/* Cinematic Hero Section */}
       <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
-        {/* Background Image - Cinematic Vibe */}
+        {/* Background Image - The Cinematic Road provided by user */}
         <div className="absolute inset-0 z-0">
           <Image 
             src="https://picsum.photos/seed/navodaya-road/1920/1080" 
@@ -24,6 +24,7 @@ export default function Home() {
             fill
             className="object-cover grayscale opacity-30"
             priority
+            data-ai-hint="cinematic road"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505]" />
         </div>

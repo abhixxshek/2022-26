@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Save, Camera, User, Trash2 } from "lucide-react";
+import { Save, Camera, User, Trash2, Image as ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
@@ -82,14 +82,14 @@ export default function ProfilePage() {
     });
   };
 
-  const handlePhotoUpload = () => {
-    // In a production app, this would trigger a file upload to Firebase Storage.
-    // For this prototype, we'll simulate setting a new photo via a random seed.
-    const newSeed = Math.random().toString(36).substring(7);
-    setProfilePhotoUrl(`https://picsum.photos/seed/${newSeed}/400/500`);
+  const handlePhotoUploadFromGallery = () => {
+    // Simulation: In a real app, this would open a file picker.
+    // For the prototype, we generate a random seed to represent a "selected" photo.
+    const randomId = Math.floor(Math.random() * 1000);
+    setProfilePhotoUrl(`https://picsum.photos/seed/${randomId}/400/500`);
     toast({
-      title: "Identity Photo Updated",
-      description: "A new visual record has been selected for your profile."
+      title: "Photo Added from Gallery",
+      description: "Your selected identity photo has been queued for synchronization."
     });
   };
 
@@ -125,13 +125,20 @@ export default function ProfilePage() {
                       className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
                       alt="Profile"
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                      <Button size="icon" variant="secondary" onClick={handlePhotoUpload} className="rounded-full w-12 h-12">
-                        <Camera className="w-5 h-5" />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-4 p-6">
+                      <Button 
+                        onClick={handlePhotoUploadFromGallery}
+                        className="w-full bg-white text-black hover:bg-primary transition-colors rounded-full font-black text-[10px] uppercase tracking-widest h-12"
+                      >
+                        <ImageIcon className="w-3 h-3 mr-2" /> Add from Gallery
                       </Button>
                       {profilePhotoUrl && (
-                        <Button size="icon" variant="destructive" onClick={() => setProfilePhotoUrl("")} className="rounded-full w-12 h-12">
-                          <Trash2 className="w-5 h-5" />
+                        <Button 
+                          variant="destructive" 
+                          onClick={() => setProfilePhotoUrl("")} 
+                          className="w-full rounded-full font-black text-[10px] uppercase tracking-widest h-12"
+                        >
+                          <Trash2 className="w-3 h-3 mr-2" /> Reset
                         </Button>
                       )}
                     </div>
@@ -144,7 +151,8 @@ export default function ProfilePage() {
                 </Card>
                 <div className="text-center px-4">
                   <p className="text-[9px] font-bold text-white/10 uppercase tracking-[0.2em] leading-relaxed">
-                    Visual records should reflect the dignity of the 7-year journey.
+                    Visual records should reflect the dignity of the 7-year journey. 
+                    Choose a photo that tells your story.
                   </p>
                 </div>
               </div>
