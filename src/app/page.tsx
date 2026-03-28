@@ -115,13 +115,13 @@ export default function Home() {
           <div className="space-y-64 relative">
             {YEAR_DATA.map((year, index) => {
               const isEven = index % 2 === 0;
-              const startYear = year.subtitle.split(' | ')[0].split('-')[0];
+              const academicYearRange = year.subtitle.split(' | ')[0];
               
               return (
                 <div key={year.id} className="relative flex items-center justify-center">
-                  {/* Year Marker */}
-                  <div className="timeline-marker">
-                    {startYear}
+                  {/* Year Range Marker (Time Lapse) */}
+                  <div className="timeline-marker w-20 h-20 text-[11px] leading-tight text-center px-1">
+                    {academicYearRange}
                   </div>
 
                   <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32 w-full items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
