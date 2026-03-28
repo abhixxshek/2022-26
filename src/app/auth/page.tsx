@@ -61,7 +61,7 @@ export default function AuthPage() {
       try {
         userCredential = await signInWithEmailAndPassword(auth, email, formattedKey);
       } catch (err: any) {
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email') {
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email' || err.code === 'auth/user-disabled') {
           userCredential = await createUserWithEmailAndPassword(auth, email, formattedKey);
           await updateProfile(userCredential.user, { displayName: name });
         } else {
@@ -86,10 +86,11 @@ export default function AuthPage() {
 
       toast({
         title: isAdminEntry ? "Admin Authorized" : "Access Authorized",
-        description: `Welcome to the Archive, ${name}.`,
+        description: `Welcome to the Archive, ${name}. Please finalize your legacy details.`,
       });
       
-      router.push("/");
+      // Redirect to profile (My Legacy) where students make their profile
+      router.push("/profile");
     } catch (error: any) {
       toast({
         variant: "destructive",
