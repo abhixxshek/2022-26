@@ -163,12 +163,12 @@ export default function Home() {
 
       {/* The Journey Section - Timeline Layout */}
       <section id="journey" className="py-60 px-6 relative bg-background overflow-hidden">
-        <div className="max-w-5xl mx-auto relative">
-          <div className="text-center mb-32 space-y-6">
+        <div className="max-w-[1600px] mx-auto relative px-12">
+          <div className="text-center mb-48 space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[8px] font-black uppercase tracking-widest">
               OUR HISTORY
             </div>
-            <h2 className="text-5xl md:text-7xl font-serif text-white tracking-tight">
+            <h2 className="text-6xl md:text-9xl font-serif text-white tracking-tight">
               The Journey: 2018–2025
             </h2>
             {user && (!journeyData || journeyData.length === 0) && (
@@ -184,7 +184,7 @@ export default function Home() {
 
           <div className="timeline-line" />
 
-          <div className="space-y-64 relative">
+          <div className="space-y-96 relative">
             {isLoading ? (
               <div className="flex justify-center py-40">
                 <Loader2 className="w-12 h-12 animate-spin text-white/10" />
@@ -202,7 +202,7 @@ export default function Home() {
                       <span className="block text-[8px] opacity-40 mt-1">{academicYearRange}</span>
                     </div>
 
-                    <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32 w-full items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                    <div className={`grid grid-cols-1 md:grid-cols-2 gap-24 md:gap-48 w-full items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
                       <motion.div 
                         initial={{ opacity: 0, x: isEven ? -50 : 50 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -211,7 +211,7 @@ export default function Home() {
                         className={`flex justify-center ${isEven ? 'md:justify-end' : 'md:justify-start'}`}
                       >
                         <div 
-                          className="polaroid -rotate-3 transition-transform hover:rotate-0 duration-500 max-w-[320px] cursor-pointer group"
+                          className="polaroid -rotate-3 transition-transform hover:rotate-0 duration-500 max-w-[600px] w-full cursor-pointer group"
                           onClick={() => handleOpenGallery(year.subtitle)}
                         >
                           <div className="relative aspect-square w-full overflow-hidden bg-muted">
@@ -221,13 +221,8 @@ export default function Home() {
                               fill
                               className="object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-110"
                             />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="text-[10px] font-black uppercase tracking-widest text-white border border-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
-                                Open Vault
-                              </span>
-                            </div>
                           </div>
-                          <div className="polaroid-caption">
+                          <div className="polaroid-caption text-xl py-8">
                             {year.title} 🕊️
                           </div>
                         </div>
@@ -240,25 +235,18 @@ export default function Home() {
                         transition={{ duration: 0.8 }}
                         className={`text-center md:text-left ${!isEven && 'md:text-right'}`}
                       >
-                        <div className="max-w-sm mx-auto md:mx-0 relative">
+                        <div className="max-w-2xl mx-auto md:mx-0 relative">
                           {user && (
-                            <div className="absolute -top-12 right-0 md:-left-12">
+                            <div className="absolute -top-16 right-0 md:-left-12">
                               <EditJourneyDialog yearData={year} />
                             </div>
                           )}
-                          <h3 className="text-3xl md:text-4xl font-serif text-white mb-6">
+                          <h3 className="text-4xl md:text-6xl font-serif text-white mb-10">
                             {year.title}
                           </h3>
-                          <p className="text-white/40 text-sm leading-relaxed font-light font-serif italic">
+                          <p className="text-white/60 text-2xl md:text-4xl leading-tight font-light font-serif italic">
                             "{year.description}"
                           </p>
-                          <button 
-                            onClick={() => handleOpenGallery(year.subtitle)}
-                            className="mt-6 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-primary hover:text-white transition-colors group"
-                          >
-                            <Eye className="w-3 h-3 transition-transform group-hover:scale-125" />
-                            View Records for {year.subtitle.split('|')[1].trim()}
-                          </button>
                         </div>
                       </motion.div>
                     </div>
