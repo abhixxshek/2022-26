@@ -4,8 +4,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V20 - Final Polish)
-     * Deployment Trigger: Resilient Auth Access Refinement
+     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V20 - Production Polish)
+     * Deployment Trigger: Robust Role and Access Path Refinement
      */
 
     function isSignedIn() {

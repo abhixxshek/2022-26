@@ -180,9 +180,6 @@ export default function Home() {
                               fill
                               className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
                             />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <Camera className="w-16 h-16 text-white/80" />
-                            </div>
                           </div>
                           <div className="polaroid-caption text-3xl py-12 tracking-tight">
                             {year.title} 🕊️

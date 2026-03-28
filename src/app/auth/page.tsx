@@ -66,9 +66,11 @@ export default function AuthPage() {
     try {
       let userCredential;
       try {
+        // We use the Access Key as the password for Firebase Auth
         userCredential = await signInWithEmailAndPassword(auth, email, formattedKey);
       } catch (err: any) {
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email') {
+          // If login fails, try to create a new user with this email and access key
           userCredential = await createUserWithEmailAndPassword(auth, email, formattedKey);
           await updateProfile(userCredential.user, { displayName: name });
         } else {
@@ -79,7 +81,6 @@ export default function AuthPage() {
       // Initialize or update Student record in Firestore (Non-blocking)
       const studentRef = doc(db, "students", userCredential.user.uid);
       
-      // We check if doc exists before setting, but without awaiting the mutation
       const studentDoc = await getDoc(studentRef);
       if (!studentDoc.exists()) {
         setDocumentNonBlocking(studentRef, {
@@ -128,20 +129,20 @@ export default function AuthPage() {
           transition={{ duration: 0.8 }}
           className="w-full max-w-md"
         >
-          <Card className="bg-black/60 backdrop-blur-3xl border-white/5 shadow-2xl rounded-[2.5rem] overflow-hidden">
+          <div className="bg-black/60 backdrop-blur-3xl border border-white/5 shadow-2xl rounded-[2.5rem] overflow-hidden">
             <div className="h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
             
-            <CardHeader className="pt-12 pb-8 text-center space-y-4">
+            <div className="pt-12 pb-8 text-center px-10">
               <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
                 <ShieldCheck className="w-8 h-8" />
               </div>
-              <CardTitle className="text-3xl font-serif italic text-white">Archive Entry</CardTitle>
-              <CardDescription className="text-[10px] uppercase font-black tracking-[0.3em] text-white/30">
+              <h2 className="text-3xl font-serif italic text-white mb-2">Archive Entry</h2>
+              <p className="text-[10px] uppercase font-black tracking-[0.3em] text-white/30">
                 Official Batch '25 Digital Portal
-              </CardDescription>
-            </CardHeader>
+              </p>
+            </div>
 
-            <CardContent className="px-10 pb-16">
+            <div className="px-10 pb-16">
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-6">
                   <div className="space-y-2">
@@ -196,8 +197,8 @@ export default function AuthPage() {
                   </span>
                 </Button>
               </form>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
       </main>
     </div>
