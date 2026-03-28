@@ -1,11 +1,11 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useAuth, useFirestore, useUser } from "@/firebase";
+import { useAuth, useFirestore } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { 
@@ -25,17 +25,10 @@ export default function AuthPage() {
   
   const auth = useAuth();
   const db = useFirestore();
-  const { user, isUserLoading } = useUser();
   const router = useRouter();
 
   const STUDENT_KEY = "JNVRTM25";
   const ADMIN_KEY = "JNVRTM18";
-
-  useEffect(() => {
-    if (user) {
-      router.push("/");
-    }
-  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,11 +59,9 @@ export default function AuthPage() {
     try {
       let userCredential;
       try {
-        // We use the Access Key as the password for Firebase Auth
         userCredential = await signInWithEmailAndPassword(auth, email, formattedKey);
       } catch (err: any) {
         if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email') {
-          // If login fails, try to create a new user with this email and access key
           userCredential = await createUserWithEmailAndPassword(auth, email, formattedKey);
           await updateProfile(userCredential.user, { displayName: name });
         } else {
@@ -78,9 +69,7 @@ export default function AuthPage() {
         }
       }
 
-      // Initialize or update Student record in Firestore (Non-blocking)
       const studentRef = doc(db, "students", userCredential.user.uid);
-      
       const studentDoc = await getDoc(studentRef);
       if (!studentDoc.exists()) {
         setDocumentNonBlocking(studentRef, {
@@ -111,8 +100,6 @@ export default function AuthPage() {
       setIsSubmitting(false);
     }
   };
-
-  if (isUserLoading) return null;
 
   return (
     <div className="bg-[#050505] min-h-screen selection:bg-primary/20 text-foreground overflow-x-hidden">

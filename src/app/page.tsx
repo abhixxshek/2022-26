@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
 import { Loader2, Database } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy, writeBatch, doc } from "firebase/firestore";
 import { EditJourneyDialog } from "@/components/EditJourneyDialog";
@@ -95,28 +96,6 @@ export default function Home() {
               </h2>
             </motion.div>
 
-            <p className="text-white/30 text-[10px] md:text-xs max-w-md mx-auto leading-relaxed font-black uppercase tracking-[0.5em] mb-20">
-              The Digital Archive of the Navodaya Family.
-              <br />
-              Once a Navodayan, Always a Navodayan.
-            </p>
-
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.2, duration: 1 }}
-            >
-              <button 
-                onClick={() => document.getElementById('journey')?.scrollIntoView({ behavior: 'smooth' })}
-                className="group flex flex-col items-center gap-4 text-[9px] uppercase font-black tracking-[0.6em] text-white/20 hover:text-primary transition-colors cursor-pointer"
-              >
-                Scroll to Explore
-                <div className="relative w-[1px] h-12 overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-full bg-primary translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-1000" />
-                  <div className="w-full h-full bg-white/10" />
-                </div>
-              </button>
-            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -200,7 +179,6 @@ export default function Home() {
                           <h3 className="text-5xl md:text-8xl font-serif text-white mb-10 tracking-tighter leading-none">
                             {year.title}
                           </h3>
-                          {/* Minimal Typography for Description */}
                           <p className="text-white/60 text-[8px] md:text-[10px] leading-relaxed font-light font-serif italic tracking-tight max-w-2xl">
                             "{year.description}"
                           </p>
