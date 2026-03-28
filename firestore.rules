@@ -3,28 +3,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NAVODAYA MEMORIES YEARBOOK - PUBLIC ARCHIVE RULES (V25)
-     * Last Deployment Trigger: 2024-03-28T21:05:00Z
-     * Deployment Goal: Resolve permission errors by enabling public read/write for all archive collections.
+     * NAVODAYA MEMORIES YEARBOOK - GLOBAL ARCHIVE ACCESS (V26)
+     * Last Deployment Trigger: 2024-03-28T21:20:00Z
+     * Deployment Goal: Unrestricted read/write for all archive records to resolve admin moderation errors.
      */
 
-    match /students/{studentId} {
-      allow read, write: if true;
-    }
-    
-    match /memories/{memoryId} {
-      allow read, write: if true;
-    }
-    
-    match /photos/{photoId} {
-      allow read, write: if true;
-    }
-    
-    match /journey/{yearId} {
-      allow read, write: if true;
-    }
-
-    // Comprehensive fallback for any nested documents within the archive structure
     match /{document=**} {
       allow read, write: if true;
     }
