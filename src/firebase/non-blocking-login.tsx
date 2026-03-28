@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Auth,
@@ -5,6 +6,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
 
@@ -14,6 +17,23 @@ export function initiateAnonymousSignIn(authInstance: Auth): void {
     toast({
       variant: "destructive",
       title: "Authentication Error",
+      description: error.message,
+    });
+  });
+}
+
+/** Initiate Google sign-in (non-blocking). */
+export function initiateGoogleSignIn(authInstance: Auth): void {
+  const provider = new GoogleAuthProvider();
+  signInWithPopup(authInstance, provider).then(() => {
+    toast({
+      title: "Authorized via Google",
+      description: "Identity verified. Redirecting to student profile.",
+    });
+  }).catch((error) => {
+    toast({
+      variant: "destructive",
+      title: "Google Auth Error",
       description: error.message,
     });
   });
