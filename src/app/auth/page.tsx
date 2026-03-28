@@ -11,6 +11,7 @@ import { initiateEmailSignIn, initiateEmailSignUp } from "@/firebase/non-blockin
 import { useAuth, useUser } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
 
 const JNVLogo = () => (
   <svg 
@@ -45,6 +46,17 @@ export default function AuthPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Password strength validation
+    if (password.length < 6) {
+      toast({
+        variant: "destructive",
+        title: "Weak Password",
+        description: "Your access key must be at least 6 characters long.",
+      });
+      return;
+    }
+
     if (isLogin) {
       initiateEmailSignIn(auth, email, password);
     } else {
