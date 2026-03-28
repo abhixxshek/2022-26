@@ -3,29 +3,18 @@
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Camera, ArrowUpDown, Plus } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Camera, ArrowUpDown } from "lucide-react";
+import { useEffect } from "react";
 import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { AddPhotoDialog } from "@/components/AddPhotoDialog";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-
-const FILTERS = [
-  "All Memories",
-  "1st yr",
-  "2nd yr",
-  "3rd yr",
-  "4th yr",
-  "Fiesta'25"
-];
 
 export default function GalleryPage() {
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const router = useRouter();
-  const [activeFilter, setActiveFilter] = useState("All Memories");
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -49,7 +38,7 @@ export default function GalleryPage() {
       <main className="pt-40 pb-32 px-6">
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
-          <div className="flex flex-col mb-16">
+          <div className="flex flex-col mb-24">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -60,7 +49,7 @@ export default function GalleryPage() {
               </h1>
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <p className="text-lg text-white/40 max-w-xl font-light leading-relaxed">
-                  A cinematic collection of fleeting moments, frozen in time. From the first lecture to the final goodbye.
+                  A cinematic collection of fleeting moments, frozen in time. From the first lecture to the final goodbye of Batch '25.
                 </p>
                 <div className="flex items-center gap-4">
                   <Button 
@@ -75,29 +64,6 @@ export default function GalleryPage() {
               </div>
             </motion.div>
           </div>
-
-          {/* Filter Pills */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-wrap items-center gap-3 mb-16"
-          >
-            {FILTERS.map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
-                className={cn(
-                  "px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border",
-                  activeFilter === filter
-                    ? "bg-primary text-black border-primary shadow-lg shadow-primary/20"
-                    : "bg-white/5 text-white/40 border-white/10 hover:border-white/20"
-                )}
-              >
-                {filter}
-              </button>
-            ))}
-          </motion.div>
 
           {/* Visual Grid */}
           {isLoading || isUserLoading ? (
