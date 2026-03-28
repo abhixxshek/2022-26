@@ -4,7 +4,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V3 - Explicit Access)
+     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V4 - Explicit Read Access)
+     * Last Updated: 2024-03-28 (Forced Re-deployment)
      */
 
     match /students/{studentId} {
@@ -13,14 +14,14 @@ service cloud.firestore {
     }
 
     match /memories/{memoryId} {
-      allow get, list: if request.auth != null;
+      allow read: if request.auth != null;
       allow create: if request.auth != null && request.resource.data.studentId == request.auth.uid;
       allow update, delete: if request.auth != null && resource.data.studentId == request.auth.uid;
     }
 
     match /photos/{photoId} {
-      // Explicitly allow both single document access and collection listing
-      allow get, list: if request.auth != null;
+      // Unified read (get + list) for any authenticated batch member
+      allow read: if request.auth != null;
       allow create: if request.auth != null && request.resource.data.uploadedByStudentId == request.auth.uid;
       allow update, delete: if request.auth != null && resource.data.uploadedByStudentId == request.auth.uid;
     }

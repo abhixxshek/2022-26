@@ -38,7 +38,7 @@ export default function Home() {
         title: year.title,
         subtitle: year.subtitle,
         description: year.description,
-        imageUrl: year.students?.[0]?.memories?.[0]?.image || `https://picsum.photos/seed/${year.id}/800/800`
+        imageUrl: year.students?.[0]?.memories?.[0]?.image || `https://picsum.photos/seed/${year.id}/1200/900`
       });
     });
 
@@ -104,7 +104,7 @@ export default function Home() {
               className="mb-12"
             >
               <h2 className="text-xl md:text-3xl font-black uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-primary/60 drop-shadow-[0_0_15px_rgba(255,191,0,0.3)] px-4">
-                JAWAHAR NAVODAYA VIDHYALAYA KALUKHEDA , RATLAM-1
+                JAWAHAR NAVODAYA VIDYALAYA KALUKHEDA , RATLAM-1
               </h2>
             </motion.div>
 
@@ -134,7 +134,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The Journey Section - Widescreen Layout */}
+      {/* The Journey Section - Extended Widescreen Layout */}
       <section id="journey" className="py-60 px-6 relative bg-background overflow-hidden">
         <div className="max-w-[1600px] mx-auto relative px-12">
           <div className="text-center mb-48 space-y-6">
@@ -185,22 +185,22 @@ export default function Home() {
                         className={`flex justify-center ${isEven ? 'md:justify-end' : 'md:justify-start'}`}
                       >
                         <div 
-                          className="polaroid -rotate-2 transition-all hover:rotate-0 duration-700 max-w-[700px] w-full cursor-pointer group shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)]"
+                          className="polaroid -rotate-2 transition-all hover:rotate-0 duration-700 max-w-[800px] w-full cursor-pointer group shadow-[0_30px_100px_-20px_rgba(0,0,0,0.7)]"
                           onClick={() => handleOpenGallery(year.subtitle)}
                         >
                           <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
                             <Image 
-                              src={year.imageUrl || `https://picsum.photos/seed/${year.id}/800/800`}
+                              src={year.imageUrl || `https://picsum.photos/seed/${year.id}/1200/900`}
                               alt={year.title}
                               fill
                               className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
                             />
                             {/* Hover Overlay */}
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <Camera className="w-12 h-12 text-white/80" />
+                                <Camera className="w-16 h-16 text-white/80" />
                             </div>
                           </div>
-                          <div className="polaroid-caption text-2xl py-10 tracking-tight">
+                          <div className="polaroid-caption text-3xl py-12 tracking-tight">
                             {year.title} 🕊️
                           </div>
                         </div>
@@ -213,16 +213,16 @@ export default function Home() {
                         transition={{ duration: 0.8 }}
                         className={`text-center md:text-left ${!isEven && 'md:text-right'}`}
                       >
-                        <div className="max-w-3xl mx-auto md:mx-0 relative">
+                        <div className="max-w-4xl mx-auto md:mx-0 relative">
                           {user && (
                             <div className="absolute -top-16 right-0 md:-left-12 z-20">
                               <EditJourneyDialog yearData={year} />
                             </div>
                           )}
-                          <h3 className="text-5xl md:text-7xl font-serif text-white mb-10 tracking-tighter">
+                          <h3 className="text-6xl md:text-8xl font-serif text-white mb-10 tracking-tighter">
                             {year.title}
                           </h3>
-                          <p className="text-white/60 text-3xl md:text-5xl lg:text-6xl leading-[1.15] font-light font-serif italic tracking-tight">
+                          <p className="text-white/60 text-4xl md:text-5xl lg:text-6xl leading-[1.15] font-light font-serif italic tracking-tight">
                             "{year.description}"
                           </p>
                         </div>
