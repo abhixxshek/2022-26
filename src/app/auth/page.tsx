@@ -29,7 +29,8 @@ export default function AuthPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
 
-  const OFFICIAL_KEY = "JNVRTM25";
+  const STUDENT_KEY = "JNVRTM25";
+  const ADMIN_KEY = "JNVRTM18";
 
   useEffect(() => {
     if (user) {
@@ -40,11 +41,15 @@ export default function AuthPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (accessKey.trim().toUpperCase() !== OFFICIAL_KEY) {
+    const formattedKey = accessKey.trim().toUpperCase();
+    const isAdminEntry = formattedKey === ADMIN_KEY;
+    const isStudentEntry = formattedKey === STUDENT_KEY;
+
+    if (!isAdminEntry && !isStudentEntry) {
       toast({
         variant: "destructive",
         title: "Invalid Access Key",
-        description: `Please use the official Batch '25 key: ${OFFICIAL_KEY}`,
+        description: `Please use the official Batch '25 or Admin key.`,
       });
       return;
     }
@@ -60,14 +65,13 @@ export default function AuthPage() {
 
     setIsSubmitting(true);
     try {
+      // Use the key as the password for simplicity as requested
       let userCredential;
       try {
-        // Attempt sign in first
-        userCredential = await signInWithEmailAndPassword(auth, email, OFFICIAL_KEY);
+        userCredential = await signInWithEmailAndPassword(auth, email, formattedKey);
       } catch (err: any) {
-        // If user doesn't exist, create them
         if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-          userCredential = await createUserWithEmailAndPassword(auth, email, OFFICIAL_KEY);
+          userCredential = await createUserWithEmailAndPassword(auth, email, formattedKey);
           await updateProfile(userCredential.user, { displayName: name });
         } else {
           throw err;
@@ -83,15 +87,16 @@ export default function AuthPage() {
           id: userCredential.user.uid,
           name: name,
           email: email,
-          house: "Aravalli", // Default house, user can change in profile
-          shortBio: "Member of Batch '25",
+          role: isAdminEntry ? "admin" : "student",
+          house: "Aravalli", // Default house
+          shortBio: isAdminEntry ? "Archive Administrator" : "Member of Batch '25",
           batchId: "batch-2018-2025",
           createdAt: serverTimestamp(),
         });
       }
 
       toast({
-        title: "Access Authorized",
+        title: isAdminEntry ? "Admin Authorized" : "Access Authorized",
         description: `Welcome to the Archive, ${name}.`,
       });
       
@@ -142,10 +147,10 @@ export default function AuthPage() {
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-[9px] font-black uppercase tracking-widest text-primary ml-1 flex items-center gap-2">
-                      <User className="w-3 h-3" /> Student Name
+                      <User className="w-3 h-3" /> Full Name
                     </label>
                     <Input 
-                      placeholder="Enter your full name" 
+                      placeholder="Enter your name" 
                       className="bg-white/[0.03] border-white/10 h-14 rounded-2xl px-6 focus:ring-primary/20 text-white"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -179,9 +184,6 @@ export default function AuthPage() {
                       onChange={(e) => setAccessKey(e.target.value)}
                       required
                     />
-                    <p className="text-[8px] text-white/20 uppercase font-black tracking-widest ml-1">
-                      * Use the official Batch '25 Access Key
-                    </p>
                   </div>
                 </div>
 
@@ -197,12 +199,6 @@ export default function AuthPage() {
               </form>
             </CardContent>
           </Card>
-
-          <div className="mt-12 text-center">
-            <p className="text-[8px] font-black uppercase tracking-[0.6em] text-white/10">
-              © 2025 Navodaya Memories | Batch 2018—2025
-            </p>
-          </div>
         </motion.div>
       </main>
     </div>

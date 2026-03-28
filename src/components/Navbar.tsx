@@ -1,11 +1,13 @@
+
 "use client";
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { useUser, useAuth } from "@/firebase";
+import { useUser, useAuth, useDoc, useMemoFirebase, useFirestore } from "@/firebase";
 import { initiateSignOut } from "@/firebase/non-blocking-login";
-import { LogOut } from "lucide-react";
+import { LogOut, ShieldCheck } from "lucide-react";
+import { doc } from "firebase/firestore";
 
 const JNVLogo = () => (
   <svg 
@@ -27,6 +29,14 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { user } = useUser();
   const auth = useAuth();
+  const db = useFirestore();
+
+  const studentRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return doc(db, "students", user.uid);
+  }, [db, user]);
+
+  const { data: studentData } = useDoc(studentRef);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,6 +81,11 @@ export function Navbar() {
             <Link href="/wall" className="text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white transition-all">
               The Wall
             </Link>
+            {studentData?.role === "admin" && (
+              <Link href="/admin" className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 hover:scale-105 transition-all">
+                <ShieldCheck className="w-3 h-3" /> Admin Panel
+              </Link>
+            )}
           </div>
           
           {user ? (

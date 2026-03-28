@@ -24,6 +24,11 @@
           "description": "The email address of the student.",
           "format": "email"
         },
+        "role": {
+          "type": "string",
+          "description": "User role (admin or student).",
+          "enum": ["admin", "student"]
+        },
         "profilePhotoUrl": {
           "type": "string",
           "description": "URL to the student's profile picture.",
