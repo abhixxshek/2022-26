@@ -6,7 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
 import { Loader2, Database } from "lucide-react";
 import Image from "next/image";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, orderBy, writeBatch, doc } from "firebase/firestore";
 import { EditJourneyDialog } from "@/components/EditJourneyDialog";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { toast } from "@/hooks/use-toast";
 
 export default function Home() {
   const db = useFirestore();
+  const { user } = useUser();
 
   const journeyQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -124,7 +125,7 @@ export default function Home() {
             <h2 className="text-7xl md:text-[10rem] font-serif text-white tracking-tight">
               The Journey
             </h2>
-            {(!journeyData || journeyData.length === 0) && (
+            {user && (!journeyData || journeyData.length === 0) && (
               <Button 
                 variant="outline" 
                 onClick={initializeJourney}
@@ -187,9 +188,11 @@ export default function Home() {
                         className={`text-center md:text-left ${!isEven && 'md:text-right'}`}
                       >
                         <div className="max-w-4xl mx-auto md:mx-0 relative">
-                          <div className="absolute -top-16 right-0 md:-left-12 z-20">
-                            <EditJourneyDialog yearData={year} />
-                          </div>
+                          {user && (
+                            <div className="absolute -top-16 right-0 md:-left-12 z-20">
+                              <EditJourneyDialog yearData={year} />
+                            </div>
+                          )}
                           <h3 className="text-5xl md:text-8xl font-serif text-white mb-10 tracking-tighter leading-none">
                             {year.title}
                           </h3>

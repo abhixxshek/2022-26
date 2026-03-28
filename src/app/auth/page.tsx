@@ -14,7 +14,7 @@ import {
   updateProfile 
 } from "firebase/auth";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { Lock, Mail, User, ArrowRight, ShieldCheck } from "lucide-react";
+import { Lock, Mail, User, ArrowRight } from "lucide-react";
 
 export default function AuthPage() {
   const [name, setName] = useState("");
@@ -57,15 +57,17 @@ export default function AuthPage() {
       const SHARED_INTERNAL_PASSWORD = "NAVODAYA_ARCHIVE_SYSTEM_PWD";
 
       try {
+        // Attempt login for returning users
         userCredential = await signInWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
       } catch (err: any) {
+        // Create account if not found
         if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email' || err.code === 'auth/wrong-password') {
           try {
             userCredential = await createUserWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
             await updateProfile(userCredential.user, { displayName: name });
           } catch (createErr: any) {
             if (createErr.code === 'auth/email-already-in-use') {
-              userCredential = await signInWithEmailAndPassword(auth, email, formattedKey);
+              userCredential = await signInWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
             } else {
               throw createErr;
             }
