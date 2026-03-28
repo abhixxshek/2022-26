@@ -112,6 +112,7 @@ export default function ProfilePage() {
       fullBio,
       house,
       profilePhotoUrl: profilePhotoUrl || "",
+      role: studentData?.role || "student",
     };
 
     setDocumentNonBlocking(studentRef, updatedData, { merge: true });

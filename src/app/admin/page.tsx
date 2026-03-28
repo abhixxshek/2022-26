@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { useFirestore, useCollection, useMemoFirebase, useUser, useDoc } from "@/firebase";
 import { collection, query, orderBy, doc } from "firebase/firestore";
@@ -18,6 +18,7 @@ export default function AdminDashboard() {
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const router = useRouter();
+  const [isAuthorizing, setIsAuthorizing] = useState(true);
 
   const studentRef = useMemoFirebase(() => {
     if (!db || !user) return null;
@@ -28,13 +29,18 @@ export default function AdminDashboard() {
   const isAdmin = studentData?.role === "admin";
 
   useEffect(() => {
-    if (!isUserLoading && !isRoleLoading && !isAdmin) {
-      toast({
-        variant: "destructive",
-        title: "Access Denied",
-        description: "You do not have administrative privileges for this archive."
-      });
-      router.push("/");
+    // Only check authorization when both user session and role data have finished loading
+    if (!isUserLoading && !isRoleLoading) {
+      if (!isAdmin) {
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "You do not have administrative privileges for this archive."
+        });
+        router.push("/");
+      } else {
+        setIsAuthorizing(false);
+      }
     }
   }, [isAdmin, isUserLoading, isRoleLoading, router]);
 
@@ -68,15 +74,14 @@ export default function AdminDashboard() {
     });
   };
 
-  const isLoading = isStudentsLoading || isMemoriesLoading || isPhotosLoading || isUserLoading || isRoleLoading;
+  const isLoading = isStudentsLoading || isMemoriesLoading || isPhotosLoading || isUserLoading || isRoleLoading || isAuthorizing;
 
-  if (!isUserLoading && !isRoleLoading && !isAdmin) {
+  if (isAuthorizing) {
     return (
       <div className="bg-[#050505] min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Lock className="w-12 h-12 text-primary mx-auto mb-6" />
-          <h1 className="text-2xl font-black uppercase tracking-widest text-white/20">Restricted Access</h1>
-          <p className="text-[10px] uppercase font-black tracking-[0.4em] text-white/10">Authorized Admin Key Required</p>
+          <Loader2 className="w-8 h-8 text-primary mx-auto animate-spin mb-4" />
+          <p className="text-[10px] uppercase font-black tracking-[0.4em] text-white/20">Verifying Admin Credentials</p>
         </div>
       </div>
     );
@@ -110,8 +115,8 @@ export default function AdminDashboard() {
             </TabsList>
 
             <TabsContent value="students" className="space-y-6">
-              {isLoading ? (
-                <div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>
+              {isStudentsLoading ? (
+                <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {students?.map((s) => (
@@ -136,45 +141,53 @@ export default function AdminDashboard() {
             </TabsContent>
 
             <TabsContent value="memories" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {memories?.map((m) => (
-                  <Card key={m.id} className="bg-black/40 border-white/5 p-8 relative group">
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete("memories", m.id)} className="absolute top-4 right-4 text-white/20 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-1 h-8 bg-primary/40 rounded-full" />
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-widest text-primary">{m.studentName}</p>
-                          <h3 className="text-lg font-bold">{m.title}</h3>
+              {isMemoriesLoading ? (
+                <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {memories?.map((m) => (
+                    <Card key={m.id} className="bg-black/40 border-white/5 p-8 relative group">
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete("memories", m.id)} className="absolute top-4 right-4 text-white/20 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-1 h-8 bg-primary/40 rounded-full" />
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-primary">{m.studentName}</p>
+                            <h3 className="text-lg font-bold">{m.title}</h3>
+                          </div>
                         </div>
+                        <p className="text-sm text-white/60 line-clamp-3 italic font-serif leading-relaxed">"{m.description}"</p>
+                        <p className="text-[9px] font-black text-white/20 uppercase tracking-widest">{m.classYearLabel}</p>
                       </div>
-                      <p className="text-sm text-white/60 line-clamp-3 italic font-serif leading-relaxed">"{m.description}"</p>
-                      <p className="text-[9px] font-black text-white/20 uppercase tracking-widest">{m.classYearLabel}</p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="photos" className="space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {photos?.map((p) => (
-                  <div key={p.id} className="relative aspect-[4/3] group rounded-2xl overflow-hidden border border-white/5 bg-black">
-                    <img src={p.url} alt={p.caption} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-6">
-                      <Button variant="destructive" size="icon" onClick={() => handleDelete("photos", p.id)} className="ml-auto w-8 h-8 rounded-full">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">{p.classYearLabel}</p>
-                        <p className="text-xs text-white line-clamp-2 font-bold">{p.caption}</p>
+              {isPhotosLoading ? (
+                <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" /></div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {photos?.map((p) => (
+                    <div key={p.id} className="relative aspect-[4/3] group rounded-2xl overflow-hidden border border-white/5 bg-black">
+                      <img src={p.url} alt={p.caption} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-6">
+                        <Button variant="destructive" size="icon" onClick={() => handleDelete("photos", p.id)} className="ml-auto w-8 h-8 rounded-full">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">{p.classYearLabel}</p>
+                          <p className="text-xs text-white line-clamp-2 font-bold">{p.caption}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>

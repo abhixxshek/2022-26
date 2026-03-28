@@ -61,7 +61,7 @@ export default function AuthPage() {
       try {
         userCredential = await signInWithEmailAndPassword(auth, email, formattedKey);
       } catch (err: any) {
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email' || err.code === 'auth/user-disabled') {
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email' || err.code === 'auth/user-disabled' || err.code === 'auth/wrong-password') {
           userCredential = await createUserWithEmailAndPassword(auth, email, formattedKey);
           await updateProfile(userCredential.user, { displayName: name });
         } else {
@@ -71,25 +71,26 @@ export default function AuthPage() {
 
       const studentRef = doc(db, "students", userCredential.user.uid);
       const studentDoc = await getDoc(studentRef);
-      if (!studentDoc.exists()) {
-        setDocumentNonBlocking(studentRef, {
-          id: userCredential.user.uid,
-          name: name,
-          email: email,
-          role: isAdminEntry ? "admin" : "student",
-          house: "Aravalli", 
-          shortBio: isAdminEntry ? "Archive Administrator" : "Member of Batch '25",
-          batchId: "batch-2018-2025",
-          createdAt: serverTimestamp(),
-        }, { merge: true });
-      }
+      
+      // Update or Set the record with the correct role based on the key used
+      const role = isAdminEntry ? "admin" : (studentDoc.exists() ? studentDoc.data()?.role : "student");
+
+      setDocumentNonBlocking(studentRef, {
+        id: userCredential.user.uid,
+        name: name,
+        email: email,
+        role: role,
+        house: studentDoc.exists() ? studentDoc.data()?.house : "Aravalli", 
+        shortBio: studentDoc.exists() ? studentDoc.data()?.shortBio : (isAdminEntry ? "Archive Administrator" : "Member of Batch '25"),
+        batchId: "batch-2018-2025",
+        lastActive: serverTimestamp(),
+      }, { merge: true });
 
       toast({
         title: isAdminEntry ? "Admin Authorized" : "Access Authorized",
-        description: `Welcome to the Archive, ${name}. Please finalize your legacy details.`,
+        description: `Welcome to the Archive, ${name}.`,
       });
       
-      // Redirect to profile (My Legacy) where students make their profile
       router.push("/profile");
     } catch (error: any) {
       toast({
