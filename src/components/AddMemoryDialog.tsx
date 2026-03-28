@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -10,6 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { generateMemoryPrompts } from "@/ai/flows/generate-memory-prompts";
 import { Sparkles, Plus, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useFirestore, useUser } from "@/firebase";
+import { collection, doc, serverTimestamp } from "firebase/firestore";
+import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export function AddMemoryDialog() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -17,6 +19,9 @@ export function AddMemoryDialog() {
   const [classYear, setClassYear] = useState("");
   const [theme, setTheme] = useState("");
   const [memoryText, setMemoryText] = useState("");
+  const [title, setTitle] = useState("");
+  const { user } = useUser();
+  const db = useFirestore();
 
   const handleGeneratePrompts = async () => {
     setIsGenerating(true);
@@ -34,12 +39,53 @@ export function AddMemoryDialog() {
     }
   };
 
+  const handlePostMemory = () => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Required",
+        description: "Please sign in to post memories."
+      });
+      return;
+    }
+
+    if (!title || !memoryText || !classYear) {
+      toast({
+        variant: "destructive",
+        title: "Incomplete Fields",
+        description: "Please provide a title, class year, and your memory."
+      });
+      return;
+    }
+
+    const memoriesRef = collection(db, "students", user.uid, "memories");
+    const memoryData = {
+      studentId: user.uid,
+      title,
+      description: memoryText,
+      classYearLabel: `Class ${classYear}`,
+      uploadedAt: new Date().toISOString(),
+      createdAt: serverTimestamp(),
+    };
+
+    addDocumentNonBlocking(memoriesRef, memoryData);
+    
+    toast({
+      title: "Memory Shared!",
+      description: "Your memory has been added to your journey logs."
+    });
+    
+    // Reset fields
+    setTitle("");
+    setMemoryText("");
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="rounded-full bg-accent text-accent-foreground hover:bg-accent/90 gap-2">
-          <Plus className="w-4 h-4" /> Add Memory
-        </Button>
+        <button className="px-12 py-5 border border-white/20 text-white rounded-full font-black text-sm uppercase tracking-widest hover:bg-white/5 transition-all">
+          <Plus className="w-4 h-4 inline-block mr-2" /> Share a Memory
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] glass border-white/10">
         <DialogHeader>
@@ -50,6 +96,16 @@ export function AddMemoryDialog() {
         </DialogHeader>
 
         <div className="space-y-6 py-4">
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Memory Title</label>
+            <Input 
+              placeholder="e.g. The Night we sneaked out..." 
+              className="bg-white/5 border-white/10"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Class Year</label>
@@ -65,7 +121,7 @@ export function AddMemoryDialog() {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Theme</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Theme (Optional)</label>
               <Input 
                 placeholder="e.g. Sports, Mess, Exam" 
                 className="bg-white/5 border-white/10"
@@ -115,7 +171,7 @@ export function AddMemoryDialog() {
             />
           </div>
 
-          <Button className="w-full bg-primary text-primary-foreground font-bold py-6">
+          <Button onClick={handlePostMemory} className="w-full bg-primary text-primary-foreground font-bold py-6">
             Post Memory
           </Button>
         </div>

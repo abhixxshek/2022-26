@@ -12,14 +12,12 @@ const JNVLogo = () => (
     className="w-10 h-10 transition-transform group-hover:scale-110"
     fill="currentColor"
   >
-    {/* Simplified official JNV logo representation */}
-    <path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" fill="none" stroke="currentColor" strokeWidth="2" />
-    <circle cx="50" cy="40" r="12" className="fill-primary" />
-    <path d="M35 65 Q50 55 65 65" fill="none" stroke="currentColor" strokeWidth="3" />
-    <path d="M30 75 Q50 65 70 75" fill="none" stroke="currentColor" strokeWidth="3" />
-    <rect x="40" y="50" width="20" height="2" fill="currentColor" />
-    <path d="M25 45 L35 45 M65 45 L75 45" stroke="currentColor" strokeWidth="1.5" />
-    <path d="M50 25 V35" stroke="currentColor" strokeWidth="1" />
+    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2" />
+    <path d="M30 40 L50 20 L70 40 L70 70 L50 80 L30 70 Z" fill="none" stroke="currentColor" strokeWidth="2" />
+    <circle cx="50" cy="45" r="8" className="fill-primary" />
+    <path d="M35 60 Q50 50 65 60" fill="none" stroke="currentColor" strokeWidth="2" />
+    <path d="M30 68 Q50 58 70 68" fill="none" stroke="currentColor" strokeWidth="2" />
+    <text x="50" y="92" textAnchor="middle" fontSize="6" fontWeight="bold" fill="currentColor">JNV</text>
   </svg>
 );
 
@@ -48,7 +46,7 @@ export function Navbar() {
             <JNVLogo />
           </div>
           <div className="flex flex-col">
-            <span className="font-headline font-bold text-lg tracking-tight leading-none">
+            <span className="font-headline font-bold text-lg tracking-tight leading-none uppercase">
               JNV <span className="text-primary">MEMORIES</span>
             </span>
             <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.15em] mt-1">

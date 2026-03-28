@@ -5,7 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
 import { StudentCard } from "@/components/StudentCard";
 import { AddMemoryDialog } from "@/components/AddMemoryDialog";
-import { ChevronDown, MapPin, Heart, Coffee, Sun, Compass, Zap, Users, BookOpen } from "lucide-react";
+import { ChevronDown, MapPin, Heart, Coffee, Sun, Compass, Zap, Users, BookOpen, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 
@@ -44,11 +44,11 @@ export default function Home() {
               <p className="text-primary font-bold tracking-[0.6em] uppercase text-[10px] md:text-xs">Navodaya Vidyalaya | Batch 2018 - 2025</p>
               <span className="h-[1px] w-8 bg-primary/40" />
             </div>
-            <h1 className="text-7xl md:text-[10rem] font-headline font-black mb-6 leading-none tracking-tighter text-gradient">
+            <h1 className="text-7xl md:text-[10rem] font-headline font-black mb-6 leading-none tracking-tighter text-gradient uppercase">
               SEVEN <span className="italic font-light">YEARS</span>
             </h1>
             <p className="text-lg md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed font-light font-body">
-              From the heavy metal <span className="text-primary font-bold italic">Trunk Boxes</span> of Class 6 to the emotional farewell of Class 12. This is the story of our shared destiny.
+              From the heavy metal <span className="text-primary font-bold italic">Trunk Boxes</span> of Class 6 to the emotional farewell of Class 12. Once a Navodayan, Always a Navodayan.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
               <button 
@@ -86,7 +86,7 @@ export default function Home() {
               { 
                 icon: <Coffee className="w-8 h-8 text-primary" />, 
                 title: "Sunday Special", 
-                desc: "The puri-sabji aroma that meant freedom. The one day the mess felt like a feast." 
+                desc: "The puri-sabji aroma that meant freedom. The one day the mess felt like a feast after a long week." 
               },
               { 
                 icon: <Users className="w-8 h-8 text-primary" />, 
@@ -134,29 +134,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Migration Theme Section */}
-      <section className="py-40 px-6 relative overflow-hidden bg-primary/5">
-        <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
-          <Compass className="w-full h-full text-primary animate-pulse" />
-        </div>
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="max-w-3xl">
-            <Badge className="bg-primary/20 text-primary mb-8 px-4 py-1 border-none uppercase tracking-widest text-[10px] font-bold">The Great Exchange</Badge>
-            <h2 className="text-5xl md:text-8xl font-headline font-black mb-10 leading-none">The <span className="text-primary italic">Migration</span> Year</h2>
-            <p className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed mb-12">
-              Class 9 was our window to the world. A 2000km train journey to a land with a different language, 
-              where we learned that "National Integration" wasn't just a chapter in civics, but a lived reality.
-            </p>
-            <Link href="/gallery" className="inline-flex items-center gap-4 text-primary font-black uppercase tracking-widest text-sm hover:gap-6 transition-all">
-              View Migration Memories <Compass className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Batch Journey: Class 6 to 12 */}
+      {/* Journey Section: Class 6 to 12 */}
       <section className="py-32 px-6">
         <div className="max-w-7xl mx-auto space-y-40">
+          <div className="text-center mb-40">
+            <h2 className="text-5xl md:text-7xl font-headline font-black mb-8 uppercase tracking-tighter">The 7-Year <span className="text-primary italic">Arc</span></h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light">From the first step in Class 6 to the final salute in Class 12.</p>
+          </div>
+
           {YEAR_DATA.map((year, index) => (
             <div key={year.id} id={year.id} className="relative">
               <div className="mb-24">
@@ -169,7 +154,7 @@ export default function Home() {
                     <span className="w-8 h-[1px] bg-primary" />
                     {year.subtitle}
                   </p>
-                  <h2 className="text-6xl md:text-9xl font-headline font-black mb-10 tracking-tighter">{year.title}</h2>
+                  <h2 className="text-6xl md:text-9xl font-headline font-black mb-10 tracking-tighter uppercase">{year.title}</h2>
                   <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-light">
                     {year.description}
                   </p>
@@ -189,30 +174,29 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-40 px-6 border-t border-white/5 relative">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-5xl md:text-[12rem] font-headline font-black text-white/5 mb-20 pointer-events-none select-none tracking-tighter">
+          <h2 className="text-5xl md:text-[12rem] font-headline font-black text-white/5 mb-20 pointer-events-none select-none tracking-tighter uppercase">
             NAVODAYA
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-20 text-left">
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">The Batch 18-25</p>
               <p className="text-muted-foreground leading-relaxed font-light">
-                This digital yearbook is a sacred space for the Batch of 2018-2025. 
-                Thousands of shared meals, countless night preps, and a brotherhood forged in the dormitories.
+                Once a Navodayan, Always a Navodayan. This digital yearbook is a sacred space for the Batch of 2018-2025.
               </p>
             </div>
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">Navigation</p>
+              <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">Quick Links</p>
               <ul className="space-y-4 text-sm font-medium">
                 <li><Link href="/gallery" className="hover:text-primary transition-colors">Moments Gallery</Link></li>
-                <li><Link href="/auth" className="hover:text-primary transition-colors">Join the Directory</Link></li>
-                <li><Link href="/profile" className="hover:text-primary transition-colors">Your Legacy</Link></li>
+                <li><Link href="/auth" className="hover:text-primary transition-colors">Join the Batch</Link></li>
+                <li><Link href="/profile" className="hover:text-primary transition-colors">Your Profile</Link></li>
               </ul>
             </div>
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">The Anthem</p>
+              <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">The Motto</p>
               <p className="italic text-muted-foreground text-sm font-light leading-relaxed">
-                "Hum Navodaya Ho, Hum Navodaya Ho... <br />
-                Pragatishila Hum, Hum Navodaya Ho."
+                "Pragati Shila Hum Navodaya Ho... <br />
+                National Integration Through Education."
               </p>
             </div>
           </div>

@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'JNV Memories | Batch 2018-2025',
-  description: 'The digital yearbook for Jawahar Navodaya Vidyalaya Batch of 2018-2025.',
+  description: 'The digital yearbook for Jawahar Navodaya Vidyalaya Batch of 2018-2025. Once a Navodayan, Always a Navodayan.',
 };
 
 export default function RootLayout({
