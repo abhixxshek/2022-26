@@ -1,3 +1,4 @@
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -32,7 +33,7 @@ export default function Home() {
             
             <h1 className="text-7xl md:text-[11rem] font-black mb-12 leading-none tracking-tighter uppercase flex flex-wrap justify-center items-baseline gap-x-12">
               <span>Batch</span>
-              <span className="font-serif font-light text-white/95 italic normal-case tracking-tight">2018—25</span>
+              <span className="font-serif font-light text-white/95 italic normal-case tracking-tight">2018—2025</span>
             </h1>
 
             <div className="w-32 h-[1px] bg-gradient-to-r from-transparent via-primary/60 to-transparent mx-auto mb-16" />
@@ -49,7 +50,7 @@ export default function Home() {
               onClick={() => document.getElementById('stats')?.scrollIntoView({ behavior: 'smooth' })}
             >
               <span className="text-[10px] uppercase font-black tracking-[0.6em] text-white/20 group-hover:text-primary transition-colors">
-                Initiate Sequence
+                Explore the Archive
               </span>
               <div className="relative w-[1px] h-24 overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-primary to-transparent translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-1000" />
