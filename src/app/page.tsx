@@ -1,12 +1,13 @@
+
 "use client";
 
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
 import { StudentCard } from "@/components/StudentCard";
-import { AddMemoryDialog } from "@/components/AddMemoryDialog";
 import { Zap, Coffee, Users, ScrollText, History, Camera, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -15,6 +16,18 @@ export default function Home() {
       
       {/* Cinematic Hero Section */}
       <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
+        {/* Background Image - Cinematic Vibe */}
+        <div className="absolute inset-0 z-0">
+          <Image 
+            src="https://picsum.photos/seed/navodaya-road/1920/1080" 
+            alt="The Road Ahead"
+            fill
+            className="object-cover grayscale opacity-30"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505]" />
+        </div>
+
         {/* Ambient background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
         
@@ -40,7 +53,7 @@ export default function Home() {
             <p className="text-white/30 text-[10px] md:text-xs max-w-md mx-auto leading-relaxed font-black uppercase tracking-[0.5em] mb-20">
               The Digital Archive of Jawahar Navodaya Vidyalaya.
               <br />
-              Preserving Every Memory, Every Bond.
+              Every mile we walked together, every memory we made.
             </p>
 
             <motion.div 

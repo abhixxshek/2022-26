@@ -3,27 +3,15 @@
   "placeholderImages": [
     {
       "id": "hero-bg",
-      "description": "Nostalgic school hallway or campus",
-      "imageUrl": "https://picsum.photos/seed/navodaya-hero/1920/1080",
-      "imageHint": "school campus"
+      "description": "Nostalgic cinematic road through a forest",
+      "imageUrl": "https://picsum.photos/seed/navodaya-road/1920/1080",
+      "imageHint": "cinematic road forest"
     },
     {
-      "id": "student-1",
-      "description": "Student portrait",
-      "imageUrl": "https://picsum.photos/seed/student1/400/500",
-      "imageHint": "student portrait"
-    },
-    {
-      "id": "student-2",
-      "description": "Student portrait",
-      "imageUrl": "https://picsum.photos/seed/student2/400/500",
-      "imageHint": "student portrait"
-    },
-    {
-      "id": "student-3",
-      "description": "Student portrait",
-      "imageUrl": "https://picsum.photos/seed/student3/400/500",
-      "imageHint": "student portrait"
+      "id": "student-default",
+      "description": "Default student portrait archive style",
+      "imageUrl": "https://picsum.photos/seed/student-archive/400/500",
+      "imageHint": "portrait grayscale"
     },
     {
       "id": "memory-1",
