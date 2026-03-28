@@ -68,11 +68,12 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
+    // Increased to 5MB
+    if (file.size > 5 * 1024 * 1024) {
       toast({
         variant: "destructive",
         title: "File Too Large",
-        description: "Please select an identity photo smaller than 2MB."
+        description: "Please select an identity photo smaller than 5MB."
       });
       return;
     }
