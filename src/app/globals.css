@@ -22,7 +22,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 142.1 76.2% 36.3%;
+    --ring: 47.9 95.8% 53.1%;
     --radius: 0.5rem;
   }
 }
@@ -37,16 +37,16 @@
   }
 }
 
+.font-serif {
+  font-family: 'Playfair Display', serif;
+}
+
 .glass {
   @apply bg-black/40 backdrop-blur-md border border-white/10;
 }
 
 .text-gradient {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-primary/50;
-}
-
-.scroll-section {
-  @apply min-h-screen flex flex-col justify-center py-20 px-6;
 }
 
 ::-webkit-scrollbar {
@@ -69,4 +69,8 @@
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+.hero-radial-gradient {
+  background: radial-gradient(circle at center, rgba(40, 40, 40, 0.4) 0%, rgba(5, 5, 5, 1) 100%);
 }
