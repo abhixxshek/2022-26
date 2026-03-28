@@ -3,11 +3,11 @@
 
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
-import { useFirestore, useCollection, useMemoFirebase, useUser, useDoc } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, useDoc, useAuth, initiateSignOut } from "@/firebase";
 import { collection, query, orderBy, doc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Users, BookOpen, Camera, Trash2, ShieldAlert, Loader2 } from "lucide-react";
+import { Users, BookOpen, Camera, Trash2, ShieldAlert, Loader2, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -16,6 +16,7 @@ import { toast } from "@/hooks/use-toast";
 
 export default function AdminDashboard() {
   const { user, isUserLoading } = useUser();
+  const auth = useAuth();
   const db = useFirestore();
   const router = useRouter();
   const [isAuthorizing, setIsAuthorizing] = useState(true);
@@ -81,6 +82,11 @@ export default function AdminDashboard() {
     });
   };
 
+  const handleSignOut = () => {
+    initiateSignOut(auth);
+    router.push("/");
+  };
+
   if (isAuthorizing) {
     return (
       <div className="bg-[#050505] min-h-screen flex items-center justify-center">
@@ -98,12 +104,21 @@ export default function AdminDashboard() {
       
       <main className="pt-40 pb-32 px-6">
         <div className="max-w-7xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-16">
-            <div className="flex items-center gap-4 mb-4">
-              <ShieldAlert className="w-8 h-8 text-primary" />
-              <h1 className="text-5xl font-black uppercase tracking-tighter">Admin <span className="text-primary">Control</span></h1>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div>
+              <div className="flex items-center gap-4 mb-4">
+                <ShieldAlert className="w-8 h-8 text-primary" />
+                <h1 className="text-5xl font-black uppercase tracking-tighter">Admin <span className="text-primary">Control</span></h1>
+              </div>
+              <p className="text-white/40 uppercase font-black text-[10px] tracking-[0.5em]">Moderation Portal | Batch '25 Archive</p>
             </div>
-            <p className="text-white/40 uppercase font-black text-[10px] tracking-[0.5em]">Moderation Portal | Batch '25 Archive</p>
+            <Button 
+              variant="outline" 
+              onClick={handleSignOut}
+              className="border-white/10 text-white/40 hover:text-destructive hover:border-destructive/40 rounded-full px-8 h-12 text-[10px] font-black uppercase tracking-[0.3em] gap-3 transition-all"
+            >
+              <LogOut className="w-3 h-3" /> Secure Logout
+            </Button>
           </motion.div>
 
           <Tabs defaultValue="students" className="space-y-12">

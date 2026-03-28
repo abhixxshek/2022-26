@@ -3,17 +3,19 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ShieldCheck, User } from "lucide-react";
-import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
+import { ShieldCheck, User, LogOut } from "lucide-react";
+import { useUser, useFirestore, useDoc, useMemoFirebase, useAuth, initiateSignOut } from "@/firebase";
 import { doc } from "firebase/firestore";
 import Image from "next/image";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { user } = useUser();
+  const auth = useAuth();
   const db = useFirestore();
 
   const studentRef = useMemoFirebase(() => {
@@ -31,6 +33,11 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSignOut = () => {
+    initiateSignOut(auth);
+    router.push("/");
+  };
 
   const navLinks = [
     { name: "The Journey", href: "/" },
@@ -95,21 +102,33 @@ export function Navbar() {
             )}
           </div>
           
-          <Link 
-            href={user ? "/profile" : "/auth"} 
-            className={cn(
-              "px-8 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border flex items-center gap-2",
-              pathname === "/auth" || pathname === "/profile"
-                ? "bg-primary text-black border-primary" 
-                : "bg-white/10 hover:bg-white/20 border-white/20 text-white"
+          <div className="flex items-center gap-4">
+            <Link 
+              href={user ? "/profile" : "/auth"} 
+              className={cn(
+                "px-8 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border flex items-center gap-2",
+                pathname === "/auth" || pathname === "/profile"
+                  ? "bg-primary text-black border-primary" 
+                  : "bg-white/10 hover:bg-white/20 border-white/20 text-white"
+              )}
+            >
+              {user ? (
+                <>
+                  <User className="w-3 h-3" /> PROFILE
+                </>
+              ) : "ARCHIVE ENTRY"}
+            </Link>
+
+            {user && (
+              <button
+                onClick={handleSignOut}
+                className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-destructive hover:border-destructive/40 transition-all"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             )}
-          >
-            {user ? (
-              <>
-                <User className="w-3 h-3" /> PROFILE
-              </>
-            ) : "ARCHIVE ENTRY"}
-          </Link>
+          </div>
         </div>
       </div>
     </nav>
