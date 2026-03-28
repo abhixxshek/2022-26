@@ -24,9 +24,9 @@ export interface YearSectionData {
 
 export const YEAR_DATA: YearSectionData[] = [
   {
-    id: "juniors-6-7",
-    title: "The Genesis",
-    subtitle: "2018-2020 | Class 6 & 7",
+    id: "class-6",
+    title: "The Arrival",
+    subtitle: "2018-2019 | Class 6",
     description: "The sound of oversized trunks hitting the dormitory floor. We were small children lost in a massive campus, crying for home, eventually finding it in each other. From the first 'Roll Call' to the first 'Mess' meal.",
     students: [
       {
@@ -45,10 +45,24 @@ export const YEAR_DATA: YearSectionData[] = [
     ]
   },
   {
-    id: "middles-8-9",
+    id: "class-7",
+    title: "The Bond",
+    subtitle: "2019-2020 | Class 7",
+    description: "No longer the 'newbies', we started owning the corridors. First house matches, the first time we sneaked into the mess for an extra cup of tea, and the birth of friendships that would last a lifetime.",
+    students: []
+  },
+  {
+    id: "class-8",
+    title: "The Middle Path",
+    subtitle: "2020-2021 | Class 8",
+    description: "The transition year. We became 'Middles'. Late night whispers in dormitories and the first realizations of how big our world really was within these JNV gates.",
+    students: []
+  },
+  {
+    id: "class-9",
     title: "The Great Migration",
-    subtitle: "2020-2022 | Class 8 & 9",
-    description: "Class 9 was our window to the world. A 2000km train journey to a land with a different language. We learned that 'National Integration' wasn't just a chapter in civics, but a lived reality.",
+    subtitle: "2021-2022 | Class 9",
+    description: "A 2000km train journey to a land with a different language. We learned that 'National Integration' wasn't just a chapter in civics, but a lived reality. Mini-India in a sleeper coach.",
     students: [
       {
         id: "rahul-das",
@@ -66,10 +80,10 @@ export const YEAR_DATA: YearSectionData[] = [
     ]
   },
   {
-    id: "seniors-10-11",
-    title: "The Turning Point",
-    subtitle: "2022-2024 | Class 10 & 11",
-    description: "The pressure of boards, the 'Night Prep' rituals, and the realization that the senior-most years were approaching. Friendships forged in the library and the volleyball court.",
+    id: "class-10",
+    title: "The Board Prep",
+    subtitle: "2022-2023 | Class 10",
+    description: "The pressure of first boards, the 'Night Prep' rituals, and the library becoming our second home. Biscuits shared during study breaks and the fear of the future starting to creep in.",
     students: [
       {
         id: "priya-verma",
@@ -87,10 +101,17 @@ export const YEAR_DATA: YearSectionData[] = [
     ]
   },
   {
-    id: "legends-12",
-    title: "The Last Salute",
+    id: "class-11",
+    title: "The Seniority",
+    subtitle: "2023-2024 | Class 11",
+    description: "The Golden Year. Seniors but without the immediate board pressure. Exploring our talents, winning trophies for the house, and realizing we only had two years left of this magic.",
+    students: []
+  },
+  {
+    id: "class-12",
+    title: "The Final Salute",
     subtitle: "2024-2025 | Class 12",
-    description: "The transition from being children to the 'Legends'. Farewell tears, writing on each other's shirts, and the realization that the seven years are finally ending.",
+    description: "The transition to 'Legends'. Farewell tears, writing on each other's shirts, and the long walk out of the main gate. Once a Navodayan, Always a Navodayan.",
     students: [
       {
         id: "sneha-reddy",
