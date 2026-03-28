@@ -25,18 +25,30 @@ export function initiateAnonymousSignIn(authInstance: Auth): void {
 /** Initiate Google sign-in (non-blocking). */
 export function initiateGoogleSignIn(authInstance: Auth): void {
   const provider = new GoogleAuthProvider();
-  signInWithPopup(authInstance, provider).then(() => {
-    toast({
-      title: "Authorized via Google",
-      description: "Identity verified. Redirecting to student profile.",
-    });
-  }).catch((error) => {
-    toast({
-      variant: "destructive",
-      title: "Google Auth Error",
-      description: error.message,
-    });
+  // Adding custom parameters can help with specific environment issues
+  provider.setCustomParameters({
+    prompt: 'select_account'
   });
+
+  signInWithPopup(authInstance, provider)
+    .then((result) => {
+      toast({
+        title: "Authorized via Google",
+        description: `Welcome, ${result.user.displayName || 'Navodayan'}. Your session is active.`,
+      });
+    })
+    .catch((error) => {
+      // Check for common popup blocked error
+      const message = error.code === 'auth/popup-blocked' 
+        ? "The sign-in popup was blocked by your browser. Please allow popups for this site."
+        : error.message;
+
+      toast({
+        variant: "destructive",
+        title: "Google Auth Error",
+        description: message,
+      });
+    });
 }
 
 /** Initiate email/password sign-up (non-blocking). */
