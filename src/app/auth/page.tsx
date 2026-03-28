@@ -91,7 +91,12 @@ export default function AuthPage() {
         description: `Welcome to the Archive, ${name}.`,
       });
       
-      router.push("/profile");
+      // Conditional Redirect: Admin to Dashboard, Student to Profile
+      if (isAdminEntry) {
+        router.push("/admin");
+      } else {
+        router.push("/profile");
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
