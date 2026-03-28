@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,15 +11,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { 
   ArrowRight, 
   ShieldCheck, 
-  History, 
   Lock, 
   Mail, 
   CheckCircle2, 
   Info,
   ExternalLink,
-  RefreshCw,
   Copy,
-  Check
+  Check,
+  Sparkles
 } from "lucide-react";
 import { initiateEmailSignIn, initiateEmailSignUp, initiateGoogleSignIn } from "@/firebase/non-blocking-login";
 import { useAuth, useUser } from "@/firebase";
@@ -64,22 +63,19 @@ export default function AuthPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
 
+  const BATCH_ACCESS_KEY = "JNVRTM25";
+
   useEffect(() => {
     if (user) {
       router.push("/profile");
     }
   }, [user, router]);
 
-  const generateKey = () => {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let result = "";
-    for (let i = 0; i < 12; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setPassword(result);
+  const applyBatchKey = () => {
+    setPassword(BATCH_ACCESS_KEY);
     toast({
-      title: "Access Key Generated",
-      description: "Please copy and save this key securely. You will need it to login.",
+      title: "Batch Key Applied",
+      description: "The official Batch '25 Access Key has been set.",
     });
   };
 
@@ -101,15 +97,6 @@ export default function AuthPage() {
         variant: "destructive",
         title: "Consent Required",
         description: "Please agree to the Digital Archive terms to proceed.",
-      });
-      return;
-    }
-
-    if (password.length < 6) {
-      toast({
-        variant: "destructive",
-        title: "Weak Access Key",
-        description: "Your Access Key must be at least 6 characters long.",
       });
       return;
     }
@@ -165,7 +152,7 @@ export default function AuthPage() {
                 Always a <span className="text-primary not-italic font-black uppercase">Navodayan.</span>
               </h1>
               <p className="text-white/40 text-lg font-light leading-relaxed max-w-lg font-serif italic">
-                A digital legacy for the Batch of 2018—2025. Access your secure record with your institutional email and access key.
+                The secure digital legacy for JNV Kalukheda (Batch of 2018—2025). Access your archive record with your official email and the batch access key.
               </p>
             </div>
 
@@ -175,8 +162,8 @@ export default function AuthPage() {
                   <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80 mb-2">Key-Based Access</h3>
-                  <p className="text-[11px] text-white/30 uppercase font-black tracking-widest leading-relaxed">No complex passwords. Just your email and a secure generated access key.</p>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80 mb-2">Standardized Key</h3>
+                  <p className="text-[11px] text-white/30 uppercase font-black tracking-widest leading-relaxed">Use the official batch key "{BATCH_ACCESS_KEY}" for instant identification.</p>
                 </div>
               </div>
 
@@ -185,7 +172,7 @@ export default function AuthPage() {
                   <ShieldCheck className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80 mb-2">Secure Archive</h3>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80 mb-2">Identity Vault</h3>
                   <p className="text-[11px] text-white/30 uppercase font-black tracking-widest leading-relaxed">Your data is stored in the Batch '25 vault, protected by Firebase security.</p>
                 </div>
               </div>
@@ -195,8 +182,8 @@ export default function AuthPage() {
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80 mb-2">Verified Identity</h3>
-                  <p className="text-[11px] text-white/30 uppercase font-black tracking-widest leading-relaxed">Connect with verified Batch '25 alumni and rediscover lost bonds.</p>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80 mb-2">Verified Bonding</h3>
+                  <p className="text-[11px] text-white/30 uppercase font-black tracking-widest leading-relaxed">Connect with verified alumni and rediscover the magic of JNV life.</p>
                 </div>
               </div>
             </div>
@@ -266,15 +253,13 @@ export default function AuthPage() {
                             <label className="text-[9px] font-black uppercase tracking-[0.4em] text-primary flex items-center gap-2">
                               <Lock className="w-3 h-3" /> Access Key
                             </label>
-                            {!isLogin && (
-                              <button 
-                                type="button" 
-                                onClick={generateKey}
-                                className="text-[8px] font-black uppercase tracking-widest text-white/30 hover:text-primary transition-colors flex items-center gap-1.5"
-                              >
-                                <RefreshCw className="w-2.5 h-2.5" /> Generate Key
-                              </button>
-                            )}
+                            <button 
+                              type="button" 
+                              onClick={applyBatchKey}
+                              className="text-[8px] font-black uppercase tracking-widest text-white/30 hover:text-primary transition-colors flex items-center gap-1.5"
+                            >
+                              <Sparkles className="w-2.5 h-2.5" /> Apply "{BATCH_ACCESS_KEY}"
+                            </button>
                           </div>
                           <div className="relative">
                             <Input 
@@ -285,7 +270,7 @@ export default function AuthPage() {
                               onChange={(e) => setPassword(e.target.value)}
                               required
                             />
-                            {!isLogin && password && (
+                            {password && (
                               <button 
                                 type="button"
                                 onClick={copyToClipboard}
@@ -295,11 +280,9 @@ export default function AuthPage() {
                               </button>
                             )}
                           </div>
-                          {!isLogin && (
-                            <p className="text-[8px] text-white/20 uppercase font-black tracking-widest ml-1">
-                              * Share this email and key only with trusted Batch '25 members.
-                            </p>
-                          )}
+                          <p className="text-[8px] text-white/20 uppercase font-black tracking-widest ml-1">
+                            {isLogin ? "* Use your registered archive access key." : `* Recommended key: ${BATCH_ACCESS_KEY} for all students.`}
+                          </p>
                         </div>
 
                         {!isLogin && (
