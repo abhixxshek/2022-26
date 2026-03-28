@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef } from "react";
@@ -35,11 +36,11 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 1024 * 1024) {
+    if (file.size > 2 * 1024 * 1024) {
       toast({
         variant: "destructive",
         title: "File Too Large",
-        description: "Please select an image smaller than 1MB."
+        description: "Please select an image smaller than 2MB."
       });
       return;
     }
