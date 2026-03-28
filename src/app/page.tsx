@@ -134,7 +134,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The Journey Section - Extended Widescreen Layout */}
+      {/* The Journey Section - Widescreen Layout */}
       <section id="journey" className="py-60 px-6 relative bg-background overflow-hidden">
         <div className="max-w-[1600px] mx-auto relative px-12">
           <div className="text-center mb-48 space-y-6">
@@ -222,7 +222,7 @@ export default function Home() {
                           <h3 className="text-6xl md:text-8xl font-serif text-white mb-10 tracking-tighter">
                             {year.title}
                           </h3>
-                          <p className="text-white/60 text-lg md:text-xl lg:text-2xl leading-relaxed font-light font-serif italic tracking-tight">
+                          <p className="text-white/60 text-sm md:text-base leading-relaxed font-light font-serif italic tracking-tight max-w-2xl">
                             "{year.description}"
                           </p>
                         </div>
