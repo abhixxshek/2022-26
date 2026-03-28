@@ -158,7 +158,7 @@ export default function Home() {
 
                     <div className={`grid grid-cols-1 md:grid-cols-2 gap-24 md:gap-48 w-full items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
                       <motion.div 
-                        initial={{ opacity: 0, x: isEven ? -50 : 50 }}
+                        initial={{ opacity: 0, x: -50 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-100px" }}
                         transition={{ duration: 0.8 }}
@@ -193,7 +193,7 @@ export default function Home() {
                           <h3 className="text-5xl md:text-8xl font-serif text-white mb-10 tracking-tighter leading-none">
                             {year.title}
                           </h3>
-                          <p className="text-white/60 text-xl md:text-3xl leading-relaxed font-light font-serif italic tracking-tight max-w-4xl">
+                          <p className="text-white/60 text-2xl md:text-4xl leading-relaxed font-light font-serif italic tracking-tight max-w-4xl">
                             "{year.description}"
                           </p>
                         </div>

@@ -76,14 +76,28 @@ export default function AuthPage() {
     setIsSubmitting(true);
     try {
       let userCredential;
+      // We use a internal shared password to allow "double-time" email usage
+      // (switching roles or names with the same email).
+      const SHARED_INTERNAL_PASSWORD = "NAVODAYA_ARCHIVE_SYSTEM_PWD";
+
       try {
-        // Attempt login using the key as password
-        userCredential = await signInWithEmailAndPassword(auth, email, formattedKey);
+        // Attempt login using the internal shared password
+        userCredential = await signInWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
       } catch (err: any) {
         if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email' || err.code === 'auth/wrong-password') {
-          // If login fails, create a new record
-          userCredential = await createUserWithEmailAndPassword(auth, email, formattedKey);
-          await updateProfile(userCredential.user, { displayName: name });
+          // If login fails or user exists with a different legacy password, we try to create/re-access
+          try {
+            userCredential = await createUserWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
+            await updateProfile(userCredential.user, { displayName: name });
+          } catch (createErr: any) {
+            if (createErr.code === 'auth/email-already-in-use') {
+              // If email exists but password was different (legacy), we inform them
+              // In an MVP, we'll try to sign in with the key as password as a fallback for legacy accounts
+              userCredential = await signInWithEmailAndPassword(auth, email, formattedKey);
+            } else {
+              throw createErr;
+            }
+          }
         } else {
           throw err;
         }
