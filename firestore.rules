@@ -1,17 +1,11 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
      * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES
-     * 
-     * Core Philosophy:
-     * This ruleset implements a "Yearbook" security model. All authenticated students
-     * can browse batches, profiles, and memories (Read Access), but modifications are
-     * strictly limited to the owner of the data (Write Access).
      */
-
-    // --- Helper Functions ---
 
     function isSignedIn() {
       return request.auth != null;
@@ -21,18 +15,9 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // --- Collection Rules ---
-
-    match /batches/{batchId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if false;
-    }
-
     match /students/{studentId} {
       allow get, list: if isSignedIn();
-      allow create: if isOwner(studentId);
-      allow update: if isOwner(studentId);
-      allow delete: if isOwner(studentId);
+      allow create, update, delete: if isOwner(studentId);
     }
 
     match /memories/{memoryId} {
@@ -45,8 +30,12 @@ service cloud.firestore {
     match /photos/{photoId} {
       allow get, list: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.uploadedByStudentId == request.auth.uid;
-      allow update: if isSignedIn() && resource.data.uploadedByStudentId == request.auth.uid;
-      allow delete: if isSignedIn() && resource.data.uploadedByStudentId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.uploadedByStudentId == request.auth.uid;
+    }
+
+    match /journey/{yearId} {
+      allow get, list: if true; // Publicly viewable
+      allow write: if isSignedIn(); // Any authenticated student can refine the legacy
     }
   }
 }

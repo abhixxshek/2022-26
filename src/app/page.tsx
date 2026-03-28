@@ -1,13 +1,55 @@
+
 "use client";
 
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
-import { Zap, Coffee, Users, ScrollText, Camera, ChevronRight } from "lucide-react";
+import { Zap, Coffee, Users, ScrollText, Camera, ChevronRight, Loader2, Database } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
+import { collection, query, orderBy, writeBatch, doc } from "firebase/firestore";
+import { EditJourneyDialog } from "@/components/EditJourneyDialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 export default function Home() {
+  const { user } = useUser();
+  const db = useFirestore();
+
+  const journeyQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return query(collection(db, "journey"), orderBy("order", "asc"));
+  }, [db]);
+
+  const { data: journeyData, isLoading } = useCollection(journeyQuery);
+
+  const initializeJourney = async () => {
+    if (!db) return;
+    const batch = writeBatch(db);
+    
+    YEAR_DATA.forEach((year, index) => {
+      const yearRef = doc(db, "journey", year.id);
+      batch.set(yearRef, {
+        id: year.id,
+        order: index,
+        title: year.title,
+        subtitle: year.subtitle,
+        description: year.description,
+        imageUrl: year.students[0]?.memories[0]?.image || `https://picsum.photos/seed/${year.id}/800/800`
+      });
+    });
+
+    try {
+      await batch.commit();
+      toast({ title: "Timeline Initialized", description: "The 7-year legacy framework has been committed to Firestore." });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Initialization Failed", description: "Check permissions." });
+    }
+  };
+
+  const displayData = journeyData && journeyData.length > 0 ? journeyData : YEAR_DATA;
+
   return (
     <div className="bg-[#050505] text-foreground min-h-screen selection:bg-primary/30 overflow-x-hidden font-body">
       <Navbar />
@@ -107,68 +149,91 @@ export default function Home() {
             <h2 className="text-5xl md:text-7xl font-serif text-white tracking-tight">
               The Journey: 2018–2025
             </h2>
+            {user && (!journeyData || journeyData.length === 0) && (
+              <Button 
+                variant="outline" 
+                onClick={initializeJourney}
+                className="mt-8 border-primary/20 text-primary hover:bg-primary/5 uppercase font-black text-[9px] tracking-widest"
+              >
+                <Database className="w-3 h-3 mr-2" /> Initialize Archive Data
+              </Button>
+            )}
           </div>
 
           {/* Vertical Line */}
           <div className="timeline-line" />
 
           <div className="space-y-64 relative">
-            {YEAR_DATA.map((year, index) => {
-              const isEven = index % 2 === 0;
-              const academicYearRange = year.subtitle.split(' | ')[0];
-              
-              return (
-                <div key={year.id} className="relative flex items-center justify-center">
-                  {/* Year Range Marker (Time Lapse) */}
-                  <div className="timeline-marker w-20 h-20 text-[11px] leading-tight text-center px-1">
-                    {academicYearRange}
-                  </div>
+            {isLoading ? (
+              <div className="flex justify-center py-40">
+                <Loader2 className="w-12 h-12 animate-spin text-white/10" />
+              </div>
+            ) : (
+              displayData.map((year: any, index: number) => {
+                const isEven = index % 2 === 0;
+                const academicYearRange = year.subtitle.split(' | ')[0];
+                
+                return (
+                  <div key={year.id} className="relative flex items-center justify-center">
+                    {/* Year Range Marker (Time Lapse) */}
+                    <div className="timeline-marker w-20 h-20 text-[11px] leading-tight text-center px-1">
+                      {academicYearRange}
+                    </div>
 
-                  <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32 w-full items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
-                    {/* Image Side */}
-                    <motion.div 
-                      initial={{ opacity: 0, x: isEven ? -50 : 50 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true, margin: "-100px" }}
-                      transition={{ duration: 0.8 }}
-                      className={`flex justify-center ${isEven ? 'md:justify-end' : 'md:justify-start'}`}
-                    >
-                      <div className="polaroid -rotate-3 transition-transform hover:rotate-0 duration-500 max-w-[320px]">
-                        <div className="relative aspect-square w-full overflow-hidden bg-muted">
-                          <Image 
-                            src={year.students[0]?.memories[0]?.image || `https://picsum.photos/seed/${year.id}/800/800`}
-                            alt={year.title}
-                            fill
-                            className="object-cover grayscale"
-                          />
+                    <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-32 w-full items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                      {/* Image Side */}
+                      <motion.div 
+                        initial={{ opacity: 0, x: isEven ? -50 : 50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 0.8 }}
+                        className={`flex justify-center ${isEven ? 'md:justify-end' : 'md:justify-start'}`}
+                      >
+                        <div className="polaroid -rotate-3 transition-transform hover:rotate-0 duration-500 max-w-[320px]">
+                          <div className="relative aspect-square w-full overflow-hidden bg-muted">
+                            <Image 
+                              src={year.imageUrl || year.students?.[0]?.memories?.[0]?.image || `https://picsum.photos/seed/${year.id}/800/800`}
+                              alt={year.title}
+                              fill
+                              className="object-cover grayscale"
+                            />
+                          </div>
+                          <div className="polaroid-caption">
+                            {year.title} 🕊️
+                          </div>
                         </div>
-                        <div className="polaroid-caption">
-                          {year.students[0]?.memories[0]?.title || year.subtitle} 🕊️
-                        </div>
-                      </div>
-                    </motion.div>
+                      </motion.div>
 
-                    {/* Text Side */}
-                    <motion.div 
-                      initial={{ opacity: 0, x: isEven ? 50 : -50 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true, margin: "-100px" }}
-                      transition={{ duration: 0.8 }}
-                      className={`text-center md:text-left ${!isEven && 'md:text-right'}`}
-                    >
-                      <div className="max-w-sm mx-auto md:mx-0">
-                        <h3 className="text-3xl md:text-4xl font-serif text-white mb-6">
-                          {year.title}
-                        </h3>
-                        <p className="text-white/40 text-sm leading-relaxed font-light font-serif italic">
-                          "{year.description}"
-                        </p>
-                      </div>
-                    </motion.div>
+                      {/* Text Side */}
+                      <motion.div 
+                        initial={{ opacity: 0, x: isEven ? 50 : -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 0.8 }}
+                        className={`text-center md:text-left ${!isEven && 'md:text-right'}`}
+                      >
+                        <div className="max-w-sm mx-auto md:mx-0 relative">
+                          {user && (
+                            <div className="absolute -top-12 right-0 md:-left-12">
+                              <EditJourneyDialog yearData={year} />
+                            </div>
+                          )}
+                          <h3 className="text-3xl md:text-4xl font-serif text-white mb-6">
+                            {year.title}
+                          </h3>
+                          <p className="text-white/40 text-sm leading-relaxed font-light font-serif italic">
+                            "{year.description}"
+                          </p>
+                          <div className="mt-4 text-[9px] font-black uppercase tracking-widest text-primary/40">
+                            {year.subtitle}
+                          </div>
+                        </div>
+                      </motion.div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
       </section>

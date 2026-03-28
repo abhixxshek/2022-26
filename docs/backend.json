@@ -133,6 +133,20 @@
         "uploadedByStudentId",
         "uploadedAt"
       ]
+    },
+    "JourneyYear": {
+      "title": "Journey Year",
+      "type": "object",
+      "description": "A milestone entry in the 7-year journey timeline.",
+      "properties": {
+        "id": { "type": "string" },
+        "order": { "type": "number", "description": "Sort order for the timeline." },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string", "description": "e.g., 2018-19 | Class 6" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string", "format": "uri" }
+      },
+      "required": ["id", "order", "title", "subtitle", "description"]
     }
   },
   "auth": {
@@ -152,6 +166,10 @@
     "/photos/{photoId}": {
       "schema": "Photo",
       "description": "Root collection for all photos (Media Vault)."
+    },
+    "/journey/{yearId}": {
+      "schema": "JourneyYear",
+      "description": "The dynamic 7-year journey timeline records."
     }
   }
 }
