@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -56,9 +57,15 @@ export function Navbar() {
           </div>
         </Link>
 
-        <div className="flex items-center gap-12">
+        <div className="flex items-center gap-10">
+          <Link href="/yearbook" className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40 hover:text-primary transition-all">
+            Yearbook
+          </Link>
           <Link href="/gallery" className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40 hover:text-primary transition-all">
-            Archive
+            Media Vault
+          </Link>
+          <Link href="/wall" className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40 hover:text-primary transition-all">
+            The Wall
           </Link>
           {user ? (
             <Link href="/profile" className="px-8 py-3 bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-full text-[9px] font-black uppercase tracking-[0.4em] transition-all">
