@@ -4,7 +4,7 @@
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
-import { Zap, Coffee, Users, ScrollText, Camera, ChevronRight, Loader2, Database, Eye } from "lucide-react";
+import { Zap, Coffee, Users, ScrollText, Camera, ChevronRight, Loader2, Database } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
@@ -134,42 +134,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-32 px-6 bg-[#020202] border-y border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-            {[
-              { icon: <Zap className="w-4 h-4" />, title: "Morning PT", count: "2500+", label: "Whistles" },
-              { icon: <Coffee className="w-4 h-4" />, title: "Sunday Mess", count: "365", label: "Specials" },
-              { icon: <Users className="w-4 h-4" />, title: "House Bonds", count: "04", label: "Dormitories" },
-              { icon: <ScrollText className="w-4 h-4" />, title: "Migration", count: "01", label: "Year Abroad" }
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center group"
-              >
-                <div className="text-primary/40 group-hover:text-primary transition-colors flex justify-center mb-4">{item.icon}</div>
-                <h4 className="text-4xl font-serif italic text-white mb-2">{item.count}</h4>
-                <p className="text-[9px] font-black uppercase tracking-widest text-white/20">{item.title}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* The Journey Section - Timeline Layout */}
+      {/* The Journey Section - Widescreen Layout */}
       <section id="journey" className="py-60 px-6 relative bg-background overflow-hidden">
         <div className="max-w-[1600px] mx-auto relative px-12">
           <div className="text-center mb-48 space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[8px] font-black uppercase tracking-widest">
               OUR HISTORY
             </div>
-            <h2 className="text-6xl md:text-9xl font-serif text-white tracking-tight">
-              The Journey: 2018–2025
+            <h2 className="text-7xl md:text-[10rem] font-serif text-white tracking-tight">
+              The Journey
             </h2>
             {user && (!journeyData || journeyData.length === 0) && (
               <Button 
@@ -193,12 +166,13 @@ export default function Home() {
               displayData.map((year: any, index: number) => {
                 const isEven = index % 2 === 0;
                 const academicYearRange = year.subtitle.split(' | ')[0];
+                const classNum = year.subtitle.match(/Class (\d+)/)?.[1];
                 
                 return (
                   <div key={year.id} className="relative flex items-center justify-center">
-                    <div className="timeline-marker w-24 h-24 text-[11px] leading-tight text-center px-1 flex flex-col items-center justify-center">
+                    <div className="timeline-marker w-28 h-28 text-[11px] leading-tight text-center px-1 flex flex-col items-center justify-center border-primary/20 shadow-[0_0_30px_rgba(255,191,0,0.1)]">
                       <span className="block opacity-40 mb-1">Class</span>
-                      <span className="text-lg font-black">{year.subtitle.match(/Class (\d+)/)?.[1]}</span>
+                      <span className="text-2xl font-black text-primary">{classNum}</span>
                       <span className="block text-[8px] opacity-40 mt-1">{academicYearRange}</span>
                     </div>
 
@@ -211,18 +185,22 @@ export default function Home() {
                         className={`flex justify-center ${isEven ? 'md:justify-end' : 'md:justify-start'}`}
                       >
                         <div 
-                          className="polaroid -rotate-3 transition-transform hover:rotate-0 duration-500 max-w-[600px] w-full cursor-pointer group"
+                          className="polaroid -rotate-2 transition-all hover:rotate-0 duration-700 max-w-[700px] w-full cursor-pointer group shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)]"
                           onClick={() => handleOpenGallery(year.subtitle)}
                         >
-                          <div className="relative aspect-square w-full overflow-hidden bg-muted">
+                          <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
                             <Image 
                               src={year.imageUrl || `https://picsum.photos/seed/${year.id}/800/800`}
                               alt={year.title}
                               fill
-                              className="object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-110"
+                              className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
                             />
+                            {/* Hover Overlay */}
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <Camera className="w-12 h-12 text-white/80" />
+                            </div>
                           </div>
-                          <div className="polaroid-caption text-xl py-8">
+                          <div className="polaroid-caption text-2xl py-10 tracking-tight">
                             {year.title} 🕊️
                           </div>
                         </div>
@@ -235,16 +213,16 @@ export default function Home() {
                         transition={{ duration: 0.8 }}
                         className={`text-center md:text-left ${!isEven && 'md:text-right'}`}
                       >
-                        <div className="max-w-2xl mx-auto md:mx-0 relative">
+                        <div className="max-w-3xl mx-auto md:mx-0 relative">
                           {user && (
-                            <div className="absolute -top-16 right-0 md:-left-12">
+                            <div className="absolute -top-16 right-0 md:-left-12 z-20">
                               <EditJourneyDialog yearData={year} />
                             </div>
                           )}
-                          <h3 className="text-4xl md:text-6xl font-serif text-white mb-10">
+                          <h3 className="text-5xl md:text-7xl font-serif text-white mb-10 tracking-tighter">
                             {year.title}
                           </h3>
-                          <p className="text-white/60 text-2xl md:text-4xl leading-tight font-light font-serif italic">
+                          <p className="text-white/60 text-3xl md:text-5xl lg:text-6xl leading-[1.15] font-light font-serif italic tracking-tight">
                             "{year.description}"
                           </p>
                         </div>

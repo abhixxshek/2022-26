@@ -4,33 +4,30 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES
+     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V3 - Explicit Access)
      */
 
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
     match /students/{studentId} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn() && request.auth.uid == studentId;
+      allow get, list: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == studentId;
     }
 
     match /memories/{memoryId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn() && request.resource.data.studentId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.studentId == request.auth.uid;
+      allow get, list: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.studentId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.studentId == request.auth.uid;
     }
 
     match /photos/{photoId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn() && request.resource.data.uploadedByStudentId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.uploadedByStudentId == request.auth.uid;
+      // Explicitly allow both single document access and collection listing
+      allow get, list: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.uploadedByStudentId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.uploadedByStudentId == request.auth.uid;
     }
 
     match /journey/{yearId} {
-      allow read: if true; // Publicly viewable
-      allow write: if isSignedIn(); // Any authenticated student can refine the legacy
+      allow read: if true; // Publicly viewable timeline
+      allow write: if request.auth != null; // Authenticated students can maintain the legacy
     }
   }
 }
