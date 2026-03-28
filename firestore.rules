@@ -5,7 +5,7 @@ service cloud.firestore {
 
     /**
      * NAVODAYA MEMORIES YEARBOOK - PUBLIC ACCESS RULES (V23)
-     * Deployment Trigger: Open access to resolve permission errors.
+     * Deployment Trigger: Open access to resolve permission errors and support public browsing.
      */
 
     match /{document=**} {
