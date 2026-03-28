@@ -70,20 +70,16 @@ export default function AuthPage() {
         }
       }
 
-      // Explicitly set/update the role in Firestore before redirecting
-      const studentRef = doc(db, "students", userCredential.user.uid);
-      const studentDoc = await getDoc(studentRef);
-      
-      const role = isAdminEntry ? "admin" : (studentDoc.exists() ? studentDoc.data()?.role : "student");
+      // Explicitly set the role based on the key entered
+      const role = isAdminEntry ? "admin" : "student";
 
-      // We await this specific write to prevent race conditions during the subsequent redirect
+      // PERSIST THE ROLE before redirecting to ensure permission checks pass on destination pages
+      const studentRef = doc(db, "students", userCredential.user.uid);
       await setDoc(studentRef, {
         id: userCredential.user.uid,
         name: name,
         email: email,
         role: role,
-        house: studentDoc.exists() ? studentDoc.data()?.house : "Aravalli", 
-        shortBio: studentDoc.exists() ? studentDoc.data()?.shortBio : (isAdminEntry ? "Archive Administrator" : "Member of Batch '25"),
         batchId: "batch-2018-2025",
         lastActive: serverTimestamp(),
       }, { merge: true });

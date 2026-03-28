@@ -31,21 +31,21 @@ export default function AdminDashboard() {
   const isAdmin = studentData?.role === "admin";
 
   useEffect(() => {
-    // Wait until both user session and role data have finished loading
+    // Only proceed once we are sure the data has finished fetching
     if (!isUserLoading && !isRoleLoading) {
-      if (user && !isAdmin) {
-        // If logged in but not an admin, redirect
+      if (!user) {
+        // User is not even logged in
+        router.push("/auth");
+      } else if (!isAdmin) {
+        // Logged in but profile doesn't have the admin role
         toast({
           variant: "destructive",
           title: "Access Denied",
           description: "You do not have administrative privileges for this archive."
         });
         router.push("/");
-      } else if (!user) {
-        // Not logged in at all
-        router.push("/auth");
       } else {
-        // User is authorized
+        // User is authorized as admin
         setIsAuthorizing(false);
       }
     }

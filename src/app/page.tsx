@@ -74,8 +74,24 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="inline-block px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-[0.4em] mb-12">
-              A Seven Year Legacy
+            <div className="flex flex-col items-center mb-12">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className="relative w-24 h-24 mb-6 filter brightness-150"
+              >
+                <Image 
+                  src="https://upload.wikimedia.org/wikipedia/en/d/d1/Navodaya_Vidyalaya_Samiti_logo.png"
+                  alt="NVS Official Logo"
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
+              </motion.div>
+              <div className="inline-block px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-[0.4em]">
+                A Seven Year Legacy
+              </div>
             </div>
             
             <h1 className="text-8xl md:text-[14rem] font-black mb-4 leading-none tracking-tighter uppercase flex flex-col items-center">
