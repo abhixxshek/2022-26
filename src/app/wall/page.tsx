@@ -1,10 +1,11 @@
+
 "use client";
 
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
 import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, orderBy, limit } from "firebase/firestore";
-import { MessageSquare, Quote } from "lucide-react";
+import { Heart } from "lucide-react";
 import { AddMemoryDialog } from "@/components/AddMemoryDialog";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -30,76 +31,106 @@ export default function WallPage() {
   if (isUserLoading) return null;
 
   return (
-    <div className="bg-[#050505] min-h-screen text-foreground">
+    <div className="bg-[#0a0a0b] min-h-screen text-foreground selection:bg-primary/20">
       <Navbar />
 
-      <main className="pt-40 pb-32 px-6">
+      <main className="pt-48 pb-32 px-6">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-12">
+          <div className="text-center mb-24 space-y-6">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest"
             >
-              <div className="flex items-center gap-3 text-primary font-black mb-6 uppercase tracking-[0.4em] text-[10px]">
-                <MessageSquare className="w-4 h-4" />
-                <span>The Public Feed</span>
-              </div>
-              <h1 className="text-6xl md:text-[8rem] font-black mb-8 leading-none tracking-tighter uppercase">
-                The <span className="text-gradient">Wall</span>
-              </h1>
-              <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed font-light font-body">
-                A shared stream of consciousness. Read the stories, achievements, and 
-                inside jokes that made our batch legendary.
-              </p>
+              <Heart className="w-3 h-3 fill-primary" />
+              Final Goodbyes
             </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-5xl md:text-7xl font-bold text-white tracking-tight"
+            >
+              Message Wall of Reflection
+            </motion.h1>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-lg text-white/40 max-w-2xl mx-auto font-light leading-relaxed"
+            >
+              A space to leave your final words, memories, and wishes. These notes 
+              will remain here as a testament to our journey.
+            </motion.p>
 
-            <AddMemoryDialog />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="pt-8"
+            >
+              <AddMemoryDialog />
+            </motion.div>
           </div>
 
           {isLoading || isUserLoading ? (
-            <div className="space-y-8">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-40 bg-white/5 animate-pulse rounded-3xl" />
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-64 bg-white/5 animate-pulse rounded-sm" />
               ))}
             </div>
           ) : (
-            <div className="columns-1 md:columns-2 gap-8 space-y-8">
+            <div className="columns-1 md:columns-2 lg:columns-4 gap-10 space-y-12">
               {memories?.map((memory: any, idx) => (
                 <motion.div
                   key={memory.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="break-inside-avoid bg-white/[0.02] border border-white/5 p-10 rounded-[2.5rem] group hover:border-primary/20 transition-all"
+                  className="relative break-inside-avoid group"
                 >
-                  <div className="flex items-center justify-between mb-8">
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.5em]">
-                      {memory.classYearLabel}
-                    </span>
-                    <Quote className="w-4 h-4 text-white/10 group-hover:text-primary transition-colors" />
-                  </div>
-                  <h3 className="text-2xl font-black mb-4 uppercase tracking-tight text-white">{memory.title}</h3>
-                  <p className="text-lg text-white/40 leading-relaxed italic mb-8">
-                    "{memory.description}"
-                  </p>
-                  <div className="flex items-center gap-4 pt-8 border-t border-white/5">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-black text-primary">
-                      {memory.studentName?.charAt(0) || "N"}
+                  {/* Tape Effect */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-3 w-16 h-8 bg-white/10 backdrop-blur-sm z-20 shadow-sm opacity-80" />
+                  
+                  <div className="bg-[#f0e6d2] p-8 md:p-10 shadow-[5px_15px_30px_rgba(0,0,0,0.3)] transform transition-all duration-500 hover:-translate-y-2 hover:rotate-1">
+                    <div className="space-y-6">
+                      <p className="text-black/80 text-xl font-serif italic leading-relaxed">
+                        "{memory.description}"
+                      </p>
+                      
+                      <div className="pt-6 border-t border-black/10">
+                        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-black">
+                          {memory.studentName || "Anonymous"}
+                        </p>
+                        {memory.classYearLabel && (
+                          <p className="text-[9px] font-bold text-black/40 uppercase tracking-widest mt-1">
+                            {memory.classYearLabel}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white/20">
-                      Shared by {memory.studentName || "A Navodayan"}
-                    </span>
                   </div>
                 </motion.div>
               ))}
+              
               {memories?.length === 0 && (
-                <p className="text-center py-40 text-white/20 font-black uppercase tracking-[0.5em] col-span-full">The wall is currently empty. Be the first to post.</p>
+                <div className="col-span-full py-40 text-center">
+                  <p className="text-white/10 font-black uppercase tracking-[0.5em] text-xl">
+                    The wall is waiting for its first mark.
+                  </p>
+                </div>
               )}
             </div>
           )}
         </div>
       </main>
+
+      {/* Background Decor */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0%,transparent_100%)]" />
+      </div>
     </div>
   );
 }
