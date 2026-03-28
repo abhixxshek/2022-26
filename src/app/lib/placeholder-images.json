@@ -1,0 +1,41 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Nostalgic school hallway or campus",
+      "imageUrl": "https://picsum.photos/seed/navodaya-hero/1920/1080",
+      "imageHint": "school campus"
+    },
+    {
+      "id": "student-1",
+      "description": "Student portrait",
+      "imageUrl": "https://picsum.photos/seed/student1/400/500",
+      "imageHint": "student portrait"
+    },
+    {
+      "id": "student-2",
+      "description": "Student portrait",
+      "imageUrl": "https://picsum.photos/seed/student2/400/500",
+      "imageHint": "student portrait"
+    },
+    {
+      "id": "student-3",
+      "description": "Student portrait",
+      "imageUrl": "https://picsum.photos/seed/student3/400/500",
+      "imageHint": "student portrait"
+    },
+    {
+      "id": "memory-1",
+      "description": "Sports day",
+      "imageUrl": "https://picsum.photos/seed/memory1/800/600",
+      "imageHint": "sports day"
+    },
+    {
+      "id": "memory-2",
+      "description": "Classroom laughter",
+      "imageUrl": "https://picsum.photos/seed/memory2/800/600",
+      "imageHint": "classroom group"
+    }
+  ]
+}
