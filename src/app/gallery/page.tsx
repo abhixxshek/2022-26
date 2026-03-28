@@ -1,25 +1,33 @@
-
 "use client";
 
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Camera, History, Plus } from "lucide-react";
-import { useState } from "react";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { Camera, Plus } from "lucide-react";
+import { useEffect } from "react";
+import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 export default function GalleryPage() {
+  const { user, isUserLoading } = useUser();
   const db = useFirestore();
-  const [filter, setFilter] = useState("All");
-  const categories = ["All", "Migration", "Daily", "Farewell", "Sports", "Academic"];
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push("/auth");
+    }
+  }, [user, isUserLoading, router]);
 
   const photosQuery = useMemoFirebase(() => {
-    if (!db) return null;
+    if (!db || !user) return null;
     return query(collection(db, "photos"), orderBy("uploadedAt", "desc"));
-  }, [db]);
+  }, [db, user]);
 
   const { data: photos, isLoading } = useCollection(photosQuery);
+
+  if (isUserLoading) return null;
 
   return (
     <div className="bg-[#050505] text-foreground min-h-screen">
@@ -46,14 +54,14 @@ export default function GalleryPage() {
               </p>
             </motion.div>
 
-            <button className="px-12 py-5 bg-white text-black rounded-full font-black text-xs uppercase tracking-widest hover:bg-primary transition-all">
+            <button className="px-12 py-5 bg-white text-black rounded-full font-black text-sm uppercase tracking-widest hover:bg-primary transition-all">
               <Plus className="w-4 h-4 inline-block mr-2" /> Upload Media
             </button>
           </div>
 
           {/* Masonry-like Grid */}
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-12 space-y-12">
-            {isLoading ? (
+            {isLoading || isUserLoading ? (
               [...Array(6)].map((_, i) => (
                 <div key={i} className="aspect-video bg-white/5 animate-pulse rounded-2xl" />
               ))
@@ -68,7 +76,7 @@ export default function GalleryPage() {
                   className="relative group break-inside-avoid rounded-2xl overflow-hidden border border-white/5 cursor-pointer bg-[#111]"
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 p-8 flex flex-col justify-end">
-                    <p className="text-primary text-[10px] font-black uppercase tracking-widest mb-2">ARCHIVE RECORED</p>
+                    <p className="text-primary text-[10px] font-black uppercase tracking-widest mb-2">ARCHIVE RECORD</p>
                     <h3 className="text-2xl font-black font-headline text-white">{img.caption}</h3>
                   </div>
                   <Image 

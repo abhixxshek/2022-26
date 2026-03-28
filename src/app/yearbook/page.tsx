@@ -1,30 +1,40 @@
-
 "use client";
 
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
 import { StudentCard } from "@/components/StudentCard";
-import { Users, History, Search } from "lucide-react";
-import { useState } from "react";
+import { Users, Search } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 
 export default function YearbookPage() {
+  const { user, isUserLoading } = useUser();
   const db = useFirestore();
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
 
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push("/auth");
+    }
+  }, [user, isUserLoading, router]);
+
   const studentsQuery = useMemoFirebase(() => {
-    if (!db) return null;
+    if (!db || !user) return null;
     return query(collection(db, "students"), orderBy("name"));
-  }, [db]);
+  }, [db, user]);
 
   const { data: students, isLoading } = useCollection(studentsQuery);
 
   const filteredStudents = students?.filter(s => 
-    s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    s.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.house?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (isUserLoading) return null;
 
   return (
     <div className="bg-[#050505] min-h-screen text-foreground selection:bg-primary/20">
@@ -55,14 +65,14 @@ export default function YearbookPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
               <Input 
                 placeholder="Search by name or house..." 
-                className="bg-white/5 border-white/10 pl-12 h-14 rounded-full"
+                className="bg-white/5 border-white/10 pl-12 h-14 rounded-full text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
 
-          {isLoading ? (
+          {isLoading || isUserLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="aspect-[3/4] bg-white/5 animate-pulse rounded-2xl" />

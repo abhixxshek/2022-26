@@ -10,7 +10,7 @@ import { generateMemoryPrompts } from "@/ai/flows/generate-memory-prompts";
 import { Sparkles, Plus, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useUser } from "@/firebase";
-import { collection, doc, serverTimestamp } from "firebase/firestore";
+import { collection, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export function AddMemoryDialog() {
@@ -58,9 +58,10 @@ export function AddMemoryDialog() {
       return;
     }
 
-    const memoriesRef = collection(db, "students", user.uid, "memories");
+    const memoriesRef = collection(db, "memories");
     const memoryData = {
       studentId: user.uid,
+      studentName: user.displayName || user.email?.split('@')[0] || "A Navodayan",
       title,
       description: memoryText,
       classYearLabel: `Class ${classYear}`,
@@ -72,7 +73,7 @@ export function AddMemoryDialog() {
     
     toast({
       title: "Memory Shared!",
-      description: "Your memory has been added to your journey logs."
+      description: "Your memory has been added to the public wall."
     });
     
     // Reset fields
@@ -89,7 +90,7 @@ export function AddMemoryDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] glass border-white/10">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-headline font-bold">Share a Memory</DialogTitle>
+          <DialogTitle className="text-2xl font-headline font-bold text-white">Share a Memory</DialogTitle>
           <DialogDescription className="text-muted-foreground">
             Preserve your Navodaya journey for generations to come.
           </DialogDescription>
@@ -100,7 +101,7 @@ export function AddMemoryDialog() {
             <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Memory Title</label>
             <Input 
               placeholder="e.g. The Night we sneaked out..." 
-              className="bg-white/5 border-white/10"
+              className="bg-white/5 border-white/10 text-white"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -110,10 +111,10 @@ export function AddMemoryDialog() {
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Class Year</label>
               <Select onValueChange={setClassYear} value={classYear}>
-                <SelectTrigger className="bg-white/5 border-white/10">
+                <SelectTrigger className="bg-white/5 border-white/10 text-white">
                   <SelectValue placeholder="Select Year" />
                 </SelectTrigger>
-                <SelectContent className="glass">
+                <SelectContent className="glass bg-black text-white border-white/10">
                   {[6, 7, 8, 9, 10, 11, 12].map(y => (
                     <SelectItem key={y} value={y.toString()}>Class {y}</SelectItem>
                   ))}
@@ -124,7 +125,7 @@ export function AddMemoryDialog() {
               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Theme (Optional)</label>
               <Input 
                 placeholder="e.g. Sports, Mess, Exam" 
-                className="bg-white/5 border-white/10"
+                className="bg-white/5 border-white/10 text-white"
                 value={theme}
                 onChange={(e) => setTheme(e.target.value)}
               />
@@ -164,14 +165,14 @@ export function AddMemoryDialog() {
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Your Memory</label>
             <Textarea 
-              className="bg-white/5 border-white/10 min-h-[120px]" 
+              className="bg-white/5 border-white/10 min-h-[120px] text-white" 
               placeholder="Write your story here..."
               value={memoryText}
               onChange={(e) => setMemoryText(e.target.value)}
             />
           </div>
 
-          <Button onClick={handlePostMemory} className="w-full bg-primary text-primary-foreground font-bold py-6">
+          <Button onClick={handlePostMemory} className="w-full bg-primary text-primary-foreground font-bold py-6 hover:bg-primary/90 transition-colors">
             Post Memory
           </Button>
         </div>

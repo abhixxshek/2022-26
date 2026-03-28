@@ -1,22 +1,33 @@
-
 "use client";
 
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, orderBy, limit } from "firebase/firestore";
-import { MessageSquare, Quote, History } from "lucide-react";
+import { MessageSquare, Quote } from "lucide-react";
 import { AddMemoryDialog } from "@/components/AddMemoryDialog";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function WallPage() {
+  const { user, isUserLoading } = useUser();
   const db = useFirestore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push("/auth");
+    }
+  }, [user, isUserLoading, router]);
 
   const memoriesQuery = useMemoFirebase(() => {
-    if (!db) return null;
+    if (!db || !user) return null;
     return query(collection(db, "memories"), orderBy("uploadedAt", "desc"), limit(50));
-  }, [db]);
+  }, [db, user]);
 
   const { data: memories, isLoading } = useCollection(memoriesQuery);
+
+  if (isUserLoading) return null;
 
   return (
     <div className="bg-[#050505] min-h-screen text-foreground">
@@ -46,7 +57,7 @@ export default function WallPage() {
             <AddMemoryDialog />
           </div>
 
-          {isLoading ? (
+          {isLoading || isUserLoading ? (
             <div className="space-y-8">
               {[...Array(5)].map((_, i) => (
                 <div key={i} className="h-40 bg-white/5 animate-pulse rounded-3xl" />
@@ -68,12 +79,12 @@ export default function WallPage() {
                     </span>
                     <Quote className="w-4 h-4 text-white/10 group-hover:text-primary transition-colors" />
                   </div>
-                  <h3 className="text-2xl font-black mb-4 uppercase tracking-tight">{memory.title}</h3>
+                  <h3 className="text-2xl font-black mb-4 uppercase tracking-tight text-white">{memory.title}</h3>
                   <p className="text-lg text-white/40 leading-relaxed italic mb-8">
                     "{memory.description}"
                   </p>
                   <div className="flex items-center gap-4 pt-8 border-t border-white/5">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-black">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-black text-primary">
                       {memory.studentName?.charAt(0) || "N"}
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-white/20">
