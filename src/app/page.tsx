@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
 import { Camera, Loader2, Database } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, orderBy, writeBatch, doc } from "firebase/firestore";
 import { EditJourneyDialog } from "@/components/EditJourneyDialog";
