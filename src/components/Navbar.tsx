@@ -4,7 +4,9 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, Loader2 } from "lucide-react";
+import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
+import { doc } from "firebase/firestore";
 
 const JNVLogo = () => (
   <svg 
@@ -24,6 +26,16 @@ const JNVLogo = () => (
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { user } = useUser();
+  const db = useFirestore();
+
+  const studentRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return doc(db, "students", user.uid);
+  }, [db, user]);
+
+  const { data: studentData } = useDoc(studentRef);
+  const isAdmin = studentData?.role === "admin";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,13 +76,16 @@ export function Navbar() {
             <Link href="/wall" className="text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white transition-all">
               The Wall
             </Link>
-            <Link href="/admin" className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 hover:scale-105 transition-all">
-              <ShieldCheck className="w-3 h-3" /> Admin Panel
-            </Link>
+            
+            {isAdmin && (
+              <Link href="/admin" className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 hover:scale-105 transition-all">
+                <ShieldCheck className="w-3 h-3" /> Admin Panel
+              </Link>
+            )}
           </div>
           
           <Link href="/auth" className="px-8 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
-            ARCHIVE ENTRY
+            {user ? "PROFILE" : "ARCHIVE ENTRY"}
           </Link>
         </div>
       </div>

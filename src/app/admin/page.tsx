@@ -1,12 +1,13 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, useDoc } from "@/firebase";
 import { collection, query, orderBy, doc } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Users, BookOpen, Camera, Trash2, ShieldAlert, Loader2 } from "lucide-react";
+import { Users, BookOpen, Camera, Trash2, ShieldAlert, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -14,7 +15,28 @@ import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
 
 export default function AdminDashboard() {
+  const { user, isUserLoading } = useUser();
   const db = useFirestore();
+  const router = useRouter();
+
+  const studentRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return doc(db, "students", user.uid);
+  }, [db, user]);
+
+  const { data: studentData, isLoading: isRoleLoading } = useDoc(studentRef);
+  const isAdmin = studentData?.role === "admin";
+
+  useEffect(() => {
+    if (!isUserLoading && !isRoleLoading && !isAdmin) {
+      toast({
+        variant: "destructive",
+        title: "Access Denied",
+        description: "You do not have administrative privileges for this archive."
+      });
+      router.push("/");
+    }
+  }, [isAdmin, isUserLoading, isRoleLoading, router]);
 
   const studentsQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -46,7 +68,19 @@ export default function AdminDashboard() {
     });
   };
 
-  const isLoading = isStudentsLoading || isMemoriesLoading || isPhotosLoading;
+  const isLoading = isStudentsLoading || isMemoriesLoading || isPhotosLoading || isUserLoading || isRoleLoading;
+
+  if (!isUserLoading && !isRoleLoading && !isAdmin) {
+    return (
+      <div className="bg-[#050505] min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Lock className="w-12 h-12 text-primary mx-auto mb-6" />
+          <h1 className="text-2xl font-black uppercase tracking-widest text-white/20">Restricted Access</h1>
+          <p className="text-[10px] uppercase font-black tracking-[0.4em] text-white/10">Authorized Admin Key Required</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#050505] min-h-screen text-foreground">
