@@ -5,8 +5,9 @@ import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
 import { StudentCard } from "@/components/StudentCard";
 import { AddMemoryDialog } from "@/components/AddMemoryDialog";
-import { ChevronDown, GraduationCap, MapPin, Heart, BookOpen, Coffee, Sun, Compass } from "lucide-react";
+import { ChevronDown, MapPin, Heart, Coffee, Sun, Compass, Zap, Users, BookOpen } from "lucide-react";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   return (
@@ -24,9 +25,10 @@ export default function Home() {
             className="w-full h-full"
           >
             <img 
-              src="https://picsum.photos/seed/jnv-hero/1920/1080" 
+              src="https://picsum.photos/seed/jnv-campus-main/1920/1080" 
               alt="JNV Campus" 
               className="w-full h-full object-cover opacity-60"
+              data-ai-hint="boarding school campus"
             />
           </motion.div>
         </div>
@@ -39,22 +41,21 @@ export default function Home() {
           >
             <div className="flex items-center justify-center gap-4 mb-8">
               <span className="h-[1px] w-8 bg-primary/40" />
-              <p className="text-primary font-bold tracking-[0.6em] uppercase text-[10px] md:text-xs">Navodaya Vidyalaya Batch of 2018 - 2025</p>
+              <p className="text-primary font-bold tracking-[0.6em] uppercase text-[10px] md:text-xs">Navodaya Vidyalaya | Batch 2018 - 2025</p>
               <span className="h-[1px] w-8 bg-primary/40" />
             </div>
             <h1 className="text-7xl md:text-[10rem] font-headline font-black mb-6 leading-none tracking-tighter text-gradient">
               SEVEN <span className="italic font-light">YEARS</span>
             </h1>
             <p className="text-lg md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed font-light font-body">
-              From Class 6 trunk boxes to Class 12 farewell tears. This is the story of 
-              <span className="text-primary mx-2 font-medium italic">us</span>.
+              From the heavy metal <span className="text-primary font-bold italic">Trunk Boxes</span> of Class 6 to the emotional farewell of Class 12. This is the story of our shared destiny.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
               <button 
                 onClick={() => document.getElementById('journey')?.scrollIntoView({ behavior: 'smooth' })}
                 className="group relative px-12 py-5 bg-white text-black rounded-full font-black text-sm uppercase tracking-widest hover:bg-primary transition-all overflow-hidden"
               >
-                <span className="relative z-10">The Journey</span>
+                <span className="relative z-10">Relive the Journey</span>
                 <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               </button>
               <AddMemoryDialog />
@@ -72,15 +73,50 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Journey Stats */}
+      {/* JNV Environment Feels */}
       <section id="journey" className="py-32 px-6 border-b border-white/5">
         <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-40">
+            {[
+              { 
+                icon: <Zap className="w-8 h-8 text-primary" />, 
+                title: "Morning PT", 
+                desc: "The collective groan at 5:30 AM, the rhythmic steps on the field, and the crisp morning air that defined our discipline." 
+              },
+              { 
+                icon: <Coffee className="w-8 h-8 text-primary" />, 
+                title: "Sunday Special", 
+                desc: "The puri-sabji aroma that meant freedom. The one day the mess felt like a feast." 
+              },
+              { 
+                icon: <Users className="w-8 h-8 text-primary" />, 
+                title: "House Brotherhood", 
+                desc: "Aravalli, Nilgiri, Shivalik, Udaygiri. Not just names, but identities we fought for in every inter-house meet." 
+              }
+            ].map((feature, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="space-y-6"
+              >
+                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center">
+                  {feature.icon}
+                </div>
+                <h3 className="text-2xl font-black font-headline uppercase">{feature.title}</h3>
+                <p className="text-muted-foreground font-light leading-relaxed">{feature.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-20">
             {[
-              { val: "2555", label: "Days in Hostel" },
-              { val: "100+", label: "Sunday Specials" },
+              { val: "2555", label: "Nights in Dorms" },
+              { val: "100+", label: "Mess Rituals" },
               { val: "365", label: "Migration Days" },
-              { val: "∞", label: "Lifetime Bonds" }
+              { val: "∞", label: "Navodayan Spirit" }
             ].map((stat, i) => (
               <motion.div 
                 key={i}
@@ -105,52 +141,50 @@ export default function Home() {
         </div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="max-w-3xl">
-            <Badge className="bg-primary/20 text-primary mb-8 px-4 py-1 border-none uppercase tracking-widest text-[10px] font-bold">The Core Experience</Badge>
+            <Badge className="bg-primary/20 text-primary mb-8 px-4 py-1 border-none uppercase tracking-widest text-[10px] font-bold">The Great Exchange</Badge>
             <h2 className="text-5xl md:text-8xl font-headline font-black mb-10 leading-none">The <span className="text-primary italic">Migration</span> Year</h2>
             <p className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed mb-12">
-              Class 9 was when we truly left home. A different state, a different language, 
-              and a year that taught us more about life than any textbook ever could.
+              Class 9 was our window to the world. A 2000km train journey to a land with a different language, 
+              where we learned that "National Integration" wasn't just a chapter in civics, but a lived reality.
             </p>
             <Link href="/gallery" className="inline-flex items-center gap-4 text-primary font-black uppercase tracking-widest text-sm hover:gap-6 transition-all">
-              View Migration Moments <Compass className="w-4 h-4" />
+              View Migration Memories <Compass className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Batch Sections */}
-      {YEAR_DATA.map((year, index) => (
-        <section 
-          key={year.id} 
-          id={year.id}
-          className="py-32 px-6 border-t border-white/5 relative"
-        >
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-24">
-              <motion.div 
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-              >
-                <p className="text-primary font-black mb-6 uppercase tracking-widest text-xs flex items-center gap-3">
-                  <span className="w-8 h-[1px] bg-primary" />
-                  {year.subtitle}
-                </p>
-                <h2 className="text-6xl md:text-9xl font-headline font-black mb-10 tracking-tighter">{year.title}</h2>
-                <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-light">
-                  {year.description}
-                </p>
-              </motion.div>
-            </div>
+      {/* Batch Journey: Class 6 to 12 */}
+      <section className="py-32 px-6">
+        <div className="max-w-7xl mx-auto space-y-40">
+          {YEAR_DATA.map((year, index) => (
+            <div key={year.id} id={year.id} className="relative">
+              <div className="mb-24">
+                <motion.div 
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <p className="text-primary font-black mb-6 uppercase tracking-widest text-xs flex items-center gap-3">
+                    <span className="w-8 h-[1px] bg-primary" />
+                    {year.subtitle}
+                  </p>
+                  <h2 className="text-6xl md:text-9xl font-headline font-black mb-10 tracking-tighter">{year.title}</h2>
+                  <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-light">
+                    {year.description}
+                  </p>
+                </motion.div>
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-              {year.students.map((student) => (
-                <StudentCard key={student.id} student={student} />
-              ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+                {year.students.map((student) => (
+                  <StudentCard key={student.id} student={student} />
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
-      ))}
+          ))}
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="py-40 px-6 border-t border-white/5 relative">
@@ -160,18 +194,18 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-20 text-left">
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">The Batch</p>
+              <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">The Batch 18-25</p>
               <p className="text-muted-foreground leading-relaxed font-light">
-                This is a tribute to the Batch of 2018-2025. Seven years of residency, 
-                thousands of meals shared, and a bond that defies distance.
+                This digital yearbook is a sacred space for the Batch of 2018-2025. 
+                Thousands of shared meals, countless night preps, and a brotherhood forged in the dormitories.
               </p>
             </div>
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-primary mb-8">Navigation</p>
               <ul className="space-y-4 text-sm font-medium">
                 <li><Link href="/gallery" className="hover:text-primary transition-colors">Moments Gallery</Link></li>
-                <li><Link href="/" className="hover:text-primary transition-colors">Student Directory</Link></li>
-                <li><button className="hover:text-primary transition-colors">Alumni Portal</button></li>
+                <li><Link href="/auth" className="hover:text-primary transition-colors">Join the Directory</Link></li>
+                <li><Link href="/profile" className="hover:text-primary transition-colors">Your Legacy</Link></li>
               </ul>
             </div>
             <div>
@@ -185,7 +219,7 @@ export default function Home() {
           <div className="mt-40 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 text-[10px] uppercase font-black tracking-widest text-muted-foreground/50">
             <p>© 2025 JNV MEMORIES | BATCH OF 2018-2025</p>
             <div className="flex gap-10">
-              <span className="flex items-center gap-2"><MapPin className="w-3 h-3" /> Across Nations</span>
+              <span className="flex items-center gap-2"><MapPin className="w-3 h-3" /> All India Alumni</span>
               <span className="flex items-center gap-2"><Heart className="w-3 h-3" /> Forever Bound</span>
             </div>
           </div>
@@ -193,16 +227,4 @@ export default function Home() {
       </footer>
     </div>
   );
-}
-
-function Badge({ children, className }: { children: React.ReactNode, className?: string }) {
-  return (
-    <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2", className)}>
-      {children}
-    </span>
-  );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }
