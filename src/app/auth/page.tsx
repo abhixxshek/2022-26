@@ -16,7 +16,10 @@ import {
   Mail, 
   CheckCircle2, 
   Info,
-  ExternalLink
+  ExternalLink,
+  RefreshCw,
+  Copy,
+  Check
 } from "lucide-react";
 import { initiateEmailSignIn, initiateEmailSignUp, initiateGoogleSignIn } from "@/firebase/non-blocking-login";
 import { useAuth, useUser } from "@/firebase";
@@ -55,6 +58,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
@@ -66,6 +70,29 @@ export default function AuthPage() {
     }
   }, [user, router]);
 
+  const generateKey = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let result = "";
+    for (let i = 0; i < 12; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setPassword(result);
+    toast({
+      title: "Access Key Generated",
+      description: "Please copy and save this key securely. You will need it to login.",
+    });
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(password);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+    toast({
+      title: "Copied",
+      description: "Access Key copied to clipboard.",
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -73,7 +100,7 @@ export default function AuthPage() {
       toast({
         variant: "destructive",
         title: "Consent Required",
-        description: "Please agree to the Archive terms to initialize your record.",
+        description: "Please agree to the Digital Archive terms to proceed.",
       });
       return;
     }
@@ -82,7 +109,7 @@ export default function AuthPage() {
       toast({
         variant: "destructive",
         title: "Weak Access Key",
-        description: "Password must be at least 6 characters for archive security.",
+        description: "Your Access Key must be at least 6 characters long.",
       });
       return;
     }
@@ -93,10 +120,6 @@ export default function AuthPage() {
         initiateEmailSignIn(auth, email, password);
       } else {
         initiateEmailSignUp(auth, email, password);
-        toast({
-          title: "Record Initialization Started",
-          description: "Welcome. Your identity is being committed to the Batch '25 Archive.",
-        });
       }
     } finally {
       setIsSubmitting(false);
@@ -142,18 +165,18 @@ export default function AuthPage() {
                 Always a <span className="text-primary not-italic font-black uppercase">Navodayan.</span>
               </h1>
               <p className="text-white/40 text-lg font-light leading-relaxed max-w-lg font-serif italic">
-                A digital legacy for the Batch of 2018—2025. Preserving seven years of brotherhood, struggle, and triumph.
+                A digital legacy for the Batch of 2018—2025. Access your secure record with your institutional email and access key.
               </p>
             </div>
 
             <div className="space-y-8">
               <div className="flex items-start gap-6 group">
                 <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 group-hover:border-primary/40 transition-all text-primary">
-                  <History className="w-6 h-6" />
+                  <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80 mb-2">The 7-Year Timeline</h3>
-                  <p className="text-[11px] text-white/30 uppercase font-black tracking-widest leading-relaxed">From the first trunk in Class 6 to the final walk of Class 12.</p>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80 mb-2">Key-Based Access</h3>
+                  <p className="text-[11px] text-white/30 uppercase font-black tracking-widest leading-relaxed">No complex passwords. Just your email and a secure generated access key.</p>
                 </div>
               </div>
 
@@ -163,7 +186,7 @@ export default function AuthPage() {
                 </div>
                 <div>
                   <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80 mb-2">Secure Archive</h3>
-                  <p className="text-[11px] text-white/30 uppercase font-black tracking-widest leading-relaxed">Protected by JNV institutional credentials. Your memories, our vault.</p>
+                  <p className="text-[11px] text-white/30 uppercase font-black tracking-widest leading-relaxed">Your data is stored in the Batch '25 vault, protected by Firebase security.</p>
                 </div>
               </div>
 
@@ -209,7 +232,7 @@ export default function AuthPage() {
                         <span className="w-full border-t border-white/5"></span>
                       </div>
                       <div className="relative flex justify-center text-[9px] uppercase font-black tracking-widest">
-                        <span className="bg-[#050505] px-6 text-white/20">or use archive credentials</span>
+                        <span className="bg-[#050505] px-6 text-white/20">or use access key</span>
                       </div>
                     </div>
                   </div>
@@ -239,17 +262,44 @@ export default function AuthPage() {
                         </div>
                         
                         <div className="space-y-3">
-                          <label className="text-[9px] font-black uppercase tracking-[0.4em] text-primary ml-1 flex items-center gap-2">
-                            <Lock className="w-3 h-3" /> Access Key / Password
-                          </label>
-                          <Input 
-                            type="password" 
-                            placeholder="••••••••" 
-                            className="bg-white/[0.03] border-white/10 h-16 focus:ring-primary/40 focus:border-primary/40 transition-all rounded-2xl px-6 text-sm placeholder:text-white/10 text-white"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                          />
+                          <div className="flex items-center justify-between ml-1">
+                            <label className="text-[9px] font-black uppercase tracking-[0.4em] text-primary flex items-center gap-2">
+                              <Lock className="w-3 h-3" /> Access Key
+                            </label>
+                            {!isLogin && (
+                              <button 
+                                type="button" 
+                                onClick={generateKey}
+                                className="text-[8px] font-black uppercase tracking-widest text-white/30 hover:text-primary transition-colors flex items-center gap-1.5"
+                              >
+                                <RefreshCw className="w-2.5 h-2.5" /> Generate Key
+                              </button>
+                            )}
+                          </div>
+                          <div className="relative">
+                            <Input 
+                              type={isLogin ? "password" : "text"} 
+                              placeholder="••••••••" 
+                              className="bg-white/[0.03] border-white/10 h-16 focus:ring-primary/40 focus:border-primary/40 transition-all rounded-2xl px-6 text-sm placeholder:text-white/10 text-white pr-24"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              required
+                            />
+                            {!isLogin && password && (
+                              <button 
+                                type="button"
+                                onClick={copyToClipboard}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-white/20 hover:text-primary transition-colors"
+                              >
+                                {isCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                              </button>
+                            )}
+                          </div>
+                          {!isLogin && (
+                            <p className="text-[8px] text-white/20 uppercase font-black tracking-widest ml-1">
+                              * Share this email and key only with trusted Batch '25 members.
+                            </p>
+                          )}
                         </div>
 
                         {!isLogin && (
@@ -269,7 +319,7 @@ export default function AuthPage() {
                                 I agree to the Digital Archive Terms
                               </label>
                               <p className="text-[9px] text-white/30 uppercase font-bold tracking-tighter">
-                                By enrolling, I agree to share my public profile and memories within the Batch '25 Alumni network.
+                                I am a member of Batch '25 and agree to share my public profile in the archive.
                               </p>
                             </div>
                           </motion.div>
@@ -301,7 +351,7 @@ export default function AuthPage() {
 
                           {isLogin && (
                             <button type="button" className="text-[8px] font-black uppercase tracking-[0.5em] text-white/10 hover:text-white transition-colors flex items-center gap-2">
-                              <Info className="w-3 h-3" /> Forgot Access Key?
+                              <Info className="w-3 h-3" /> Help with Access
                             </button>
                           )}
                         </div>

@@ -4,8 +4,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V16 - Advanced Registration)
-     * Explicitly separated read operations for robust archive browsing.
+     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V17 - Access Key Identity)
      */
 
     match /students/{studentId} {
@@ -20,15 +19,14 @@ service cloud.firestore {
     }
 
     match /photos/{photoId} {
-      // Explicitly allow get and list for authenticated students to browse the visual vault
       allow get, list: if request.auth != null;
       allow create: if request.auth != null && request.resource.data.uploadedByStudentId == request.auth.uid;
       allow update, delete: if request.auth != null && resource.data.uploadedByStudentId == request.auth.uid;
     }
 
     match /journey/{yearId} {
-      allow read: if true; // Publicly viewable milestones for legacy
-      allow write: if request.auth != null; // Authenticated students can maintain history
+      allow read: if true;
+      allow write: if request.auth != null;
     }
   }
 }
