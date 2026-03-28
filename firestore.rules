@@ -4,24 +4,24 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V11 - Forced Deployment Fix)
-     * Ensuring explicit read permissions for authenticated sessions across all collections.
+     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V12 - Explicit List Fix)
+     * Separating get and list permissions to ensure consistent archive browsing.
      */
 
     match /students/{studentId} {
-      allow read: if request.auth != null;
+      allow get, list: if request.auth != null;
       allow write: if request.auth != null && request.auth.uid == studentId;
     }
 
     match /memories/{memoryId} {
-      allow read: if request.auth != null;
+      allow get, list: if request.auth != null;
       allow create: if request.auth != null && request.resource.data.studentId == request.auth.uid;
       allow update, delete: if request.auth != null && resource.data.studentId == request.auth.uid;
     }
 
     match /photos/{photoId} {
-      // Shorthand 'read' covers both 'get' and 'list' operations for authenticated users
-      allow read: if request.auth != null;
+      // Explicitly allow get and list for authenticated users
+      allow get, list: if request.auth != null;
       allow create: if request.auth != null && request.resource.data.uploadedByStudentId == request.auth.uid;
       allow update, delete: if request.auth != null && resource.data.uploadedByStudentId == request.auth.uid;
     }

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -10,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Save, ImageIcon, Trash2, Loader2, Camera } from "lucide-react";
+import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
@@ -53,6 +54,8 @@ export default function ProfilePage() {
     }
   }, [studentData]);
 
+  const isNewStudent = !studentData;
+
   const addEmojiToShortBio = (emoji: string) => {
     setShortBio(prev => prev + emoji);
   };
@@ -93,8 +96,8 @@ export default function ProfilePage() {
     if (!name || !house) {
       toast({
         variant: "destructive",
-        title: "Required Fields",
-        description: "Please provide your name and house affiliation."
+        title: "Incomplete Record",
+        description: "Your Name and House affiliation are mandatory for the yearbook."
       });
       return;
     }
@@ -112,9 +115,15 @@ export default function ProfilePage() {
 
     setDocumentNonBlocking(studentRef, updatedData, { merge: true });
     toast({
-      title: "Legacy Updated",
-      description: "Your record has been successfully committed to the archive."
+      title: isNewStudent ? "Registration Complete" : "Legacy Updated",
+      description: isNewStudent 
+        ? "Welcome to the family. Your record is now part of the archive." 
+        : "Your changes have been committed to the archive."
     });
+    
+    if (isNewStudent) {
+      router.push("/yearbook");
+    }
   };
 
   const handleTriggerFilePicker = () => {
@@ -133,6 +142,20 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
+            {isNewStudent && (
+              <div className="mb-12 p-8 rounded-3xl bg-primary/5 border border-primary/20 flex flex-col md:flex-row items-center gap-8 shadow-[0_0_50px_rgba(255,191,0,0.05)]">
+                <div className="p-4 rounded-full bg-primary/10 text-primary">
+                  <UserPlus className="w-8 h-8" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black uppercase tracking-widest text-white mb-2">Complete Your Enrollment</h2>
+                  <p className="text-white/40 text-[10px] uppercase font-black tracking-[0.3em] leading-relaxed">
+                    Welcome to the Batch '25 Archive. Please fill in your identity details to be visible to your classmates in the digital yearbook.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -141,13 +164,17 @@ export default function ProfilePage() {
               onChange={handleFileChange} 
             />
 
-            <div className="flex items-center justify-between mb-12">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-8">
               <div>
-                <h1 className="text-5xl font-headline font-black uppercase tracking-tighter mb-2">My <span className="text-primary">Legacy</span></h1>
-                <p className="text-muted-foreground font-light text-sm tracking-widest uppercase">Batch 2018—25 Student Record</p>
+                <h1 className="text-5xl font-black uppercase tracking-tighter mb-2">
+                  My <span className="text-primary">{isNewStudent ? "Enrollment" : "Legacy"}</span>
+                </h1>
+                <p className="text-muted-foreground font-light text-[10px] tracking-[0.4em] uppercase">
+                  {isNewStudent ? "First-time Identity Record" : "Batch 2018—25 Student Record"}
+                </p>
               </div>
-              <Button onClick={handleSave} className="bg-white text-black font-black uppercase tracking-widest gap-2 h-14 px-10 rounded-full shadow-lg hover:bg-primary transition-all">
-                <Save className="w-4 h-4" /> Save Record
+              <Button onClick={handleSave} className="w-full md:w-auto bg-white text-black font-black uppercase tracking-widest gap-2 h-14 px-10 rounded-full shadow-lg hover:bg-primary transition-all">
+                <Save className="w-4 h-4" /> {isNewStudent ? "Finalize Enrollment" : "Save Changes"}
               </Button>
             </div>
 
@@ -173,7 +200,7 @@ export default function ProfilePage() {
                           onClick={handleTriggerFilePicker}
                           className="w-full bg-white text-black hover:bg-primary transition-colors rounded-full font-black text-[10px] uppercase tracking-widest h-12"
                         >
-                          <ImageIcon className="w-3 h-3 mr-2" /> Open Gallery
+                          <ImageIcon className="w-3 h-3 mr-2" /> Select Photo
                         </Button>
                         {profilePhotoUrl && (
                           <Button 
@@ -181,7 +208,7 @@ export default function ProfilePage() {
                             onClick={() => setProfilePhotoUrl("")} 
                             className="w-full rounded-full font-black text-[10px] uppercase tracking-widest h-12"
                           >
-                            <Trash2 className="w-3 h-3 mr-2" /> Remove Photo
+                            <Trash2 className="w-3 h-3 mr-2" /> Remove
                           </Button>
                         )}
                       </div>
@@ -190,7 +217,7 @@ export default function ProfilePage() {
                   <CardContent className="pt-6 pb-8 text-center">
                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-2">ARCHIVE IDENTITY</p>
                     <p className="text-xl font-bold text-white">{name || "Unnamed Navodayan"}</p>
-                    <p className="text-[9px] text-primary font-black uppercase tracking-[0.4em] mt-2">{house ? `${house} House` : "Unassigned Dormitory"}</p>
+                    <p className="text-[9px] text-primary font-black uppercase tracking-[0.4em] mt-2">{house ? `${house} House` : "Unassigned House"}</p>
                   </CardContent>
                 </Card>
               </div>
@@ -199,17 +226,17 @@ export default function ProfilePage() {
                 <section className="space-y-6">
                   <div className="flex items-center gap-4 mb-4">
                     <span className="h-[1px] w-8 bg-primary/40" />
-                    <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Record</label>
+                    <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Core Identity (Required)</label>
                   </div>
                   <div className="space-y-4">
                     <Input 
-                      placeholder="Full Name as per Register" 
+                      placeholder="Your Full Name (As per school records)" 
                       className="bg-white/[0.03] border-white/10 h-16 rounded-2xl px-6 focus:ring-primary/20 transition-all text-white"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                     />
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Select onValueChange={setHouse} value={house}>
                         <SelectTrigger className="bg-white/[0.03] border-white/10 h-16 rounded-2xl px-6 text-white">
                           <SelectValue placeholder="House Affiliation" />
@@ -220,7 +247,7 @@ export default function ProfilePage() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <div className="flex items-center px-6 bg-white/[0.02] border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
+                      <div className="flex items-center px-6 bg-white/[0.02] border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] text-white/20 h-16">
                         Batch 2018-2025
                       </div>
                     </div>
@@ -231,12 +258,12 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4">
                       <span className="h-[1px] w-8 bg-primary/40" />
-                      <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">The Short Definition</label>
+                      <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Statement</label>
                     </div>
                     <EmojiPicker onEmojiSelect={addEmojiToShortBio} />
                   </div>
                   <Input 
-                    placeholder="One line that defines your JNV life..." 
+                    placeholder="Describe your JNV journey in one sentence..." 
                     className="bg-white/[0.03] border-white/10 h-16 rounded-2xl px-6 focus:ring-primary/20 transition-all text-white"
                     value={shortBio}
                     onChange={(e) => setShortBio(e.target.value)}
@@ -252,8 +279,8 @@ export default function ProfilePage() {
                     <EmojiPicker onEmojiSelect={addEmojiToFullBio} />
                   </div>
                   <Textarea 
-                    placeholder="Tell your Navodaya story..." 
-                    className="bg-white/[0.03] border-white/10 min-h-[300px] rounded-[2rem] p-8 focus:ring-primary/20 transition-all text-lg leading-relaxed font-light font-serif italic text-white"
+                    placeholder="Share your favorite school memories, achievements, and final thoughts..." 
+                    className="bg-white/[0.03] border-white/10 min-h-[300px] rounded-[2rem] p-8 focus:ring-primary/20 transition-all text-base leading-relaxed font-light font-serif italic text-white"
                     value={fullBio}
                     onChange={(e) => setFullBio(e.target.value)}
                   />

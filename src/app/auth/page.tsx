@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,8 +6,8 @@ import { Navbar } from "@/components/Navbar";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, ShieldCheck, History, UserPlus } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, ShieldCheck, History } from "lucide-react";
 import { initiateEmailSignIn, initiateEmailSignUp } from "@/firebase/non-blocking-login";
 import { useAuth, useUser } from "@/firebase";
 import { useRouter } from "next/navigation";
@@ -60,8 +61,8 @@ export default function AuthPage() {
     } else {
       initiateEmailSignUp(auth, email, password);
       toast({
-        title: "Record Initialized",
-        description: "Welcome to the archive. Please complete your student profile.",
+        title: "Record Initialization Started",
+        description: "Welcome. Your credentials are being committed. Next, complete your student profile.",
       });
     }
   };
@@ -72,7 +73,6 @@ export default function AuthPage() {
     <div className="bg-[#020202] min-h-screen selection:bg-primary/20 text-foreground overflow-hidden">
       <Navbar />
       
-      {/* Ambient background effects */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-black to-transparent" />
@@ -95,7 +95,7 @@ export default function AuthPage() {
               <JNVLogo />
             </motion.div>
             <h1 className="text-4xl md:text-5xl font-serif italic text-white mb-4 tracking-tight">
-              {isLogin ? "Archive Portal" : "Enrollment"}
+              {isLogin ? "Archive Portal" : "Student Enrollment"}
             </h1>
             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
               Batch 2018 — 2025 Digital Records
@@ -179,7 +179,6 @@ export default function AuthPage() {
         </motion.div>
       </main>
 
-      {/* Floating Batch Text */}
       <div className="fixed bottom-12 right-12 pointer-events-none opacity-5">
         <p className="text-[12rem] font-black uppercase leading-none select-none">
           2018—25
