@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Save, ImageIcon, Trash2, Loader2 } from "lucide-react";
+import { Save, ImageIcon, Trash2, Loader2, Camera } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
