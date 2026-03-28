@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    --background: 0 0% 2%;
+    --background: 20 10% 4%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 3%;
+    --card: 20 10% 6%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3%;
+    --popover: 20 10% 6%;
     --popover-foreground: 0 0% 98%;
-    --primary: 45 100% 50%; /* JNV Gold */
+    --primary: 45 100% 50%;
     --primary-foreground: 0 0% 0%;
     --secondary: 0 0% 9%;
     --secondary-foreground: 0 0% 98%;
@@ -41,12 +41,26 @@
   font-family: 'Playfair Display', serif;
 }
 
-.glass {
-  @apply bg-black/40 backdrop-blur-md border border-white/10;
-}
-
 .text-gradient {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-primary/50;
+}
+
+.polaroid {
+  @apply bg-[#fdfdfd] p-4 pb-12 shadow-2xl;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 5px rgba(0,0,0,0.1);
+}
+
+.polaroid-caption {
+  @apply text-[#222] text-[10px] font-medium text-center mt-4 italic;
+  font-family: 'Playfair Display', serif;
+}
+
+.timeline-line {
+  @apply absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[1px] bg-white/10;
+}
+
+.timeline-marker {
+  @apply absolute left-1/2 -translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full border border-white/10 bg-background text-[10px] font-bold text-primary z-10;
 }
 
 ::-webkit-scrollbar {
@@ -61,24 +75,6 @@
   @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-colors;
 }
 
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
 .hero-radial-gradient {
-  background: radial-gradient(circle at center, rgba(45, 45, 45, 0.4) 0%, rgba(5, 5, 5, 1) 100%);
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  background: radial-gradient(circle at center, rgba(45, 45, 45, 0.2) 0%, rgba(5, 5, 5, 1) 100%);
 }

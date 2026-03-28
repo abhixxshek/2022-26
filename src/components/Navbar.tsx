@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -9,7 +8,7 @@ import { useUser } from "@/firebase";
 const JNVLogo = () => (
   <svg 
     viewBox="0 0 100 100" 
-    className="w-10 h-10 transition-transform group-hover:scale-110"
+    className="w-8 h-8 transition-transform group-hover:scale-110"
     fill="none" 
     xmlns="http://www.w3.org/2000/svg"
   >
@@ -19,7 +18,6 @@ const JNVLogo = () => (
       d="M50 45 C45 40 42 35 50 25 C58 35 55 40 50 45 Z" 
       fill="hsl(var(--primary))" 
     />
-    <path d="M35 60 L50 65 L65 60 L65 75 L50 80 L35 75 Z" fill="currentColor" fillOpacity="0.1" />
   </svg>
 );
 
@@ -38,42 +36,43 @@ export function Navbar() {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-700 px-8 py-10",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-8 py-8",
         isScrolled ? "bg-black/90 backdrop-blur-xl py-6 border-b border-white/5" : "bg-transparent"
       )}
     >
-      <div className="max-w-[1800px] mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-5 group">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-4 group">
           <div className="text-white">
             <JNVLogo />
           </div>
-          <div className="hidden sm:flex flex-col">
-            <span className="font-black text-xs tracking-[0.5em] uppercase leading-none">
-              JNV <span className="text-primary">MEMORIES</span>
-            </span>
-            <span className="text-[8px] font-bold tracking-[0.2em] text-white/30 uppercase mt-1">
-              Once a Navodayan, Always a Navodayan
-            </span>
-          </div>
+          <span className="font-serif italic text-white text-lg tracking-tight">
+            Batch '25
+          </span>
         </Link>
 
-        <div className="flex items-center gap-10">
-          <Link href="/yearbook" className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40 hover:text-primary transition-all">
-            Yearbook
-          </Link>
-          <Link href="/gallery" className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40 hover:text-primary transition-all">
-            Media Vault
-          </Link>
-          <Link href="/wall" className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40 hover:text-primary transition-all">
-            The Wall
-          </Link>
+        <div className="flex items-center gap-12">
+          <div className="hidden md:flex items-center gap-10">
+            <Link href="/" className="text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary pb-1">
+              The Journey
+            </Link>
+            <Link href="/yearbook" className="text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white transition-all">
+              Yearbook
+            </Link>
+            <Link href="/gallery" className="text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white transition-all">
+              Media Vault
+            </Link>
+            <Link href="/wall" className="text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white transition-all">
+              The Wall
+            </Link>
+          </div>
+          
           {user ? (
-            <Link href="/profile" className="px-8 py-3 bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-full text-[9px] font-black uppercase tracking-[0.4em] transition-all">
+            <Link href="/profile" className="px-8 py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
               My Legacy
             </Link>
           ) : (
-            <Link href="/auth" className="px-8 py-3 bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-full text-[9px] font-black uppercase tracking-[0.4em] transition-all">
-              Portal Access
+            <Link href="/auth" className="px-8 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
+              SIGN IN
             </Link>
           )}
         </div>
