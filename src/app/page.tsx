@@ -4,7 +4,7 @@
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
-import { Zap, Coffee, Users, ScrollText, Camera, ChevronRight, Loader2, Database } from "lucide-react";
+import { Camera, ChevronRight, Loader2, Database } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
@@ -222,7 +222,7 @@ export default function Home() {
                           <h3 className="text-6xl md:text-8xl font-serif text-white mb-10 tracking-tighter">
                             {year.title}
                           </h3>
-                          <p className="text-white/60 text-4xl md:text-5xl lg:text-7xl leading-[1.1] font-light font-serif italic tracking-tight">
+                          <p className="text-white/60 text-2xl md:text-3xl lg:text-5xl leading-[1.2] font-light font-serif italic tracking-tight">
                             "{year.description}"
                           </p>
                         </div>
