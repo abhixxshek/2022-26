@@ -4,7 +4,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V19 - Resilient Access)
+     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V20 - Final Polish)
+     * Deployment Trigger: Resilient Auth Access Refinement
      */
 
     function isSignedIn() {
@@ -29,14 +30,14 @@ service cloud.firestore {
     }
 
     match /memories/{memoryId} {
-      allow get, list: if isSignedIn();
+      allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.studentId == request.auth.uid;
       allow update: if isSignedIn() && resource.data.studentId == request.auth.uid;
       allow delete: if isAdmin() || (isSignedIn() && resource.data.studentId == request.auth.uid);
     }
 
     match /photos/{photoId} {
-      allow get, list: if isSignedIn();
+      allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.uploadedByStudentId == request.auth.uid;
       allow update: if isSignedIn() && resource.data.uploadedByStudentId == request.auth.uid;
       allow delete: if isAdmin() || (isSignedIn() && resource.data.uploadedByStudentId == request.auth.uid);
