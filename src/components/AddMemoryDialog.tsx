@@ -7,11 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { generateMemoryPrompts } from "@/ai/flows/generate-memory-prompts";
-import { Sparkles, Plus, Loader2 } from "lucide-react";
+import { Sparkles, Plus, Loader2, Smile } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useUser } from "@/firebase";
 import { collection, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+
+const QUICK_EMOJIS = ["❤️", "😂", "😭", "✨", "🎓", "🎒", "🍱", "⚽", "📝", "🕊️"];
 
 export function AddMemoryDialog() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -37,6 +39,10 @@ export function AddMemoryDialog() {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const addEmoji = (emoji: string) => {
+    setMemoryText(prev => prev + emoji);
   };
 
   const handlePostMemory = () => {
@@ -79,6 +85,7 @@ export function AddMemoryDialog() {
     // Reset fields
     setTitle("");
     setMemoryText("");
+    setPrompts([]);
   };
 
   return (
@@ -88,20 +95,20 @@ export function AddMemoryDialog() {
           <Plus className="w-4 h-4 inline-block mr-2" /> Share a Memory
         </button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] glass border-white/10">
+      <DialogContent className="sm:max-w-[500px] bg-black/90 backdrop-blur-2xl border-white/10 text-white">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-headline font-bold text-white">Share a Memory</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
+          <DialogTitle className="text-2xl font-serif italic text-white">Share a Memory</DialogTitle>
+          <DialogDescription className="text-white/40 text-[10px] uppercase font-black tracking-widest">
             Preserve your Navodaya journey for generations to come.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Memory Title</label>
+            <label className="text-[10px] font-black uppercase tracking-wider text-primary">Memory Title</label>
             <Input 
               placeholder="e.g. The Night we sneaked out..." 
-              className="bg-white/5 border-white/10 text-white"
+              className="bg-white/5 border-white/10 text-white focus:ring-primary/20 h-12"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -109,12 +116,12 @@ export function AddMemoryDialog() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Class Year</label>
+              <label className="text-[10px] font-black uppercase tracking-wider text-primary">Class Year</label>
               <Select onValueChange={setClassYear} value={classYear}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                <SelectTrigger className="bg-white/5 border-white/10 text-white h-12">
                   <SelectValue placeholder="Select Year" />
                 </SelectTrigger>
-                <SelectContent className="glass bg-black text-white border-white/10">
+                <SelectContent className="bg-black text-white border-white/10">
                   {[6, 7, 8, 9, 10, 11, 12].map(y => (
                     <SelectItem key={y} value={y.toString()}>Class {y}</SelectItem>
                   ))}
@@ -122,10 +129,10 @@ export function AddMemoryDialog() {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Theme (Optional)</label>
+              <label className="text-[10px] font-black uppercase tracking-wider text-primary">Theme (Optional)</label>
               <Input 
                 placeholder="e.g. Sports, Mess, Exam" 
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/5 border-white/10 text-white focus:ring-primary/20 h-12"
                 value={theme}
                 onChange={(e) => setTheme(e.target.value)}
               />
@@ -134,13 +141,13 @@ export function AddMemoryDialog() {
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Inspiration</label>
+              <label className="text-[10px] font-black uppercase tracking-wider text-primary">Inspiration</label>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={handleGeneratePrompts}
                 disabled={isGenerating}
-                className="text-primary hover:text-primary/80 h-auto py-1"
+                className="text-primary hover:text-primary/80 hover:bg-primary/10 h-auto py-1 text-[10px] uppercase font-black tracking-widest"
               >
                 {isGenerating ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Sparkles className="w-3 h-3 mr-2" />}
                 Get AI Prompts
@@ -153,7 +160,7 @@ export function AddMemoryDialog() {
                   <button
                     key={i}
                     onClick={() => setMemoryText(p)}
-                    className="text-left text-xs bg-primary/10 hover:bg-primary/20 border border-primary/20 rounded-lg p-3 transition-colors text-primary"
+                    className="text-left text-[11px] bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded-xl p-3 transition-colors text-primary italic font-serif"
                   >
                     {p}
                   </button>
@@ -163,17 +170,31 @@ export function AddMemoryDialog() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Your Memory</label>
+            <div className="flex items-center justify-between">
+              <label className="text-[10px] font-black uppercase tracking-wider text-primary">Your Memory</label>
+              <div className="flex gap-2">
+                {QUICK_EMOJIS.map(e => (
+                  <button 
+                    key={e} 
+                    type="button" 
+                    onClick={() => addEmoji(e)}
+                    className="hover:scale-125 transition-transform text-lg"
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </div>
             <Textarea 
-              className="bg-white/5 border-white/10 min-h-[120px] text-white" 
+              className="bg-white/5 border-white/10 min-h-[150px] text-white focus:ring-primary/20 font-serif italic text-lg leading-relaxed p-6" 
               placeholder="Write your story here..."
               value={memoryText}
               onChange={(e) => setMemoryText(e.target.value)}
             />
           </div>
 
-          <Button onClick={handlePostMemory} className="w-full bg-primary text-primary-foreground font-bold py-6 hover:bg-primary/90 transition-colors">
-            Post Memory
+          <Button onClick={handlePostMemory} className="w-full bg-white text-black font-black uppercase tracking-[0.4em] py-8 rounded-full hover:bg-primary transition-all">
+            Post to Reflection Wall
           </Button>
         </div>
       </DialogContent>

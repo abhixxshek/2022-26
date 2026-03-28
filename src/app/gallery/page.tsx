@@ -3,11 +3,12 @@
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Camera, Plus } from "lucide-react";
+import { Camera } from "lucide-react";
 import { useEffect } from "react";
 import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { AddPhotoDialog } from "@/components/AddPhotoDialog";
 
 export default function GalleryPage() {
   const { user, isUserLoading } = useUser();
@@ -54,9 +55,7 @@ export default function GalleryPage() {
               </p>
             </motion.div>
 
-            <button className="px-12 py-5 bg-white text-black rounded-full font-black text-sm uppercase tracking-widest hover:bg-primary transition-all">
-              <Plus className="w-4 h-4 inline-block mr-2" /> Upload Media
-            </button>
+            <AddPhotoDialog />
           </div>
 
           {/* Masonry-like Grid */}
