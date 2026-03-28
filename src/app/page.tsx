@@ -157,7 +157,7 @@ export default function Home() {
 
           <div className="timeline-line" />
 
-          <div className="space-y-96 relative">
+          <div className="space-y-[40rem] relative">
             {isLoading ? (
               <div className="flex justify-center py-40">
                 <Loader2 className="w-12 h-12 animate-spin text-white/10" />
@@ -222,7 +222,7 @@ export default function Home() {
                           <h3 className="text-6xl md:text-8xl font-serif text-white mb-10 tracking-tighter">
                             {year.title}
                           </h3>
-                          <p className="text-white/60 text-4xl md:text-5xl lg:text-6xl leading-[1.15] font-light font-serif italic tracking-tight">
+                          <p className="text-white/60 text-4xl md:text-5xl lg:text-7xl leading-[1.1] font-light font-serif italic tracking-tight">
                             "{year.description}"
                           </p>
                         </div>

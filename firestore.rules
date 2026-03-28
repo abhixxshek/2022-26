@@ -4,8 +4,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V4 - Explicit Read Access)
-     * Last Updated: 2024-03-28 (Forced Re-deployment)
+     * NAVODAYA MEMORIES YEARBOOK - SECURITY RULES (V5 - Explicit Read Permissions)
+     * Ensuring list/get operations are correctly authorized for authenticated students.
      */
 
     match /students/{studentId} {
@@ -20,8 +20,8 @@ service cloud.firestore {
     }
 
     match /photos/{photoId} {
-      // Unified read (get + list) for any authenticated batch member
-      allow read: if request.auth != null;
+      // Explicitly granting get and list for authenticated batch members
+      allow get, list: if request.auth != null;
       allow create: if request.auth != null && request.resource.data.uploadedByStudentId == request.auth.uid;
       allow update, delete: if request.auth != null && resource.data.uploadedByStudentId == request.auth.uid;
     }
