@@ -4,14 +4,12 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Plus, Camera, ImageIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useUser } from "@/firebase";
 import { collection, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
-
-const QUICK_EMOJIS = ["❤️", "📸", "🎒", "🏠", "🏫", "🍱", "⚽", "✨", "🕊️", "🎓"];
+import { EmojiPicker } from "@/components/EmojiPicker";
 
 export function AddPhotoDialog() {
   const [caption, setCaption] = useState("");
@@ -98,18 +96,7 @@ export function AddPhotoDialog() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-[10px] font-black uppercase tracking-wider text-primary">Caption & Expression</label>
-              <div className="flex gap-2">
-                {QUICK_EMOJIS.map(e => (
-                  <button 
-                    key={e} 
-                    type="button" 
-                    onClick={() => addEmoji(e)}
-                    className="hover:scale-125 transition-transform text-lg"
-                  >
-                    {e}
-                  </button>
-                ))}
-              </div>
+              <EmojiPicker onEmojiSelect={addEmoji} />
             </div>
             <Textarea 
               placeholder="Describe this moment..." 

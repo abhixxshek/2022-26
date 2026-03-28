@@ -14,8 +14,7 @@ import { Save, ImageIcon, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
-
-const QUICK_EMOJIS = ["❤️", "😂", "😭", "✨", "🎓", "🎒", "🍱", "⚽", "📝", "🕊️"];
+import { EmojiPicker } from "@/components/EmojiPicker";
 
 export default function ProfilePage() {
   const { user, isUserLoading } = useUser();
@@ -210,18 +209,7 @@ export default function ProfilePage() {
                       <span className="h-[1px] w-8 bg-primary/40" />
                       <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">The Full Narrative</label>
                     </div>
-                    <div className="flex gap-2">
-                      {QUICK_EMOJIS.map(e => (
-                        <button 
-                          key={e} 
-                          type="button" 
-                          onClick={() => addEmoji(e)}
-                          className="hover:scale-125 transition-transform text-lg"
-                        >
-                          {e}
-                        </button>
-                      ))}
-                    </div>
+                    <EmojiPicker onEmojiSelect={addEmoji} />
                   </div>
                   <Textarea 
                     placeholder="Tell your Navodaya story... the early morning whistles, the mess rushes, the midnight preps, and the bonds that will never break." 

@@ -7,13 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { generateMemoryPrompts } from "@/ai/flows/generate-memory-prompts";
-import { Sparkles, Plus, Loader2, Smile } from "lucide-react";
+import { Sparkles, Plus, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useUser } from "@/firebase";
 import { collection, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
-
-const QUICK_EMOJIS = ["❤️", "😂", "😭", "✨", "🎓", "🎒", "🍱", "⚽", "📝", "🕊️"];
+import { EmojiPicker } from "@/components/EmojiPicker";
 
 export function AddMemoryDialog() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -172,18 +171,7 @@ export function AddMemoryDialog() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-[10px] font-black uppercase tracking-wider text-primary">Your Memory</label>
-              <div className="flex gap-2">
-                {QUICK_EMOJIS.map(e => (
-                  <button 
-                    key={e} 
-                    type="button" 
-                    onClick={() => addEmoji(e)}
-                    className="hover:scale-125 transition-transform text-lg"
-                  >
-                    {e}
-                  </button>
-                ))}
-              </div>
+              <EmojiPicker onEmojiSelect={addEmoji} />
             </div>
             <Textarea 
               className="bg-white/5 border-white/10 min-h-[150px] text-white focus:ring-primary/20 font-serif italic text-lg leading-relaxed p-6" 
