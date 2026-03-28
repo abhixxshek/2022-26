@@ -194,7 +194,7 @@ export default function Home() {
                           <h3 className="text-5xl md:text-8xl font-serif text-white mb-10 tracking-tighter leading-none">
                             {year.title}
                           </h3>
-                          <p className="text-white/60 text-lg md:text-2xl leading-relaxed font-light font-serif italic tracking-tight max-w-4xl">
+                          <p className="text-white/60 text-lg md:text-3xl leading-relaxed font-light font-serif italic tracking-tight max-w-4xl">
                             "{year.description}"
                           </p>
                         </div>
