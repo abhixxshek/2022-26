@@ -9,12 +9,16 @@ import { Users, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+
+const HOUSES = ["All Houses", "Aravalli", "Nilgiri", "Shivalik", "Udaygiri"];
 
 export default function YearbookPage() {
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeHouse, setActiveHouse] = useState("All Houses");
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -29,10 +33,12 @@ export default function YearbookPage() {
 
   const { data: students, isLoading } = useCollection(studentsQuery);
 
-  const filteredStudents = students?.filter(s => 
-    s.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.house?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredStudents = students?.filter(s => {
+    const matchesSearch = s.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         s.house?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesHouse = activeHouse === "All Houses" || s.house === activeHouse;
+    return matchesSearch && matchesHouse;
+  });
 
   if (isUserLoading) return null;
 
@@ -40,38 +46,53 @@ export default function YearbookPage() {
     <div className="bg-[#050505] min-h-screen text-foreground selection:bg-primary/20">
       <Navbar />
 
-      <main className="pt-40 pb-32 px-6">
+      <main className="pt-48 pb-32 px-6">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-12">
+          <div className="text-center mb-24">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
             >
-              <div className="flex items-center gap-3 text-primary font-black mb-6 uppercase tracking-[0.4em] text-[10px]">
-                <Users className="w-4 h-4" />
-                <span>Student Directory</span>
-              </div>
-              <h1 className="text-6xl md:text-[8rem] font-black mb-8 leading-none tracking-tighter uppercase">
-                The <span className="text-gradient">Yearbook</span>
-              </h1>
-              <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed font-light font-body">
-                The faces that defined seven years. From the hallways of Aravalli to the 
-                playgrounds of Udaygiri.
+              <h1 className="text-5xl md:text-7xl font-serif text-white mb-6">The Batch of '25</h1>
+              <p className="text-white/40 max-w-2xl mx-auto text-sm md:text-base font-light leading-relaxed">
+                Faces that defined our journey. Moments that became memories. Click a card to explore their legacy.
               </p>
             </motion.div>
+          </div>
 
-            <div className="relative w-full md:w-96">
+          {/* Controls */}
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 mb-20 bg-white/[0.02] border border-white/5 p-6 rounded-3xl">
+            <div className="relative w-full lg:w-96">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
               <Input 
-                placeholder="Search by name or house..." 
-                className="bg-white/5 border-white/10 pl-12 h-14 rounded-full text-white"
+                placeholder="Find a classmate..." 
+                className="bg-black/40 border-white/10 pl-12 h-12 rounded-full text-white focus:ring-primary/20 transition-all placeholder:text-white/10"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+
+            <div className="flex flex-wrap justify-center gap-2">
+              {HOUSES.map((house) => (
+                <button
+                  key={house}
+                  onClick={() => setActiveHouse(house)}
+                  className={cn(
+                    "px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border",
+                    activeHouse === house 
+                      ? "bg-primary text-black border-primary shadow-lg shadow-primary/20" 
+                      : "bg-white/5 text-white/40 border-white/10 hover:border-white/20 hover:text-white"
+                  )}
+                >
+                  {house}
+                </button>
+              ))}
+            </div>
           </div>
 
+          {/* Grid */}
           {isLoading || isUserLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[...Array(8)].map((_, i) => (
@@ -79,18 +100,20 @@ export default function YearbookPage() {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {filteredStudents?.map((student: any) => (
                 <StudentCard key={student.id} student={{
                   ...student,
                   photo: student.profilePhotoUrl || `https://picsum.photos/seed/${student.id}/400/500`,
                   bio: student.shortBio,
-                  classYear: "12", // Default for 2018-2025 batch final year
-                  quote: student.fullBio?.substring(0, 50) + "..."
+                  classYear: "12",
+                  quote: student.fullBio
                 }} />
               ))}
               {filteredStudents?.length === 0 && (
-                <p className="col-span-full text-center py-40 text-white/20 font-black uppercase tracking-[0.5em]">No records found in the archive.</p>
+                <div className="col-span-full py-40 text-center">
+                  <p className="text-white/10 font-black uppercase tracking-[0.5em] text-xl">No records found in the archive.</p>
+                </div>
               )}
             </div>
           )}
