@@ -4,6 +4,7 @@ import {
   signInAnonymously,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
 } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
 
@@ -35,6 +36,22 @@ export function initiateEmailSignIn(authInstance: Auth, email: string, password:
     toast({
       variant: "destructive",
       title: "Sign In Error",
+      description: error.message,
+    });
+  });
+}
+
+/** Initiate sign-out (non-blocking). */
+export function initiateSignOut(authInstance: Auth): void {
+  signOut(authInstance).then(() => {
+    toast({
+      title: "Signed Out",
+      description: "You have been securely logged out of the archive.",
+    });
+  }).catch((error) => {
+    toast({
+      variant: "destructive",
+      title: "Sign Out Error",
       description: error.message,
     });
   });

@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { useUser } from "@/firebase";
+import { useUser, useAuth } from "@/firebase";
+import { initiateSignOut } from "@/firebase/non-blocking-login";
+import { LogOut } from "lucide-react";
 
 const JNVLogo = () => (
   <svg 
@@ -24,6 +26,7 @@ const JNVLogo = () => (
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { user } = useUser();
+  const auth = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +35,10 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSignOut = () => {
+    initiateSignOut(auth);
+  };
 
   return (
     <nav
@@ -67,9 +74,18 @@ export function Navbar() {
           </div>
           
           {user ? (
-            <Link href="/profile" className="px-8 py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
-              My Legacy
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/profile" className="px-8 py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
+                My Legacy
+              </Link>
+              <button 
+                onClick={handleSignOut}
+                className="p-2.5 text-white/40 hover:text-white transition-colors"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           ) : (
             <Link href="/auth" className="px-8 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
               SIGN IN
