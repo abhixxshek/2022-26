@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, History } from "lucide-react";
 import { initiateEmailSignIn, initiateEmailSignUp } from "@/firebase/non-blocking-login";
 import { useAuth, useUser } from "@/firebase";
 import { useRouter } from "next/navigation";
@@ -15,17 +15,17 @@ import { useEffect } from "react";
 const JNVLogo = () => (
   <svg 
     viewBox="0 0 100 100" 
-    className="w-16 h-16"
+    className="w-20 h-20"
     fill="none" 
     xmlns="http://www.w3.org/2000/svg"
   >
-    <circle cx="50" cy="50" r="48" stroke="currentColor" strokeWidth="2" />
-    <path d="M50 75 L50 45" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+    <circle cx="50" cy="50" r="48" stroke="currentColor" strokeWidth="1" />
+    <path d="M50 75 L50 45" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
     <path 
       d="M50 45 C45 40 42 35 50 25 C58 35 55 40 50 45 Z" 
       fill="hsl(var(--primary))" 
     />
-    <path d="M35 60 L50 65 L65 60 L65 75 L50 80 L35 75 Z" fill="currentColor" fillOpacity="0.2" />
+    <path d="M35 60 L50 65 L65 60 L65 75 L50 80 L35 75 Z" fill="currentColor" fillOpacity="0.1" />
   </svg>
 );
 
@@ -55,77 +55,81 @@ export default function AuthPage() {
   if (isUserLoading) return null;
 
   return (
-    <div className="bg-[#050505] min-h-screen">
+    <div className="bg-[#020202] min-h-screen selection:bg-primary/20">
       <Navbar />
       
-      <main className="pt-40 pb-32 px-6 flex items-center justify-center">
+      <main className="pt-48 pb-40 px-6 flex items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="w-full max-w-md"
         >
-          <Card className="glass border-white/10 shadow-2xl overflow-hidden">
-            <div className="h-2 bg-primary" />
-            <CardHeader className="text-center pb-8">
-              <div className="flex justify-center mb-6">
-                <div className="text-primary">
+          <Card className="bg-[#050505] border-white/5 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] overflow-hidden rounded-[2.5rem]">
+            <div className="h-1.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
+            <CardHeader className="text-center pb-12 pt-16">
+              <div className="flex justify-center mb-10">
+                <div className="text-primary/80 animate-pulse">
                   <JNVLogo />
                 </div>
               </div>
-              <CardTitle className="text-3xl font-headline font-black uppercase tracking-tight">
-                {isLogin ? "Welcome Back" : "Join the Batch"}
+              <CardTitle className="text-4xl font-serif italic text-white tracking-tight">
+                {isLogin ? "Welcome Back" : "Join the Archive"}
               </CardTitle>
-              <CardDescription className="text-muted-foreground mt-2 font-body font-light">
+              <CardDescription className="text-white/30 mt-4 text-[10px] font-black uppercase tracking-[0.4em] leading-relaxed">
                 {isLogin 
-                  ? "Sign in to manage your memories and profile." 
-                  : "Register to preserve your Navodaya journey forever."}
+                  ? "SIGN IN TO MANAGE YOUR LEGACY." 
+                  : "PRESERVE YOUR 7-YEAR JOURNEY FOREVER."}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">JNV Alumni Email</label>
+            <CardContent className="px-10 pb-16">
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="space-y-4">
+                  <label className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20 ml-1">Identity / Email</label>
                   <Input 
                     type="email" 
                     placeholder="name@alumni.jnv.com" 
-                    className="bg-white/5 border-white/10 h-12 focus:ring-primary"
+                    className="bg-white/[0.03] border-white/5 h-14 focus:ring-primary/40 focus:border-primary/40 transition-all rounded-2xl px-6 text-sm"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Password</label>
+                <div className="space-y-4">
+                  <label className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20 ml-1">Access Key / Password</label>
                   <Input 
                     type="password" 
                     placeholder="••••••••" 
-                    className="bg-white/5 border-white/10 h-12 focus:ring-primary"
+                    className="bg-white/[0.03] border-white/5 h-14 focus:ring-primary/40 focus:border-primary/40 transition-all rounded-2xl px-6 text-sm"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                 </div>
                 
-                <Button className="w-full bg-primary text-black font-black uppercase tracking-widest py-7 group hover:bg-white transition-all">
-                  {isLogin ? "Sign In" : "Register"} 
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <Button className="w-full bg-white text-black hover:bg-primary transition-all duration-500 rounded-full h-16 text-[10px] font-black uppercase tracking-[0.6em] shadow-xl group">
+                  {isLogin ? "AUTHORIZE" : "INITIALIZE"} 
+                  <ArrowRight className="ml-3 w-4 h-4 group-hover:translate-x-2 transition-transform" />
                 </Button>
 
-                <div className="text-center pt-4">
+                <div className="text-center pt-8">
                   <button 
                     type="button"
                     onClick={() => setIsLogin(!isLogin)}
-                    className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
+                    className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20 hover:text-primary transition-colors underline-offset-8 decoration-white/10 hover:decoration-primary"
                   >
-                    {isLogin ? "Create a new account" : "Already have an account? Sign In"}
+                    {isLogin ? "CREATE NEW STUDENT RECORD" : "ALREADY HAVE AN ARCHIVE ACCESS?"}
                   </button>
                 </div>
               </form>
             </CardContent>
           </Card>
-          <p className="text-center mt-8 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">
-            Once a Navodayan, Always a Navodayan
-          </p>
+          <div className="text-center mt-12 flex items-center justify-center gap-4 text-white/10">
+            <History className="w-4 h-4" />
+            <p className="text-[9px] font-black uppercase tracking-[0.6em]">
+              BATCH 2018 - 2025 PORTAL
+            </p>
+          </div>
         </motion.div>
       </main>
     </div>

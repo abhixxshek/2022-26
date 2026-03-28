@@ -37,33 +37,36 @@ export function Navbar() {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-8 py-6",
-        isScrolled ? "bg-black/80 backdrop-blur-lg py-4 border-b border-white/5" : "bg-transparent"
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-700 px-8 py-10",
+        isScrolled ? "bg-black/90 backdrop-blur-xl py-6 border-b border-white/5" : "bg-transparent"
       )}
     >
-      <div className="max-w-[1600px] mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-4 group">
+      <div className="max-w-[1800px] mx-auto flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-5 group">
           <div className="text-white">
             <JNVLogo />
           </div>
           <div className="hidden sm:flex flex-col">
-            <span className="font-bold text-sm tracking-[0.4em] uppercase leading-none">
+            <span className="font-black text-xs tracking-[0.5em] uppercase leading-none">
               JNV <span className="text-primary">MEMORIES</span>
+            </span>
+            <span className="text-[8px] font-bold tracking-[0.2em] text-white/30 uppercase mt-1">
+              Once a Navodayan, Always a Navodayan
             </span>
           </div>
         </Link>
 
-        <div className="flex items-center gap-12">
-          <Link href="/gallery" className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60 hover:text-primary transition-colors">
+        <div className="flex items-center gap-16">
+          <Link href="/gallery" className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 hover:text-primary transition-all">
             Archive
           </Link>
           {user ? (
-            <Link href="/profile" className="px-6 py-2 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white hover:text-black transition-all">
-              My Profile
+            <Link href="/profile" className="px-8 py-3 bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.4em] transition-all">
+              My Legacy
             </Link>
           ) : (
-            <Link href="/auth" className="px-6 py-2 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-white hover:text-black transition-all">
-              Student Login
+            <Link href="/auth" className="px-8 py-3 bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.4em] transition-all">
+              Portal Access
             </Link>
           )}
         </div>
