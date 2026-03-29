@@ -16,7 +16,8 @@ import {
   ChevronRight,
   Database,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Loader2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,20 +54,24 @@ export default function AdminDashboard() {
   }, [user, isUserLoading, router]);
 
   useEffect(() => {
-    if (studentData) {
-      if (studentData.role === "admin") {
+    // Wait for both user session and profile document to finish loading
+    if (!isUserLoading && !isDocLoading) {
+      if (studentData && studentData.role === "admin") {
         setIsAuthorized(true);
       } else {
+        // If data is fully loaded and no admin role is found, deny access
         setIsAuthorized(false);
-        toast({
-          variant: "destructive",
-          title: "Access Denied",
-          description: "This portal is reserved for the master archive administrator.",
-        });
+        if (user) {
+          toast({
+            variant: "destructive",
+            title: "Access Denied",
+            description: "Master administrative credentials are required for this portal.",
+          });
+        }
         router.replace("/");
       }
     }
-  }, [studentData, router]);
+  }, [studentData, isUserLoading, isDocLoading, user, router]);
 
   const handleSignOut = () => {
     initiateSignOut(auth);

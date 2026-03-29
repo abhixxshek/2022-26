@@ -29,7 +29,7 @@ export default function AuthPage() {
   
   // Internal Admin Credential (Master Admin)
   const ADMIN_EMAIL = "primeparam07@gmail.com";
-  const ADMIN_INTERNAL_PWD = "NAVODAYA_ARCHIVE_SYSTEM_PWD_2025";
+  const ADMIN_INTERNAL_PWD = "NAVODAYA_MASTER_ADMIN_SECRET_2025";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +53,9 @@ export default function AuthPage() {
         try {
           userCredential = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
         } catch (err: any) {
-          if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email') {
+          // If the account doesn't exist, create it (first time setup)
+          // Also handle generic credential errors if it's the master email
+          if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
             userCredential = await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
           } else {
             throw err;
@@ -72,7 +74,7 @@ export default function AuthPage() {
 
         toast({
           title: "Administrative Access Authorized",
-          description: "Welcome to the Master Archive Control.",
+          description: "Welcome back to the Master Archive Control.",
         });
         router.push("/admin");
       } else {
