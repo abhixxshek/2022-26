@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit3, Save, ImageIcon, Camera, Loader2, Crop } from "lucide-react";
+import { Edit3, Save, ImageIcon, Camera, Loader2, Crop, ShieldAlert } from "lucide-react";
 import { doc } from "firebase/firestore";
 import { useFirestore } from "@/firebase";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
@@ -104,14 +104,19 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
 
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="ghost" size="icon" className="text-white/20 hover:text-primary transition-all bg-black/40 backdrop-blur-sm rounded-full w-12 h-12 border border-white/5 hover:border-primary/40 hover:scale-110">
-            <Edit3 className="w-5 h-5" />
+          <Button 
+            className="bg-primary text-black hover:bg-white transition-all rounded-full h-12 px-6 gap-2 font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(255,191,0,0.4)] border border-primary/50"
+          >
+            <Edit3 className="w-4 h-4" /> Edit Archive
           </Button>
         </DialogTrigger>
         <DialogContent className="bg-black/95 border-white/10 text-white backdrop-blur-2xl max-w-2xl rounded-[2.5rem] p-0 overflow-hidden">
           <div className="p-10 border-b border-white/5 bg-white/[0.02]">
             <DialogHeader>
-              <DialogTitle className="font-serif italic text-3xl">Refine Journey Record</DialogTitle>
+              <DialogTitle className="font-serif italic text-3xl flex items-center gap-3">
+                <ShieldAlert className="w-8 h-8 text-primary" />
+                Refine Journey Record
+              </DialogTitle>
               <DialogDescription className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mt-2">
                 Curate the official historical account and cinematic visual for this milestone.
               </DialogDescription>

@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Trash2 } from "lucide-react";
+import { Trash2, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFirestore, useUser, useDoc, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
@@ -71,33 +71,37 @@ export function StudentCard({ student }: StudentCardProps) {
       className="group relative"
     >
       {isAdmin && (
-        <div className="absolute top-4 right-4 z-40 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-4 right-4 z-40 opacity-100 transition-opacity">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button 
                 variant="destructive" 
                 size="icon" 
-                className="w-10 h-10 rounded-full bg-red-600 hover:bg-red-700 shadow-xl"
+                className="w-12 h-12 rounded-full bg-red-600 hover:bg-primary hover:text-black shadow-2xl border-2 border-white/20 animate-pulse hover:animate-none"
+                title="PURGE RECORD"
               >
-                <Trash2 className="w-5 h-5" />
+                <Trash2 className="w-6 h-6" />
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="bg-black/90 border-white/10 text-white backdrop-blur-2xl">
+            <AlertDialogContent className="bg-black/90 border-white/10 text-white backdrop-blur-2xl rounded-[2rem]">
               <AlertDialogHeader>
-                <AlertDialogTitle className="font-serif italic text-2xl">Remove Student Record?</AlertDialogTitle>
-                <AlertDialogDescription className="text-white/40 text-[10px] uppercase font-black tracking-widest">
-                  This action will permanently delete {student.name}'s identity and history from the Batch '25 digital archive.
+                <div className="flex justify-center mb-4">
+                  <ShieldAlert className="w-16 h-16 text-red-600" />
+                </div>
+                <AlertDialogTitle className="font-serif italic text-3xl text-center">Master Purge Confirmation</AlertDialogTitle>
+                <AlertDialogDescription className="text-white/40 text-[10px] uppercase font-black tracking-widest text-center mt-2 leading-relaxed">
+                  You are about to permanently delete {student.name}'s identity and 7-year history from the Batch '25 digital archive. This action is irreversible.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter className="mt-8 gap-4">
-                <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-full h-12 uppercase font-black text-[9px] tracking-widest px-8">
-                  Cancel
+              <AlertDialogFooter className="mt-10 gap-4">
+                <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-full h-14 uppercase font-black text-[10px] tracking-widest px-8 flex-1">
+                  Abadon Purge
                 </AlertDialogCancel>
                 <AlertDialogAction 
                   onClick={handleConfirmDelete}
-                  className="bg-red-600 hover:bg-red-700 text-white rounded-full h-12 uppercase font-black text-[9px] tracking-widest px-8"
+                  className="bg-red-600 hover:bg-primary hover:text-black text-white rounded-full h-14 uppercase font-black text-[10px] tracking-widest px-8 flex-1 transition-all"
                 >
-                  Confirm Purge
+                  Confirm Removal
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
