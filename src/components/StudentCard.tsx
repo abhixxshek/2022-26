@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Student } from "@/lib/data";

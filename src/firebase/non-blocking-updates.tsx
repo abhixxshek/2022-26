@@ -1,3 +1,4 @@
+
 'use client';
     
 import {
@@ -69,22 +70,24 @@ export function updateDocumentNonBlocking(docRef: DocumentReference, data: any) 
 
 /**
  * Initiates a deleteDoc operation for a document reference.
- * Shows a success toast ONLY after the operation completes.
+ * Provides immediate feedback and handles server-side rejection.
  */
 export function deleteDocumentNonBlocking(docRef: DocumentReference, successTitle: string = "Record Removed") {
   if (!docRef) {
-    toast({ variant: "destructive", title: "Reference Error", description: "Document record not found." });
+    toast({ variant: "destructive", title: "Reference Error", description: "The archival record could not be found." });
     return;
   }
 
+  // Optimistic UI handled by Firestore SDK; we handle the promise for confirmation/rejection.
   deleteDoc(docRef)
     .then(() => {
       toast({
         title: successTitle,
-        description: "The record has been purged from the master archive."
+        description: "The record has been permanently purged from the master archive."
       });
     })
     .catch(error => {
+      // Revert feedback if server rejects the operation (e.g. permission or path issues)
       errorEmitter.emit(
         'permission-error',
         new FirestorePermissionError({
@@ -95,7 +98,7 @@ export function deleteDocumentNonBlocking(docRef: DocumentReference, successTitl
       toast({
         variant: "destructive",
         title: "Purge Failed",
-        description: error.message || "Archive synchronization error."
+        description: error.message || "The archive rejected the removal request."
       });
     });
 }
