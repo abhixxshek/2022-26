@@ -6,7 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
 import { Loader2, Database } from "lucide-react";
 import Image from "next/image";
-import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, useDoc } from "@/firebase";
 import { collection, query, orderBy, writeBatch, doc } from "firebase/firestore";
 import { EditJourneyDialog } from "@/components/EditJourneyDialog";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,13 @@ import { toast } from "@/hooks/use-toast";
 export default function Home() {
   const db = useFirestore();
   const { user } = useUser();
+
+  const studentRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return doc(db, "students", user.uid);
+  }, [db, user]);
+
+  const { data: studentData } = useDoc(studentRef);
 
   const journeyQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -48,6 +55,7 @@ export default function Home() {
   };
 
   const displayData = journeyData && journeyData.length > 0 ? journeyData : YEAR_DATA;
+  const isAdmin = studentData?.role === "admin";
 
   return (
     <div className="bg-[#050505] text-foreground min-h-screen selection:bg-primary/30 overflow-x-hidden font-body">
@@ -125,7 +133,7 @@ export default function Home() {
             <h2 className="text-7xl md:text-[10rem] font-serif text-white tracking-tight">
               The Journey
             </h2>
-            {user && (!journeyData || journeyData.length === 0) && (
+            {isAdmin && (!journeyData || journeyData.length === 0) && (
               <Button 
                 variant="outline" 
                 onClick={initializeJourney}
@@ -188,7 +196,7 @@ export default function Home() {
                         className={`text-center md:text-left ${!isEven && 'md:text-right'}`}
                       >
                         <div className="max-w-4xl mx-auto md:mx-0 relative">
-                          {user && (
+                          {isAdmin && (
                             <div className="absolute -top-16 right-0 md:-left-12 z-20">
                               <EditJourneyDialog yearData={year} />
                             </div>

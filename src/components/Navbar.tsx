@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { User, LogOut } from "lucide-react";
-import { useUser, useAuth, initiateSignOut } from "@/firebase";
+import { User, LogOut, ShieldCheck } from "lucide-react";
+import { useUser, useAuth, initiateSignOut, useDoc, useMemoFirebase, useFirestore } from "@/firebase";
 import Image from "next/image";
+import { doc } from "firebase/firestore";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,6 +16,14 @@ export function Navbar() {
   const router = useRouter();
   const { user } = useUser();
   const auth = useAuth();
+  const db = useFirestore();
+
+  const studentRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return doc(db, "students", user.uid);
+  }, [db, user]);
+
+  const { data: studentData } = useDoc(studentRef);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,6 +44,8 @@ export function Navbar() {
     { name: "Media Vault", href: "/gallery" },
     { name: "The Wall", href: "/wall" },
   ];
+
+  const isAdmin = studentData?.role === "admin";
 
   return (
     <nav
@@ -78,6 +89,18 @@ export function Navbar() {
                 </Link>
               );
             })}
+            
+            {isAdmin && (
+              <Link 
+                href="/admin" 
+                className={cn(
+                  "text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2",
+                  pathname === "/admin" ? "text-primary" : "text-primary/60 hover:text-primary"
+                )}
+              >
+                <ShieldCheck className="w-3 h-3" /> ADMIN
+              </Link>
+            )}
           </div>
           
           <div className="flex items-center gap-4">

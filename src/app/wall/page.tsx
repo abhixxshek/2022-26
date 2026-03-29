@@ -3,7 +3,7 @@
 
 import { Navbar } from "@/components/Navbar";
 import { motion } from "framer-motion";
-import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, useDoc } from "@/firebase";
 import { collection, query, orderBy, limit, doc } from "firebase/firestore";
 import { Heart, Loader2, Trash2 } from "lucide-react";
 import { AddMemoryDialog } from "@/components/AddMemoryDialog";
@@ -14,6 +14,13 @@ import { toast } from "@/hooks/use-toast";
 export default function WallPage() {
   const db = useFirestore();
   const { user } = useUser();
+
+  const studentRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return doc(db, "students", user.uid);
+  }, [db, user]);
+
+  const { data: studentData } = useDoc(studentRef);
 
   const memoriesQuery = useMemoFirebase(() => {
     if (!db) return null;
@@ -29,9 +36,11 @@ export default function WallPage() {
     deleteDocumentNonBlocking(docRef);
     toast({ 
       title: "Memory Removed", 
-      description: "The item has been successfully deleted." 
+      description: "The item has been successfully deleted by administrator." 
     });
   };
+
+  const isAdmin = studentData?.role === "admin";
 
   return (
     <div className="bg-[#0a0a0b] min-h-screen text-foreground selection:bg-primary/20">
@@ -96,8 +105,8 @@ export default function WallPage() {
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-3 w-16 h-8 bg-white/10 backdrop-blur-sm z-20 shadow-sm opacity-80" />
                   
                   <div className="bg-[#f0e6d2] p-8 md:p-10 shadow-[5px_15px_30px_rgba(0,0,0,0.3)] transform transition-all duration-500 hover:-translate-y-2 hover:rotate-1 relative">
-                    {/* Delete Button for all users */}
-                    {user && (
+                    {/* Admin Delete Button */}
+                    {isAdmin && (
                       <Button 
                         variant="ghost" 
                         size="icon" 

@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Camera, ArrowUpDown, X, Loader2, Trash2 } from "lucide-react";
 import { useEffect, useState, Suspense } from "react";
-import { useFirestore, useCollection, useMemoFirebase, useUser } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, useDoc } from "@/firebase";
 import { collection, query, orderBy, where, doc } from "firebase/firestore";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AddPhotoDialog } from "@/components/AddPhotoDialog";
@@ -20,6 +20,13 @@ function GalleryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filterClass, setFilterClass] = useState<string | null>(null);
+
+  const studentRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return doc(db, "students", user.uid);
+  }, [db, user]);
+
+  const { data: studentData } = useDoc(studentRef);
 
   useEffect(() => {
     const classParam = searchParams.get("class");
@@ -60,9 +67,11 @@ function GalleryContent() {
     deleteDocumentNonBlocking(docRef);
     toast({ 
       title: "Photo Removed", 
-      description: "The item has been successfully deleted." 
+      description: "The item has been successfully deleted by administrator." 
     });
   };
+
+  const isAdmin = studentData?.role === "admin";
 
   return (
     <main className="pt-40 pb-32 px-6">
@@ -131,8 +140,8 @@ function GalleryContent() {
                   className="object-cover transition-all duration-700 group-hover:scale-105"
                 />
                 
-                {/* Delete Button for all users */}
-                {user && (
+                {/* Admin Delete Button */}
+                {isAdmin && (
                   <Button 
                     variant="destructive" 
                     size="icon" 

@@ -14,7 +14,7 @@ import {
   updateProfile 
 } from "firebase/auth";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { Lock, Mail, User, ArrowRight } from "lucide-react";
+import { Lock, Mail, User, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function AuthPage() {
   const [name, setName] = useState("");
@@ -27,17 +27,30 @@ export default function AuthPage() {
   const router = useRouter();
 
   const STUDENT_KEY = "JNVRTM25";
+  const ADMIN_KEY = "JNVRTM18";
+  const ADMIN_EMAIL = "primeparam07@gmail.com";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const formattedKey = accessKey.trim().toUpperCase();
+    const formattedEmail = email.trim().toLowerCase();
 
-    if (formattedKey !== STUDENT_KEY) {
+    // Admin Verification Logic
+    if (formattedKey === ADMIN_KEY) {
+      if (formattedEmail !== ADMIN_EMAIL) {
+        toast({
+          variant: "destructive",
+          title: "Administrative Denial",
+          description: "This key is restricted to the master archive administrator.",
+        });
+        return;
+      }
+    } else if (formattedKey !== STUDENT_KEY) {
       toast({
         variant: "destructive",
         title: "Invalid Access Key",
-        description: `Please use the official Batch '25 key.`,
+        description: "Please use the official Batch '25 or Admin key.",
       });
       return;
     }
@@ -57,10 +70,8 @@ export default function AuthPage() {
       const SHARED_INTERNAL_PASSWORD = "NAVODAYA_ARCHIVE_SYSTEM_PWD";
 
       try {
-        // Attempt login for returning users
         userCredential = await signInWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
       } catch (err: any) {
-        // Create account if not found
         if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email' || err.code === 'auth/wrong-password') {
           try {
             userCredential = await createUserWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
@@ -77,22 +88,24 @@ export default function AuthPage() {
         }
       }
 
+      const role = formattedKey === ADMIN_KEY ? "admin" : "student";
       const studentRef = doc(db, "students", userCredential.user.uid);
+      
       await setDoc(studentRef, {
         id: userCredential.user.uid,
         name: name,
         email: email,
-        role: "student",
+        role: role,
         batchId: "batch-2018-2025",
         lastActive: serverTimestamp(),
       }, { merge: true });
 
       toast({
-        title: "Access Authorized",
+        title: role === "admin" ? "Administrative Access Authorized" : "Access Authorized",
         description: `Welcome to the Archive, ${name}.`,
       });
       
-      router.push("/profile");
+      router.push(role === "admin" ? "/admin" : "/profile");
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -124,9 +137,11 @@ export default function AuthPage() {
             
             <div className="pt-12 pb-8 text-center px-10">
               <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                <Lock className="w-8 h-8" />
+                {accessKey.toUpperCase() === "JNVRTM18" ? <ShieldCheck className="w-8 h-8" /> : <Lock className="w-8 h-8" />}
               </div>
-              <h2 className="text-3xl font-serif italic text-white mb-2">Archive Entry</h2>
+              <h2 className="text-3xl font-serif italic text-white mb-2">
+                {accessKey.toUpperCase() === "JNVRTM18" ? "Admin Access" : "Archive Entry"}
+              </h2>
               <p className="text-[10px] uppercase font-black tracking-[0.3em] text-white/30">
                 Official Batch '25 Digital Portal
               </p>

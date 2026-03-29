@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useFirestore, useUser } from "@/firebase";
+import { useFirestore, useUser, useDoc, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
@@ -20,6 +20,13 @@ interface StudentCardProps {
 export function StudentCard({ student }: StudentCardProps) {
   const { user } = useUser();
   const db = useFirestore();
+
+  const studentRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return doc(db, "students", user.uid);
+  }, [db, user]);
+
+  const { data: studentData } = useDoc(studentRef);
 
   const houseColorClass = {
     Aravalli: "text-aravalli",
@@ -44,9 +51,11 @@ export function StudentCard({ student }: StudentCardProps) {
     deleteDocumentNonBlocking(docRef);
     toast({ 
       title: "Record Removed", 
-      description: "The student record has been deleted." 
+      description: "The student record has been deleted by administrator." 
     });
   };
+
+  const isAdmin = studentData?.role === "admin";
 
   return (
     <motion.div
@@ -56,7 +65,8 @@ export function StudentCard({ student }: StudentCardProps) {
       transition={{ duration: 0.5 }}
       className="group relative"
     >
-      {user && (
+      {/* Admin Delete Button */}
+      {isAdmin && (
         <Button 
           variant="destructive" 
           size="icon" 
