@@ -55,7 +55,6 @@ export default function Home() {
   };
 
   const displayData = journeyData && journeyData.length > 0 ? journeyData : YEAR_DATA;
-  const isAdmin = studentData?.role === "admin";
   const isAuthorizedToEdit = !!user; // Allow all logged in students to contribute to the journey
 
   return (
@@ -119,6 +118,9 @@ export default function Home() {
               <h2 className="text-xl md:text-3xl font-black uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-primary/60 drop-shadow-[0_0_15px_rgba(255,191,0,0.3)] px-4">
                 JAWAHAR NAVODAYA VIDYALAYA RATLAM
               </h2>
+              <p className="text-3xl md:text-6xl font-black mt-8 text-white tracking-tighter drop-shadow-[0_10px_30px_rgba(255,255,255,0.2)]">
+                हम ही नवोदय हो 🤍
+              </p>
             </motion.div>
           </motion.div>
         </div>
@@ -134,7 +136,7 @@ export default function Home() {
             <h2 className="text-7xl md:text-[10rem] font-serif text-white tracking-tight">
               The Journey
             </h2>
-            {isAdmin && (!journeyData || journeyData.length === 0) && (
+            {studentData?.role === "admin" && (!journeyData || journeyData.length === 0) && (
               <Button 
                 variant="outline" 
                 onClick={initializeJourney}
