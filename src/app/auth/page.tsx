@@ -9,16 +9,14 @@ import { useAuth, useFirestore } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { 
+  signInAnonymously,
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  updateProfile 
+  createUserWithEmailAndPassword 
 } from "firebase/auth";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { Lock, Mail, User, ArrowRight, ShieldCheck } from "lucide-react";
+import { Lock, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function AuthPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [accessKey, setAccessKey] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -28,25 +26,17 @@ export default function AuthPage() {
 
   const STUDENT_KEY = "JNVRTM25";
   const ADMIN_KEY = "JNVRTM18";
+  
+  // Internal Admin Credential (Master Admin)
   const ADMIN_EMAIL = "primeparam07@gmail.com";
+  const ADMIN_INTERNAL_PWD = "NAVODAYA_ARCHIVE_SYSTEM_PWD_2025";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const formattedKey = accessKey.trim().toUpperCase();
-    const formattedEmail = email.trim().toLowerCase();
 
-    // Admin Verification Logic
-    if (formattedKey === ADMIN_KEY) {
-      if (formattedEmail !== ADMIN_EMAIL) {
-        toast({
-          variant: "destructive",
-          title: "Administrative Denial",
-          description: "This key is restricted to the master archive administrator.",
-        });
-        return;
-      }
-    } else if (formattedKey !== STUDENT_KEY) {
+    if (formattedKey !== STUDENT_KEY && formattedKey !== ADMIN_KEY) {
       toast({
         variant: "destructive",
         title: "Invalid Access Key",
@@ -55,57 +45,54 @@ export default function AuthPage() {
       return;
     }
 
-    if (!name.trim() || !email.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Missing Information",
-        description: "Name and Email are required for the archive record.",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
     try {
-      let userCredential;
-      const SHARED_INTERNAL_PASSWORD = "NAVODAYA_ARCHIVE_SYSTEM_PWD";
-
-      try {
-        userCredential = await signInWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
-      } catch (err: any) {
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email' || err.code === 'auth/wrong-password') {
-          try {
-            userCredential = await createUserWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
-            await updateProfile(userCredential.user, { displayName: name });
-          } catch (createErr: any) {
-            if (createErr.code === 'auth/email-already-in-use') {
-              userCredential = await signInWithEmailAndPassword(auth, email, SHARED_INTERNAL_PASSWORD);
-            } else {
-              throw createErr;
-            }
+      if (formattedKey === ADMIN_KEY) {
+        // Admin: Sign in with fixed master account
+        let userCredential;
+        try {
+          userCredential = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
+        } catch (err: any) {
+          if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email') {
+            userCredential = await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
+          } else {
+            throw err;
           }
-        } else {
-          throw err;
         }
+
+        const studentRef = doc(db, "students", userCredential.user.uid);
+        await setDoc(studentRef, {
+          id: userCredential.user.uid,
+          name: "Master Admin",
+          email: ADMIN_EMAIL,
+          role: "admin",
+          batchId: "batch-2018-2025",
+          lastActive: serverTimestamp(),
+        }, { merge: true });
+
+        toast({
+          title: "Administrative Access Authorized",
+          description: "Welcome to the Master Archive Control.",
+        });
+        router.push("/admin");
+      } else {
+        // Student: Anonymous Sign In
+        const userCredential = await signInAnonymously(auth);
+        
+        const studentRef = doc(db, "students", userCredential.user.uid);
+        await setDoc(studentRef, {
+          id: userCredential.user.uid,
+          role: "student",
+          batchId: "batch-2018-2025",
+          lastActive: serverTimestamp(),
+        }, { merge: true });
+
+        toast({
+          title: "Archive Entry Authorized",
+          description: "Welcome to the Batch '25 Archive.",
+        });
+        router.push("/profile");
       }
-
-      const role = formattedKey === ADMIN_KEY ? "admin" : "student";
-      const studentRef = doc(db, "students", userCredential.user.uid);
-      
-      await setDoc(studentRef, {
-        id: userCredential.user.uid,
-        name: name,
-        email: email,
-        role: role,
-        batchId: "batch-2018-2025",
-        lastActive: serverTimestamp(),
-      }, { merge: true });
-
-      toast({
-        title: role === "admin" ? "Administrative Access Authorized" : "Access Authorized",
-        description: `Welcome to the Archive, ${name}.`,
-      });
-      
-      router.push(role === "admin" ? "/admin" : "/profile");
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -152,39 +139,12 @@ export default function AuthPage() {
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-[9px] font-black uppercase tracking-widest text-primary ml-1 flex items-center gap-2">
-                      <User className="w-3 h-3" /> Full Name
-                    </label>
-                    <input 
-                      placeholder="Enter your name" 
-                      className="w-full bg-white/[0.03] border border-white/10 h-14 rounded-2xl px-6 focus:outline-none focus:ring-1 focus:ring-primary/40 text-white placeholder:text-white/10"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-primary ml-1 flex items-center gap-2">
-                      <Mail className="w-3 h-3" /> Institutional Email
-                    </label>
-                    <input 
-                      type="email"
-                      placeholder="email@example.com" 
-                      className="w-full bg-white/[0.03] border border-white/10 h-14 rounded-2xl px-6 focus:outline-none focus:ring-1 focus:ring-primary/40 text-white placeholder:text-white/10"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase tracking-widest text-primary ml-1 flex items-center gap-2">
                       <Lock className="w-3 h-3" /> Access Key
                     </label>
                     <input 
                       type="text"
                       placeholder="ENTER KEY" 
-                      className="w-full bg-white/[0.03] border border-white/10 h-14 rounded-2xl px-6 focus:outline-none focus:ring-1 focus:ring-primary/40 text-white uppercase tracking-widest placeholder:text-white/10"
+                      className="w-full bg-white/[0.03] border border-white/10 h-16 rounded-2xl px-6 focus:outline-none focus:ring-1 focus:ring-primary/40 text-white uppercase tracking-[0.2em] placeholder:text-white/10 text-center"
                       value={accessKey}
                       onChange={(e) => setAccessKey(e.target.value)}
                       required

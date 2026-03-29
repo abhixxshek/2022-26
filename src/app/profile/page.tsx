@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus } from "lucide-react";
+import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
@@ -31,6 +31,7 @@ export default function ProfilePage() {
   const { data: studentData, isLoading: isDocLoading } = useDoc(studentRef);
 
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [shortBio, setShortBio] = useState("");
   const [fullBio, setFullBio] = useState("");
   const [house, setHouse] = useState("");
@@ -47,14 +48,15 @@ export default function ProfilePage() {
   useEffect(() => {
     if (studentData) {
       setName(studentData.name || "");
+      setEmail(studentData.email || user?.email || "");
       setShortBio(studentData.shortBio || "");
       setFullBio(studentData.fullBio || "");
       setHouse(studentData.house || "");
       setProfilePhotoUrl(studentData.profilePhotoUrl || "");
     }
-  }, [studentData]);
+  }, [studentData, user]);
 
-  const isNewStudent = !studentData;
+  const isNewStudent = !studentData?.name;
 
   const addEmojiToShortBio = (emoji: string) => {
     setShortBio(prev => prev + emoji);
@@ -94,11 +96,11 @@ export default function ProfilePage() {
   const handleSave = () => {
     if (!studentRef || !user) return;
     
-    if (!name || !house) {
+    if (!name || !house || !email) {
       toast({
         variant: "destructive",
         title: "Incomplete Record",
-        description: "Your Name and House affiliation are mandatory for the yearbook."
+        description: "Your Name, Email, and House affiliation are mandatory for the yearbook."
       });
       return;
     }
@@ -107,7 +109,7 @@ export default function ProfilePage() {
       id: user.uid,
       batchId,
       name,
-      email: user.email,
+      email,
       shortBio,
       fullBio,
       house,
@@ -231,12 +233,24 @@ export default function ProfilePage() {
                     <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Core Identity (Required)</label>
                   </div>
                   <div className="space-y-4">
-                    <Input 
-                      placeholder="Your Full Name (As per school records)" 
-                      className="bg-white/[0.03] border-white/10 h-16 rounded-2xl px-6 focus:ring-primary/20 transition-all text-white"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
+                    <div className="relative">
+                      <Input 
+                        placeholder="Your Full Name (As per school records)" 
+                        className="bg-white/[0.03] border-white/10 h-16 rounded-2xl px-6 focus:ring-primary/20 transition-all text-white"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="relative">
+                      <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                      <Input 
+                        placeholder="Institutional Email Address" 
+                        className="bg-white/[0.03] border-white/10 h-16 rounded-2xl pl-14 pr-6 focus:ring-primary/20 transition-all text-white"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Select onValueChange={setHouse} value={house}>
