@@ -182,7 +182,7 @@ export default function Home() {
                               className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
                             />
                             {isAdmin && (
-                              <div className="absolute top-6 right-6 z-30">
+                              <div className="absolute top-4 right-4 z-50">
                                 <EditJourneyDialog yearData={year} />
                               </div>
                             )}

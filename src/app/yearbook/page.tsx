@@ -32,8 +32,11 @@ export default function YearbookPage() {
   const { data: students, isLoading } = useCollection(studentsQuery);
 
   const filteredStudents = students?.filter(s => {
-    const matchesSearch = s.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         s.house?.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = 
+      s.name?.toLowerCase().includes(searchLower) ||
+      s.nickname?.toLowerCase().includes(searchLower) ||
+      s.house?.toLowerCase().includes(searchLower);
     const matchesHouse = activeHouse === "All Houses" || s.house === activeHouse;
     return matchesSearch && matchesHouse;
   });

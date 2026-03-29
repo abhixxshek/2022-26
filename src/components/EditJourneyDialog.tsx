@@ -2,11 +2,11 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit3, Save, ImageIcon, Camera, Loader2, Crop, ShieldAlert } from "lucide-react";
+import { Edit3, Save, ImageIcon, Camera, Loader2, ShieldAlert } from "lucide-react";
 import { doc } from "firebase/firestore";
 import { useFirestore } from "@/firebase";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
@@ -105,9 +105,9 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
       <Dialog>
         <DialogTrigger asChild>
           <Button 
-            className="bg-primary text-black hover:bg-white transition-all rounded-full h-12 px-6 gap-2 font-black uppercase text-[10px] tracking-widest shadow-[0_0_20px_rgba(255,191,0,0.4)] border border-primary/50"
+            className="bg-[#FFBF00] text-black hover:bg-white transition-all rounded-full h-10 px-4 gap-2 font-black uppercase text-[9px] tracking-widest shadow-[0_0_20px_rgba(255,191,0,0.6)] border-2 border-white/20 animate-pulse hover:animate-none"
           >
-            <Edit3 className="w-4 h-4" /> Edit Archive
+            <Edit3 className="w-3.5 h-3.5" /> EDIT ARCHIVE
           </Button>
         </DialogTrigger>
         <DialogContent className="bg-black/95 border-white/10 text-white backdrop-blur-2xl max-w-2xl rounded-[2.5rem] p-0 overflow-hidden">
