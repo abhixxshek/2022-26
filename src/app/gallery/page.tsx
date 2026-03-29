@@ -13,6 +13,17 @@ import { AddPhotoDialog } from "@/components/AddPhotoDialog";
 import { Button } from "@/components/ui/button";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 function GalleryContent() {
   const db = useFirestore();
@@ -57,10 +68,8 @@ function GalleryContent() {
     router.push("/gallery");
   };
 
-  const handleDelete = (id: string) => {
+  const handleConfirmDelete = (id: string) => {
     if (!id || !db) return;
-    if (!confirm("Are you sure you want to permanently remove this photo from the archive?")) return;
-    
     toast({ title: "Initiating Purge", description: "Connecting to the master vault..." });
     const photoRef = doc(db, "photos", id);
     deleteDocumentNonBlocking(photoRef, "Visual Purged");
@@ -136,18 +145,38 @@ function GalleryContent() {
                 />
                 
                 {isAdmin && (
-                  <Button 
-                    variant="destructive" 
-                    size="icon" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleDelete(img.id);
-                    }} 
-                    className="absolute top-4 right-4 z-40 w-10 h-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 shadow-2xl"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </Button>
+                  <div className="absolute top-4 right-4 z-40 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="destructive" 
+                          size="icon" 
+                          className="w-10 h-10 rounded-full bg-red-600 hover:bg-red-700 shadow-2xl"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-black/90 border-white/10 text-white backdrop-blur-2xl">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="font-serif italic text-2xl">Purge Visual from Vault?</AlertDialogTitle>
+                          <AlertDialogDescription className="text-white/40 text-[10px] uppercase font-black tracking-widest">
+                            This action will permanently remove this visual record from the master vault.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="mt-8 gap-4">
+                          <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-full h-12 uppercase font-black text-[9px] tracking-widest px-8">
+                            Cancel Removal
+                          </AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => handleConfirmDelete(img.id)}
+                            className="bg-red-600 hover:bg-red-700 text-white rounded-full h-12 uppercase font-black text-[9px] tracking-widest px-8"
+                          >
+                            Confirm Purge
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 )}
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 p-8 flex flex-col justify-end">

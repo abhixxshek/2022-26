@@ -12,6 +12,17 @@ import { useFirestore, useUser, useDoc, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface StudentCardProps {
   student: Student & { nickname?: string };
@@ -42,12 +53,8 @@ export function StudentCard({ student }: StudentCardProps) {
     Udaygiri: "bg-udaygiri",
   }[student.house as string] || "bg-primary";
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleConfirmDelete = () => {
     if (!student.id || !db) return;
-    if (!confirm(`Are you sure you want to permanently remove ${student.name}'s record from the archive?`)) return;
-    
     toast({ title: "Removing Record", description: "De-archiving identity from the vault..." });
     const recordRef = doc(db, "students", student.id);
     deleteDocumentNonBlocking(recordRef, "Record Removed");
@@ -64,14 +71,38 @@ export function StudentCard({ student }: StudentCardProps) {
       className="group relative"
     >
       {isAdmin && (
-        <Button 
-          variant="destructive" 
-          size="icon" 
-          onClick={handleDelete}
-          className="absolute top-4 right-4 z-40 w-10 h-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 shadow-xl"
-        >
-          <Trash2 className="w-5 h-5" />
-        </Button>
+        <div className="absolute top-4 right-4 z-40 opacity-0 group-hover:opacity-100 transition-opacity">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="destructive" 
+                size="icon" 
+                className="w-10 h-10 rounded-full bg-red-600 hover:bg-red-700 shadow-xl"
+              >
+                <Trash2 className="w-5 h-5" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-black/90 border-white/10 text-white backdrop-blur-2xl">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-serif italic text-2xl">Remove Student Record?</AlertDialogTitle>
+                <AlertDialogDescription className="text-white/40 text-[10px] uppercase font-black tracking-widest">
+                  This action will permanently delete {student.name}'s identity and history from the Batch '25 digital archive.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="mt-8 gap-4">
+                <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-full h-12 uppercase font-black text-[9px] tracking-widest px-8">
+                  Cancel Archive Removal
+                </AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleConfirmDelete}
+                  className="bg-red-600 hover:bg-red-700 text-white rounded-full h-12 uppercase font-black text-[9px] tracking-widest px-8"
+                >
+                  Confirm Purge
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       )}
 
       <Link href={`/student/${student.id}`}>

@@ -10,6 +10,17 @@ import { AddMemoryDialog } from "@/components/AddMemoryDialog";
 import { Button } from "@/components/ui/button";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function WallPage() {
   const db = useFirestore();
@@ -29,10 +40,8 @@ export default function WallPage() {
 
   const { data: memories, isLoading } = useCollection(memoriesQuery);
 
-  const handleDelete = (id: string) => {
+  const handleConfirmDelete = (id: string) => {
     if (!id || !db) return;
-    if (!confirm("Are you sure you want to permanently remove this memory from the wall?")) return;
-    
     toast({ title: "Initiating Removal", description: "Expunging record from the Reflection Wall..." });
     const memoryRef = doc(db, "memories", id);
     deleteDocumentNonBlocking(memoryRef, "Memory Erased");
@@ -104,18 +113,38 @@ export default function WallPage() {
                   
                   <div className="bg-[#f0e6d2] p-8 md:p-10 shadow-[5px_15px_30px_rgba(0,0,0,0.3)] transform transition-all duration-500 hover:-translate-y-2 hover:rotate-1 relative">
                     {isAdmin && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleDelete(memory.id);
-                        }} 
-                        className="absolute top-2 right-2 text-red-600/30 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-50"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </Button>
+                      <div className="absolute top-2 right-2 z-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-red-600/30 hover:text-red-600 hover:bg-red-500/5"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="bg-black/90 border-white/10 text-white backdrop-blur-2xl">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="font-serif italic text-2xl">Expunge Memory?</AlertDialogTitle>
+                              <AlertDialogDescription className="text-white/40 text-[10px] uppercase font-black tracking-widest">
+                                This reflection will be permanently removed from the public wall.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter className="mt-8 gap-4">
+                              <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-full h-12 uppercase font-black text-[9px] tracking-widest px-8">
+                                Cancel
+                              </AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => handleConfirmDelete(memory.id)}
+                                className="bg-red-600 hover:bg-red-700 text-white rounded-full h-12 uppercase font-black text-[9px] tracking-widest px-8"
+                              >
+                                Confirm Erase
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     )}
                     
                     <div className="space-y-6">
