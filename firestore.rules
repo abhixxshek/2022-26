@@ -1,78 +1,45 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    /**
-     * NAVODAYA MEMORIES SECURITY RULES (REFINED)
-     *
-     * Core Philosophy:
-     * This ruleset implements a "Yearbook" model. All authenticated users can view the archive.
-     * Write access is governed by ownership or administrative role.
-     */
-
-    // --- Helper Functions ---
-
-    function isSignedIn() {
+    // Helper to check if user is authenticated
+    function isAuthenticated() {
       return request.auth != null;
     }
 
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    /** 
-     * @description Checks if the requesting user has administrative privileges.
-     * This uses a direct get() on the students collection to verify the 'role' field.
-     */
+    // Helper to check if the user is an admin
     function isAdmin() {
-      return isSignedIn() && 
+      return isAuthenticated() && 
         get(/databases/$(database)/documents/students/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // --- Collection Rules ---
-
-    /**
-     * @description Master student records and profile identities.
-     */
-    match /students/{studentId} {
-      allow get, list: if isSignedIn();
-      allow create: if isOwner(studentId);
-      allow update: if isOwner(studentId) || isAdmin();
+    // Students Collection: Profiles and Roles
+    match /students/{userId} {
+      allow get, list: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
       allow delete: if isAdmin();
     }
 
-    /**
-     * @description The 7-year historical journey milestones.
-     * Accessible for all authenticated students to contribute and refine.
-     */
+    // Journey Collection: The 7-Year History
     match /journey/{yearId} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn();
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated(); // Allow all batch members to contribute to the history
     }
 
-    /**
-     * @description The Media Vault (Photos).
-     */
+    // Photos Collection: The Media Vault
     match /photos/{photoId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update, delete: if isAdmin();
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAdmin() || (isAuthenticated() && request.resource.data.uploadedByStudentId == request.auth.uid);
+      allow delete: if isAdmin();
     }
 
-    /**
-     * @description The Reflection Wall (Memories).
-     */
+    // Memories Collection: The Reflection Wall
     match /memories/{memoryId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update, delete: if isAdmin();
-    }
-
-    /**
-     * @description Legacy support for studentProfiles (redirected to students).
-     */
-    match /studentProfiles/{profileId} {
-      allow read, write: if isSignedIn();
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAdmin() || (isAuthenticated() && request.resource.data.studentId == request.auth.uid);
+      allow delete: if isAdmin();
     }
   }
 }
