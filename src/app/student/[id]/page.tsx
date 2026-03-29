@@ -5,11 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowLeft, Quote, Star, BookOpen, Home, Loader2 } from "lucide-react";
+import { ArrowLeft, Quote, Star, BookOpen, Home, Loader2, Share2, Link as LinkIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 export default function StudentProfile() {
   const { id } = useParams();
@@ -22,6 +24,15 @@ export default function StudentProfile() {
   }, [db, id]);
 
   const { data: student, isLoading } = useDoc(studentRef);
+
+  const copyProfileLink = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Archival Link Copied",
+      description: "The legacy record is ready to be shared.",
+    });
+  };
 
   if (isLoading) {
     return (
@@ -60,7 +71,7 @@ export default function StudentProfile() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between mb-32"
+            className="flex flex-col md:flex-row items-center justify-between mb-32 gap-8"
           >
             <button 
               onClick={() => router.back()}
@@ -71,9 +82,16 @@ export default function StudentProfile() {
               </div>
               Back to Archive
             </button>
-            <div className="flex items-center gap-10">
+            
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <Button 
+                onClick={copyProfileLink}
+                className="bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-full px-6 h-12 text-[9px] font-black uppercase tracking-widest gap-2"
+              >
+                <Share2 className="w-3 h-3" /> Share Record
+              </Button>
               <Badge variant="outline" className="border-primary/20 text-primary px-6 py-2 uppercase font-black text-[9px] tracking-[0.5em] rounded-full">BATCH 2018-2025</Badge>
-              <div className={cn("hidden md:flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.5em] px-6 py-2 rounded-full border", houseColorClass)}>
+              <div className={cn("flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.5em] px-6 py-2 rounded-full border", houseColorClass)}>
                 <Home className="w-4 h-4" />
                 {student.house} House
               </div>

@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
@@ -5,7 +6,23 @@ import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'JNV Memories | Batch 2018-2025',
-  description: 'The digital yearbook for Jawahar Navodaya Vidyalaya Batch of 2018-2025. Once a Navodayan, Always a Navodayan.',
+  description: 'The official digital archive and yearbook for Jawahar Navodaya Vidyalaya Batch of 2018-2025. Preserving a seven-year legacy.',
+  openGraph: {
+    title: 'JNV Memories | Batch 2018-2025',
+    description: 'The official digital archive for Jawahar Navodaya Vidyalaya Batch of 2018-2025. Once a Navodayan, Always a Navodayan.',
+    url: 'https://jnv-memories.web.app',
+    siteName: 'JNV Memories Archive',
+    images: [
+      {
+        url: 'https://upload.wikimedia.org/wikipedia/en/d/d1/Navodaya_Vidyalaya_Samiti_logo.png',
+        width: 800,
+        height: 800,
+        alt: 'JNV Official Logo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({

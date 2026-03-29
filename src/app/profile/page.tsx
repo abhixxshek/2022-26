@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus, Mail, User, RefreshCw, Crop } from "lucide-react";
+import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus, Mail, User, RefreshCw, Share2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
@@ -85,7 +85,6 @@ export default function ProfilePage() {
       setIsReading(false);
     };
     reader.readAsDataURL(file);
-    // Reset file input
     e.target.value = '';
   };
 
@@ -137,8 +136,14 @@ export default function ProfilePage() {
     }
   };
 
-  const handleTriggerFilePicker = () => {
-    fileInputRef.current?.click();
+  const copyProfileLink = () => {
+    if (!user) return;
+    const url = `${window.location.origin}/student/${user.uid}`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Archival Link Copied",
+      description: "Your public record is ready to be shared.",
+    });
   };
 
   if (isUserLoading || isDocLoading) {
@@ -172,28 +177,6 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            {isNewStudent && (
-              <div className="mb-12 p-8 rounded-3xl bg-primary/5 border border-primary/20 flex flex-col md:flex-row items-center gap-8 shadow-[0_0_50px_rgba(255,191,0,0.05)]">
-                <div className="p-4 rounded-full bg-primary/10 text-primary">
-                  <UserPlus className="w-8 h-8" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-black uppercase tracking-widest text-white mb-2">Complete Your Enrollment</h2>
-                  <p className="text-white/40 text-[10px] uppercase font-black tracking-[0.3em] leading-relaxed">
-                    Welcome to the Batch '25 Archive. Please fill in your identity details to be visible to your classmates.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden" 
-              accept="image/*" 
-              onChange={handleFileChange} 
-            />
-
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-8">
               <div>
                 <h1 className="text-5xl font-black uppercase tracking-tighter mb-2">
@@ -203,9 +186,20 @@ export default function ProfilePage() {
                   {isNewStudent ? "First-time Identity Record" : "Batch 2018—25 Student Record"}
                 </p>
               </div>
-              <Button onClick={handleSave} className="w-full md:w-auto bg-white text-black font-black uppercase tracking-widest gap-2 h-14 px-10 rounded-full shadow-lg hover:bg-primary transition-all">
-                <Save className="w-4 h-4" /> {isNewStudent ? "Finalize Enrollment" : "Save Changes"}
-              </Button>
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                {!isNewStudent && (
+                  <Button 
+                    onClick={copyProfileLink}
+                    variant="outline"
+                    className="border-white/10 text-white hover:bg-white/5 rounded-full h-14 px-8 text-[10px] font-black uppercase tracking-widest gap-2"
+                  >
+                    <Share2 className="w-3 h-3" /> Copy Archival Link
+                  </Button>
+                )}
+                <Button onClick={handleSave} className="flex-1 md:flex-none bg-white text-black font-black uppercase tracking-widest gap-2 h-14 px-10 rounded-full shadow-lg hover:bg-primary transition-all">
+                  <Save className="w-4 h-4" /> {isNewStudent ? "Finalize Enrollment" : "Save Changes"}
+                </Button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -227,7 +221,7 @@ export default function ProfilePage() {
                     {!isReading && (
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-4 p-6">
                         <Button 
-                          onClick={handleTriggerFilePicker}
+                          onClick={() => fileInputRef.current?.click()}
                           className="w-full bg-white text-black hover:bg-primary transition-colors rounded-full font-black text-[10px] uppercase tracking-widest h-12"
                         >
                           <RefreshCw className="w-3 h-3 mr-2" /> Adjust Visual
@@ -344,6 +338,7 @@ export default function ProfilePage() {
             </div>
           </motion.div>
         </div>
+        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
       </main>
     </div>
   );
