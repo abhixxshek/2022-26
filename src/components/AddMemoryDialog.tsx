@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,8 +40,12 @@ export function AddMemoryDialog() {
     }
   };
 
-  const addEmoji = (emoji: string) => {
+  const addEmoji = useCallback((emoji: string) => {
     setMemoryText(prev => prev + emoji);
+  }, []);
+
+  const handlePromptClick = (prompt: string) => {
+    setMemoryText(prev => prev ? prev + " " + prompt : prompt);
   };
 
   const handlePostMemory = () => {
@@ -158,7 +162,7 @@ export function AddMemoryDialog() {
                 {prompts.map((p, i) => (
                   <button
                     key={i}
-                    onClick={() => setMemoryText(p)}
+                    onClick={() => handlePromptClick(p)}
                     className="text-left text-[11px] bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded-xl p-3 transition-colors text-primary italic font-serif"
                   >
                     {p}

@@ -33,6 +33,7 @@ export function EmojiPicker({ onEmojiSelect }: EmojiPickerProps) {
           size="icon" 
           className="h-10 w-10 text-white/40 hover:text-primary hover:bg-white/5 rounded-full transition-all"
           title="Add Emoji"
+          type="button"
         >
           <Smile className="w-6 h-6" />
         </Button>
