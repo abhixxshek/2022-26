@@ -55,19 +55,20 @@ export default function AuthPage() {
         // Admin: Sign in with fixed master account
         let userCredential;
         try {
+          // Attempt direct sign in first
           userCredential = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
         } catch (err: any) {
-          // If the account doesn't exist, create it (first time setup)
-          if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+          // If the account doesn't exist or we hit a generic credential error, attempt creation
+          if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email') {
             try {
               userCredential = await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
             } catch (createErr: any) {
+              // If creation fails because it exists after all, try one last sign-in (race condition)
               if (createErr.code === 'auth/email-already-in-use') {
-                // If it's already in use but we hit an error earlier, try one last sign-in
-                // or surface the specific error.
-                throw new Error("Administrative record conflict. Please contact support.");
+                userCredential = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
+              } else {
+                throw createErr;
               }
-              throw createErr;
             }
           } else {
             throw err;
