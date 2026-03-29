@@ -6,7 +6,9 @@ import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'JNV Memories | Batch 2018-2025',
-  description: 'The official digital archive and yearbook for Jawahar Navodaya Vidyalaya Batch of 2018-2025. Preserving a seven-year legacy.',
+  description: 'The official digital archive and yearbook for Jawahar Navodaya Vidyalaya Batch of 2018-2025. Preserving a seven-year legacy of brotherhood and excellence.',
+  keywords: ['JNV Ratlam', 'Batch 2025', 'Navodaya Memories', 'Digital Yearbook', 'JNV Alumni'],
+  authors: [{ name: 'Batch 2025 Contributors' }],
   openGraph: {
     title: 'JNV Memories | Batch 2018-2025',
     description: 'The official digital archive for Jawahar Navodaya Vidyalaya Batch of 2018-2025. Once a Navodayan, Always a Navodayan.',
@@ -22,6 +24,12 @@ export const metadata: Metadata = {
     ],
     locale: 'en_US',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'JNV Memories | Batch 2018-2025',
+    description: 'A seven-year legacy of Jawahar Navodaya Vidyalaya Ratlam Batch 2018-2025.',
+    images: ['https://upload.wikimedia.org/wikipedia/en/d/d1/Navodaya_Vidyalaya_Samiti_logo.png'],
   },
 };
 
