@@ -118,7 +118,7 @@ export default function Home() {
               <h2 className="text-xl md:text-3xl font-black uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-primary/60 drop-shadow-[0_0_15px_rgba(255,191,0,0.3)] px-4">
                 JAWAHAR NAVODAYA VIDYALAYA RATLAM
               </h2>
-              <p className="text-3xl md:text-6xl font-black mt-8 text-white tracking-tighter drop-shadow-[0_10px_30px_rgba(255,255,255,0.2)]">
+              <p className="text-4xl md:text-7xl font-black mt-8 text-white tracking-tighter drop-shadow-[0_10px_30px_rgba(255,255,255,0.4)]">
                 हम ही नवोदय हो 🤍
               </p>
             </motion.div>

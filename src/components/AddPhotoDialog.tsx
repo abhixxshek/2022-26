@@ -74,8 +74,14 @@ export function AddPhotoDialog() {
     setPendingPhotos(prev => prev.filter(p => p.id !== id));
   };
 
-  const updateCaption = (id: string, caption: string) => {
-    setPendingPhotos(prev => prev.map(p => p.id === id ? { ...p, caption } : p));
+  const updateCaption = (id: string, newCaption: string) => {
+    setPendingPhotos(prev => prev.map(p => p.id === id ? { ...p, caption: newCaption } : p));
+  };
+
+  const appendEmoji = (id: string, emoji: string) => {
+    setPendingPhotos(prev => 
+      prev.map(p => p.id === id ? { ...p, caption: p.caption + emoji } : p)
+    );
   };
 
   const openAdjuster = (id: string) => {
@@ -162,7 +168,6 @@ export function AddPhotoDialog() {
           </button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[700px] w-[95vw] bg-black/95 border-white/10 text-white max-h-[90vh] flex flex-col p-0 overflow-hidden rounded-[2.5rem]">
-          {/* Fixed Header */}
           <div className="p-8 border-b border-white/5 shrink-0 bg-black/40 backdrop-blur-md z-10">
             <DialogHeader>
               <DialogTitle className="text-3xl font-serif italic text-white">Archive Vault Entry</DialogTitle>
@@ -172,7 +177,6 @@ export function AddPhotoDialog() {
             </DialogHeader>
           </div>
 
-          {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
             <div className="space-y-12 pb-4">
               <section className="space-y-6">
@@ -248,7 +252,7 @@ export function AddPhotoDialog() {
                         <div className="flex-1 space-y-4">
                           <div className="flex items-center justify-between">
                             <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Archival Caption</span>
-                            <EmojiPicker onEmojiSelect={(e) => updateCaption(photo.id, photo.caption + e)} />
+                            <EmojiPicker onEmojiSelect={(emoji) => appendEmoji(photo.id, emoji)} />
                           </div>
                           <Textarea 
                             placeholder="Describe this moment..." 
@@ -265,7 +269,6 @@ export function AddPhotoDialog() {
             </div>
           </div>
 
-          {/* Fixed Footer */}
           <div className="p-8 border-t border-white/5 bg-black/60 backdrop-blur-md shrink-0">
             <Button 
               onClick={handleBulkUpload} 
