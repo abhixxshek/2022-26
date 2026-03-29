@@ -4,9 +4,9 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NAVODAYA MEMORIES YEARBOOK - GLOBAL ARCHIVE ACCESS (V26)
-     * Last Deployment Trigger: 2024-03-28T21:20:00Z
-     * Deployment Goal: Unrestricted read/write for all archive records to resolve admin moderation errors.
+     * NAVODAYA MEMORIES YEARBOOK - GLOBAL ARCHIVE ACCESS (V27)
+     * Last Deployment Trigger: 2024-03-28T22:30:00Z
+     * Deployment Goal: Permissive read/write for all archive records.
      */
 
     match /{document=**} {

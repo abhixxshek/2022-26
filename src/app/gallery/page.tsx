@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Navbar } from "@/components/Navbar";
@@ -57,6 +58,7 @@ function GalleryContent() {
   };
 
   const handleDelete = (id: string) => {
+    if (!id || !db) return;
     if (!confirm("Are you sure you want to permanently remove this photo from the archive?")) return;
     
     const photoRef = doc(db, "photos", id);
@@ -127,7 +129,7 @@ function GalleryContent() {
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: idx * 0.05 }}
-                className="relative group rounded-3xl overflow-hidden border border-white/5 bg-[#111] aspect-[4/3] cursor-pointer"
+                className="relative group rounded-3xl overflow-hidden border border-white/5 bg-[#111] aspect-[4/3]"
               >
                 <Image 
                   src={img.url} 
@@ -145,7 +147,7 @@ function GalleryContent() {
                       e.stopPropagation();
                       handleDelete(img.id);
                     }} 
-                    className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 shadow-2xl"
+                    className="absolute top-4 right-4 z-40 w-10 h-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 shadow-2xl"
                   >
                     <Trash2 className="w-5 h-5" />
                   </Button>

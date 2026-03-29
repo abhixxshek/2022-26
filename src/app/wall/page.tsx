@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Navbar } from "@/components/Navbar";
@@ -29,6 +30,7 @@ export default function WallPage() {
   const { data: memories, isLoading } = useCollection(memoriesQuery);
 
   const handleDelete = (id: string) => {
+    if (!id || !db) return;
     if (!confirm("Are you sure you want to permanently remove this memory from the wall?")) return;
     
     const memoryRef = doc(db, "memories", id);
@@ -108,8 +110,12 @@ export default function WallPage() {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        onClick={() => handleDelete(memory.id)} 
-                        className="absolute top-2 right-2 text-red-600/30 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-30"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete(memory.id);
+                        }} 
+                        className="absolute top-2 right-2 text-red-600/30 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-50"
                       >
                         <Trash2 className="w-5 h-5" />
                       </Button>

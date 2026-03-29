@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Student } from "@/lib/data";
@@ -44,6 +45,7 @@ export function StudentCard({ student }: StudentCardProps) {
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!student.id || !db) return;
     if (!confirm(`Are you sure you want to permanently remove ${student.name}'s record from the archive?`)) return;
     
     const recordRef = doc(db, "students", student.id);
@@ -69,7 +71,7 @@ export function StudentCard({ student }: StudentCardProps) {
           variant="destructive" 
           size="icon" 
           onClick={handleDelete}
-          className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 shadow-xl"
+          className="absolute top-4 right-4 z-40 w-10 h-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 shadow-xl"
         >
           <Trash2 className="w-5 h-5" />
         </Button>
