@@ -32,12 +32,12 @@ export function StudentCard({ student }: StudentCardProps) {
   const { user } = useUser();
   const db = useFirestore();
 
-  const studentRef = useMemoFirebase(() => {
+  const currentUserRef = useMemoFirebase(() => {
     if (!db || !user) return null;
     return doc(db, "students", user.uid);
   }, [db, user]);
 
-  const { data: currentUserData } = useDoc(studentRef);
+  const { data: currentUserData } = useDoc(currentUserRef);
 
   const houseColorClass = {
     Aravalli: "text-aravalli",
@@ -55,7 +55,7 @@ export function StudentCard({ student }: StudentCardProps) {
 
   const handleConfirmDelete = () => {
     if (!student.id || !db) return;
-    toast({ title: "Removing Record", description: "De-archiving identity from the vault..." });
+    toast({ title: "Initiating Purge", description: "Expunging record from the master archive..." });
     const recordRef = doc(db, "students", student.id);
     deleteDocumentNonBlocking(recordRef, "Record Removed");
   };
@@ -91,7 +91,7 @@ export function StudentCard({ student }: StudentCardProps) {
               </AlertDialogHeader>
               <AlertDialogFooter className="mt-8 gap-4">
                 <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-full h-12 uppercase font-black text-[9px] tracking-widest px-8">
-                  Cancel Archive Removal
+                  Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction 
                   onClick={handleConfirmDelete}
@@ -108,7 +108,7 @@ export function StudentCard({ student }: StudentCardProps) {
       <Link href={`/student/${student.id}`}>
         <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#080808] border border-white/5 transition-all duration-700 hover:border-white/20">
           <Image
-            src={student.photo}
+            src={student.photo || `https://picsum.photos/seed/${student.id}/400/500`}
             alt={student.name}
             fill
             className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
@@ -136,7 +136,7 @@ export function StudentCard({ student }: StudentCardProps) {
           </div>
 
           <div className="absolute top-0 left-0 right-0 p-8 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-in-out bg-black/80 backdrop-blur-md border-b border-white/10">
-            <p className="text-[10px] text-white/80 font-light leading-relaxed italic font-serif">
+            <p className="text-[10px] text-white/80 font-light leading-relaxed italic font-serif line-clamp-4">
               "{student.bio || "A true Navodayan at heart."}"
             </p>
           </div>

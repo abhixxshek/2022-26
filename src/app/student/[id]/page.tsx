@@ -129,7 +129,6 @@ export default function StudentProfile() {
                 </div>
               </div>
 
-              {/* Institutional Details */}
               <section>
                 <div className="flex items-center gap-6 mb-16">
                   <Star className="w-6 h-6 text-primary" />
@@ -147,7 +146,6 @@ export default function StudentProfile() {
                 </div>
               </section>
 
-              {/* Placeholder for real memories if integrated later */}
               <section className="pt-16 border-t border-white/5">
                 <div className="flex items-center gap-6 mb-16">
                   <BookOpen className="w-6 h-6 text-primary" />

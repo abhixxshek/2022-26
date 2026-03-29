@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus, Mail, User } from "lucide-react";
+import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus, Mail, User, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
@@ -76,7 +76,7 @@ export default function ProfilePage() {
       toast({
         variant: "destructive",
         title: "File Too Large",
-        description: "Please select an identity photo smaller than 5MB."
+        description: "Please select an identity photo smaller than 5MB for the archive."
       });
       return;
     }
@@ -87,8 +87,8 @@ export default function ProfilePage() {
       setProfilePhotoUrl(event.target?.result as string);
       setIsReading(false);
       toast({
-        title: "Identity Photo Selected",
-        description: "Your new visual identity has been queued."
+        title: "Visual Identity Adjusted",
+        description: "Your new archive portrait has been prepared."
       });
     };
     reader.readAsDataURL(file);
@@ -101,7 +101,7 @@ export default function ProfilePage() {
       toast({
         variant: "destructive",
         title: "Incomplete Record",
-        description: "Your Name, Email, and House affiliation are mandatory for the yearbook."
+        description: "Your Full Name, Email, and House affiliation are mandatory for the yearbook."
       });
       return;
     }
@@ -136,10 +136,16 @@ export default function ProfilePage() {
     fileInputRef.current?.click();
   };
 
-  if (isUserLoading || isDocLoading) return null;
+  if (isUserLoading || isDocLoading) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-[#050505] min-h-screen">
+    <div className="bg-[#050505] min-h-screen selection:bg-primary/20">
       <Navbar />
       
       <main className="pt-40 pb-32 px-6">
@@ -156,7 +162,7 @@ export default function ProfilePage() {
                 <div>
                   <h2 className="text-xl font-black uppercase tracking-widest text-white mb-2">Complete Your Enrollment</h2>
                   <p className="text-white/40 text-[10px] uppercase font-black tracking-[0.3em] leading-relaxed">
-                    Welcome to the Batch '25 Archive. Please fill in your identity details to be visible to your classmates in the digital yearbook.
+                    Welcome to the Batch '25 Archive. Please fill in your identity details to be visible to your classmates.
                   </p>
                 </div>
               </div>
@@ -206,7 +212,7 @@ export default function ProfilePage() {
                           onClick={handleTriggerFilePicker}
                           className="w-full bg-white text-black hover:bg-primary transition-colors rounded-full font-black text-[10px] uppercase tracking-widest h-12"
                         >
-                          <ImageIcon className="w-3 h-3 mr-2" /> Select Photo
+                          <RefreshCw className="w-3 h-3 mr-2" /> Adjust Visual
                         </Button>
                         {profilePhotoUrl && (
                           <Button 
@@ -240,7 +246,7 @@ export default function ProfilePage() {
                   <div className="space-y-4">
                     <div className="relative">
                       <Input 
-                        placeholder="Your Full Name (As per school records)" 
+                        placeholder="Your Full Name (Official)" 
                         className="bg-white/[0.03] border-white/10 h-16 rounded-2xl px-6 focus:ring-primary/20 transition-all text-white"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -250,7 +256,7 @@ export default function ProfilePage() {
                     <div className="relative">
                       <User className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                       <Input 
-                        placeholder="Archive Nickname (Optional)" 
+                        placeholder="Archive Nickname (Adjust as you like)" 
                         className="bg-white/[0.03] border-white/10 h-16 rounded-2xl pl-14 pr-6 focus:ring-primary/20 transition-all text-white"
                         value={nickname}
                         onChange={(e) => setNickname(e.target.value)}

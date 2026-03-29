@@ -165,7 +165,7 @@ function GalleryContent() {
                         </AlertDialogHeader>
                         <AlertDialogFooter className="mt-8 gap-4">
                           <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-full h-12 uppercase font-black text-[9px] tracking-widest px-8">
-                            Cancel Removal
+                            Cancel
                           </AlertDialogCancel>
                           <AlertDialogAction 
                             onClick={() => handleConfirmDelete(img.id)}

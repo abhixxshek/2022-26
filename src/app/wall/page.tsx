@@ -139,7 +139,7 @@ export default function WallPage() {
                                 onClick={() => handleConfirmDelete(memory.id)}
                                 className="bg-red-600 hover:bg-red-700 text-white rounded-full h-12 uppercase font-black text-[9px] tracking-widest px-8"
                               >
-                                Confirm Erase
+                                Confirm Purge
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
