@@ -4,7 +4,7 @@
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
-import { Loader2, Database } from "lucide-react";
+import { Loader2, Database, ShieldAlert } from "lucide-react";
 import Image from "next/image";
 import { useFirestore, useCollection, useMemoFirebase, useUser, useDoc } from "@/firebase";
 import { collection, query, orderBy, writeBatch, doc } from "firebase/firestore";
@@ -21,14 +21,14 @@ export default function Home() {
     return doc(db, "students", user.uid);
   }, [db, user]);
 
-  const { data: studentData } = useDoc(studentRef);
+  const { data: studentData, isLoading: isStudentLoading } = useDoc(studentRef);
 
   const journeyQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(collection(db, "journey"), orderBy("order", "asc"));
   }, [db]);
 
-  const { data: journeyData, isLoading } = useCollection(journeyQuery);
+  const { data: journeyData, isLoading: isJourneyLoading } = useCollection(journeyQuery);
 
   const initializeJourney = async () => {
     if (!db) return;
@@ -48,9 +48,9 @@ export default function Home() {
 
     try {
       await batch.commit();
-      toast({ title: "Timeline Initialized", description: "The 7-year legacy framework has been committed to Firestore." });
+      toast({ title: "Archive Initialized", description: "The 7-year legacy framework has been committed to the master vault." });
     } catch (e) {
-      toast({ variant: "destructive", title: "Initialization Failed", description: "Check console for details." });
+      toast({ variant: "destructive", title: "Initialization Failed", description: "Database rejection encountered. Check master credentials." });
     }
   };
 
@@ -128,7 +128,7 @@ export default function Home() {
         <div className="max-w-[1600px] mx-auto relative px-12">
           <div className="text-center mb-48 space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[8px] font-black uppercase tracking-widest">
-              OUR HISTORY
+              OFFICIAL CHRONICLES
             </div>
             <h2 className="text-7xl md:text-[10rem] font-serif text-white tracking-tight">
               The Journey
@@ -137,9 +137,9 @@ export default function Home() {
               <Button 
                 variant="outline" 
                 onClick={initializeJourney}
-                className="mt-8 border-primary/20 text-primary hover:bg-primary/5 uppercase font-black text-[9px] tracking-widest"
+                className="mt-8 bg-[#FFBF00] text-black border-none hover:bg-white uppercase font-black text-[10px] tracking-widest px-8 h-14 rounded-full shadow-[0_0_30px_rgba(255,191,0,0.4)] animate-pulse"
               >
-                <Database className="w-3 h-3 mr-2" /> Initialize Archive Data
+                <Database className="w-4 h-4 mr-2" /> Bootstrap Master History
               </Button>
             )}
           </div>
@@ -147,7 +147,7 @@ export default function Home() {
           <div className="timeline-line" />
 
           <div className="space-y-[40rem] relative">
-            {isLoading ? (
+            {isJourneyLoading ? (
               <div className="flex justify-center py-40">
                 <Loader2 className="w-12 h-12 animate-spin text-white/10" />
               </div>
@@ -201,6 +201,11 @@ export default function Home() {
                         className={`text-center md:text-left ${!isEven && 'md:text-right'}`}
                       >
                         <div className="max-w-4xl mx-auto md:mx-0 relative">
+                          {isAdmin && (
+                            <div className="mb-6 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#FFBF00]">
+                              <ShieldAlert className="w-3 h-3" /> Historical Record Verified
+                            </div>
+                          )}
                           <h3 className="text-5xl md:text-8xl font-serif text-white mb-10 tracking-tighter leading-none">
                             {year.title}
                           </h3>
@@ -221,11 +226,11 @@ export default function Home() {
       <footer className="py-24 px-12 border-t border-white/5 bg-black/50">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
           <div className="flex flex-col items-center md:items-start gap-4">
-            <span className="font-serif italic text-lg text-white">Batch '25</span>
+            <span className="font-serif italic text-lg text-white">Batch '25 Archive</span>
             <p className="text-[8px] font-black uppercase tracking-[0.5em] text-white/10 italic">Once a Navodayan, Always a Navodayan</p>
           </div>
           <div className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20">
-            © 2025 BATCH 2018—2025
+            © 2025 MASTER ARCHIVE • BATCH 2018—2025
           </div>
         </div>
       </footer>

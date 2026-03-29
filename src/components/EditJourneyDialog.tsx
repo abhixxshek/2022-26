@@ -65,8 +65,8 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
     setIsAdjusterOpen(false);
     setTempImageUrl(null);
     toast({
-      title: "Archival Visual Adjusted",
-      description: "The historical record has been perfectly framed."
+      title: "Historical Frame Adjusted",
+      description: "The cinematic record has been perfectly captured."
     });
   };
 
@@ -82,8 +82,8 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
     });
 
     toast({
-      title: "Archive Refined",
-      description: `The history of ${subtitle.split('|')[0]} has been updated.`,
+      title: "Archive Committed",
+      description: `The history for ${subtitle.split('|')[0]} has been updated in the master vault.`,
     });
   };
 
@@ -158,7 +158,7 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
                 {!isReading && imageUrl && (
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                     <Button onClick={() => fileInputRef.current?.click()} className="bg-white text-black font-black uppercase text-[10px] tracking-widest rounded-full h-12 px-8 hover:bg-primary">
-                      <Camera className="w-4 h-4 mr-2" /> New Photo
+                      <Camera className="w-4 h-4 mr-2" /> Update Visual
                     </Button>
                   </div>
                 )}
