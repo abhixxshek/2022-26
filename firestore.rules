@@ -3,117 +3,76 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NAVODAYA MEMORIES SECURITY RULES
+     * NAVODAYA MEMORIES SECURITY RULES (REFINED)
      *
      * Core Philosophy:
-     * This ruleset implements a "Yearbook" model. All authenticated users can view profiles, memories, 
-     * quotes, and highlights to foster a sense of community. However, write access is strictly 
-     * restricted to the owner of the specific profile.
-     *
-     * Data Structure:
-     * - /studentProfiles/{studentProfileId}: The root document for a user's presence.
-     * - /studentProfiles/{studentProfileId}/memories/{memoryId}: User-contributed stories.
-     * - /studentProfiles/{studentProfileId}/quotes/{quoteId}: Memorable sayings.
-     * - /studentProfiles/{studentProfileId}/highlights/{highlightId}: Key achievements.
-     * - /classYears/{classYearId}: Shared reference data for academic years.
-     *
-     * Key Security Decisions:
-     * 1. Public Read (Authenticated): Any signed-in user can read any profile or memory.
-     * 2. Strict Ownership: Write operations are only permitted if the 'studentProfileId' 
-     *    matches the authenticated user's UID.
-     * 3. Static Reference Data: The 'classYears' collection is read-only for users.
-     *
-     * Denormalization for Authorization:
-     * To ensure high performance and avoid expensive get() calls, every sub-document 
-     * (Memory, Quote, Highlight) includes a 'studentProfileId' field. This field is validated 
-     * against the path and the user's UID during creation and is immutable thereafter.
+     * This ruleset implements a "Yearbook" model. All authenticated users can view the archive.
+     * Write access is governed by ownership or administrative role.
      */
 
     // --- Helper Functions ---
 
-    /** @description Checks if the user is authenticated. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** @description Checks if the user's UID matches the provided ID. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /** @description Checks if the user is the owner of an existing document. */
-    function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
+    /** 
+     * @description Checks if the requesting user has administrative privileges.
+     * This uses a direct get() on the students collection to verify the 'role' field.
+     */
+    function isAdmin() {
+      return isSignedIn() && 
+        get(/databases/$(database)/documents/students/$(request.auth.uid)).data.role == 'admin';
     }
 
     // --- Collection Rules ---
 
     /**
-     * @description Rules for the student's primary profile document.
-     * @path /studentProfiles/{studentProfileId}
-     * @allow (create) if auth.uid matches studentProfileId.
-     * @deny (update) if auth.uid does not match the existing document's ID.
-     * @principle Enforces path-based ownership and validates relational integrity of the ID.
+     * @description Master student records and profile identities.
      */
-    match /studentProfiles/{studentProfileId} {
+    match /students/{studentId} {
       allow get, list: if isSignedIn();
-      allow create: if isOwner(studentProfileId) && request.resource.data.id == studentProfileId;
-      allow update: if isExistingOwner(studentProfileId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(studentProfileId);
-
-      /**
-       * @description User-contributed memories associated with their profile.
-       * @path /studentProfiles/{studentProfileId}/memories/{memoryId}
-       * @allow (list) if user is signed in (Yearbook style).
-       * @deny (create) if studentProfileId in data doesn't match the path.
-       * @principle Uses denormalized studentProfileId for owner-based write authorization.
-       */
-      match /memories/{memoryId} {
-        allow get, list: if isSignedIn();
-        allow create: if isOwner(studentProfileId) && request.resource.data.studentProfileId == studentProfileId;
-        allow update: if isExistingOwner(studentProfileId) && request.resource.data.studentProfileId == resource.data.studentProfileId;
-        allow delete: if isExistingOwner(studentProfileId);
-      }
-
-      /**
-       * @description User-contributed quotes associated with their profile.
-       * @path /studentProfiles/{studentProfileId}/quotes/{quoteId}
-       * @allow (get) if user is signed in.
-       * @deny (update) if attempting to change the studentProfileId link.
-       * @principle Enforces ownership and immutability of the relational link.
-       */
-      match /quotes/{quoteId} {
-        allow get, list: if isSignedIn();
-        allow create: if isOwner(studentProfileId) && request.resource.data.studentProfileId == studentProfileId;
-        allow update: if isExistingOwner(studentProfileId) && request.resource.data.studentProfileId == resource.data.studentProfileId;
-        allow delete: if isExistingOwner(studentProfileId);
-      }
-
-      /**
-       * @description User-contributed highlights and achievements.
-       * @path /studentProfiles/{studentProfileId}/highlights/{highlightId}
-       * @allow (create) if the user owns the parent profile path.
-       * @deny (delete) if the user is not the owner.
-       * @principle Restricts modification of personal highlights to the profile owner.
-       */
-      match /highlights/{highlightId} {
-        allow get, list: if isSignedIn();
-        allow create: if isOwner(studentProfileId) && request.resource.data.studentProfileId == studentProfileId;
-        allow update: if isExistingOwner(studentProfileId) && request.resource.data.studentProfileId == resource.data.studentProfileId;
-        allow delete: if isExistingOwner(studentProfileId);
-      }
+      allow create: if isOwner(studentId);
+      allow update: if isOwner(studentId) || isAdmin();
+      allow delete: if isAdmin();
     }
 
     /**
-     * @description Static reference data for academic years.
-     * @path /classYears/{classYearId}
-     * @allow (get, list) if user is signed in.
-     * @deny (write) users are not permitted to modify global class metadata.
-     * @principle Read-only access for reference data.
+     * @description The 7-year historical journey milestones.
+     * Accessible for all authenticated students to contribute and refine.
      */
-    match /classYears/{classYearId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if false;
+    match /journey/{yearId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    /**
+     * @description The Media Vault (Photos).
+     */
+    match /photos/{photoId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    /**
+     * @description The Reflection Wall (Memories).
+     */
+    match /memories/{memoryId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Legacy support for studentProfiles (redirected to students).
+     */
+    match /studentProfiles/{profileId} {
+      allow read, write: if isSignedIn();
     }
   }
 }

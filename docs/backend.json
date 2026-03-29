@@ -1,319 +1,99 @@
 {
   "entities": {
-    "StudentProfile": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "StudentProfile",
+    "Student": {
+      "title": "Student",
+      "description": "Represents a student's profile and identity within the Batch '25 archive.",
       "type": "object",
-      "description": "Represents a student's profile, capturing their personal details for the Navodaya Memories yearbook.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the StudentProfile entity."
-        },
-        "firstName": {
-          "type": "string",
-          "description": "The student's first name."
-        },
-        "lastName": {
-          "type": "string",
-          "description": "The student's last name."
-        },
-        "profilePictureUrl": {
-          "type": "string",
-          "description": "URL to the student's profile picture.",
-          "format": "uri"
-        },
-        "shortBio": {
-          "type": "string",
-          "description": "A brief biographical summary or personal statement from the student."
-        },
-        "classYearIds": {
-          "type": "array",
-          "description": "References to ClassYear entities representing the academic years the student was part of their Navodaya journey. (Relationship: StudentProfile N:N ClassYear)",
-          "items": {
-            "type": "string"
-          }
-        }
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "nickname": { "type": "string" },
+        "email": { "type": "string" },
+        "house": { "type": "string", "enum": ["Aravalli", "Nilgiri", "Shivalik", "Udaygiri"] },
+        "role": { "type": "string", "enum": ["student", "admin"] },
+        "batchId": { "type": "string" },
+        "profilePhotoUrl": { "type": "string", "format": "uri" },
+        "shortBio": { "type": "string" },
+        "fullBio": { "type": "string" }
       },
-      "required": [
-        "id",
-        "firstName",
-        "lastName",
-        "profilePictureUrl",
-        "shortBio",
-        "classYearIds"
-      ]
+      "required": ["id", "name", "role"]
     },
-    "ClassYear": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ClassYear",
+    "JourneyMilestone": {
+      "title": "JourneyMilestone",
+      "description": "A specific year in the 7-year JNV journey.",
       "type": "object",
-      "description": "Represents a specific academic year (e.g., Class 6, Class 12) within the 7-year Navodaya journey, used for organizing content chronologically.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the ClassYear entity."
-        },
-        "yearName": {
-          "type": "string",
-          "description": "The common name for the academic year, e.g., 'Class 6', 'Class of 2022'."
-        },
-        "description": {
-          "type": "string",
-          "description": "A short description or theme for this academic year."
-        },
-        "startDate": {
-          "type": "string",
-          "description": "The starting date of the academic year.",
-          "format": "date-time"
-        },
-        "endDate": {
-          "type": "string",
-          "description": "The ending date of the academic year.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "yearName",
-        "description",
-        "startDate",
-        "endDate"
-      ]
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string", "format": "uri" },
+        "order": { "type": "number" }
+      }
     },
-    "Memory": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Memory",
+    "VaultPhoto": {
+      "title": "VaultPhoto",
+      "description": "A visual record stored in the media vault.",
       "type": "object",
-      "description": "Captures a specific memory or event associated with a student and a class year, potentially including photos.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Memory entity."
-        },
-        "title": {
-          "type": "string",
-          "description": "A short, descriptive title for the memory."
-        },
-        "description": {
-          "type": "string",
-          "description": "The detailed narrative or description of the memory."
-        },
-        "imageUrl": {
-          "type": "string",
-          "description": "URL to an associated image or photo for the memory (optional).",
-          "format": "uri"
-        },
-        "dateRecorded": {
-          "type": "string",
-          "description": "The date when the memory occurred or was added.",
-          "format": "date-time"
-        },
-        "studentProfileId": {
-          "type": "string",
-          "description": "Reference to the StudentProfile associated with this memory. (Relationship: StudentProfile 1:N Memory)"
-        },
-        "classYearId": {
-          "type": "string",
-          "description": "Reference to the ClassYear this memory belongs to. (Relationship: ClassYear 1:N Memory)"
-        }
-      },
-      "required": [
-        "id",
-        "title",
-        "description",
-        "dateRecorded",
-        "studentProfileId",
-        "classYearId"
-      ]
+        "id": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "caption": { "type": "string" },
+        "classYearLabel": { "type": "string" },
+        "uploadedByStudentId": { "type": "string" }
+      }
     },
-    "Quote": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Quote",
+    "WallMemory": {
+      "title": "WallMemory",
+      "description": "A reflection note left on the public wall.",
       "type": "object",
-      "description": "Stores a memorable quote from or associated with a student and a particular class year.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Quote entity."
-        },
-        "text": {
-          "type": "string",
-          "description": "The content of the quote."
-        },
-        "author": {
-          "type": "string",
-          "description": "The person attributed to the quote (could be the student or someone else)."
-        },
-        "context": {
-          "type": "string",
-          "description": "Optional context or brief explanation about when or where the quote was said."
-        },
-        "studentProfileId": {
-          "type": "string",
-          "description": "Reference to the StudentProfile associated with this quote. (Relationship: StudentProfile 1:N Quote)"
-        },
-        "classYearId": {
-          "type": "string",
-          "description": "Reference to the ClassYear this quote belongs to. (Relationship: ClassYear 1:N Quote)"
-        }
-      },
-      "required": [
-        "id",
-        "text",
-        "author",
-        "studentProfileId",
-        "classYearId"
-      ]
-    },
-    "Highlight": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Highlight",
-      "type": "object",
-      "description": "Documents a significant achievement, event, or special moment for a student during a specific class year.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Highlight entity."
-        },
-        "title": {
-          "type": "string",
-          "description": "A concise title for the highlight, e.g., 'Sports Day Winner'."
-        },
-        "description": {
-          "type": "string",
-          "description": "A detailed description of the achievement or moment."
-        },
-        "dateOccurred": {
-          "type": "string",
-          "description": "The date when the highlight occurred.",
-          "format": "date-time"
-        },
-        "imageUrl": {
-          "type": "string",
-          "description": "URL to an optional image or photo related to the highlight.",
-          "format": "uri"
-        },
-        "studentProfileId": {
-          "type": "string",
-          "description": "Reference to the StudentProfile associated with this highlight. (Relationship: StudentProfile 1:N Highlight)"
-        },
-        "classYearId": {
-          "type": "string",
-          "description": "Reference to the ClassYear this highlight belongs to. (Relationship: ClassYear 1:N Highlight)"
-        }
-      },
-      "required": [
-        "id",
-        "title",
-        "description",
-        "dateOccurred",
-        "studentProfileId",
-        "classYearId"
-      ]
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "studentName": { "type": "string" },
+        "studentId": { "type": "string" },
+        "classYearLabel": { "type": "string" }
+      }
     }
   },
   "auth": {
-    "providers": [
-      "password",
-      "anonymous"
-    ]
+    "providers": ["anonymous", "password"]
   },
   "firestore": {
     "structure": [
       {
-        "path": "/studentProfiles/{studentProfileId}",
+        "path": "/students/{studentId}",
         "definition": {
-          "entityName": "studentProfile",
-          "schema": {
-            "$ref": "#/backend/entities/StudentProfile"
-          },
-          "description": "Stores individual student profiles. The document ID `{studentProfileId}` will typically match the authenticated user's UID for write operations. Includes denormalized 'classYearIds' for associations.",
-          "params": [
-            {
-              "name": "studentProfileId",
-              "description": "Unique identifier for the student's profile, usually corresponding to the user's authentication UID."
-            }
-          ]
+          "entityName": "Student",
+          "schema": { "$ref": "#/backend/entities/Student" },
+          "description": "Master identity records."
         }
       },
       {
-        "path": "/classYears/{classYearId}",
+        "path": "/journey/{yearId}",
         "definition": {
-          "entityName": "classYear",
-          "schema": {
-            "$ref": "#/backend/entities/ClassYear"
-          },
-          "description": "Collection of academic year definitions (e.g., Class 6, Class 12). This data is generally static and publicly readable, serving as reference data.",
-          "params": [
-            {
-              "name": "classYearId",
-              "description": "Unique identifier for a specific academic year."
-            }
-          ]
+          "entityName": "JourneyMilestone",
+          "schema": { "$ref": "#/backend/entities/JourneyMilestone" },
+          "description": "The 7-year timeline."
         }
       },
       {
-        "path": "/studentProfiles/{studentProfileId}/memories/{memoryId}",
+        "path": "/photos/{photoId}",
         "definition": {
-          "entityName": "memory",
-          "schema": {
-            "$ref": "#/backend/entities/Memory"
-          },
-          "description": "Subcollection storing memories contributed by a specific student. Each memory document includes denormalized 'studentProfileId' (matching the parent path wildcard) and 'classYearId' for authorization independence and efficient querying.",
-          "params": [
-            {
-              "name": "studentProfileId",
-              "description": "The ID of the student profile to which this memory belongs."
-            },
-            {
-              "name": "memoryId",
-              "description": "Unique identifier for a specific memory document."
-            }
-          ]
+          "entityName": "VaultPhoto",
+          "schema": { "$ref": "#/backend/entities/VaultPhoto" },
+          "description": "Archived visuals."
         }
       },
       {
-        "path": "/studentProfiles/{studentProfileId}/quotes/{quoteId}",
+        "path": "/memories/{memoryId}",
         "definition": {
-          "entityName": "quote",
-          "schema": {
-            "$ref": "#/backend/entities/Quote"
-          },
-          "description": "Subcollection storing quotes associated with a specific student. Each quote document includes denormalized 'studentProfileId' (matching the parent path wildcard) and 'classYearId' for authorization independence and efficient querying.",
-          "params": [
-            {
-              "name": "studentProfileId",
-              "description": "The ID of the student profile to which this quote belongs."
-            },
-            {
-              "name": "quoteId",
-              "description": "Unique identifier for a specific quote document."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/studentProfiles/{studentProfileId}/highlights/{highlightId}",
-        "definition": {
-          "entityName": "highlight",
-          "schema": {
-            "$ref": "#/backend/entities/Highlight"
-          },
-          "description": "Subcollection storing highlights for a specific student. Each highlight document includes denormalized 'studentProfileId' (matching the parent path wildcard) and 'classYearId' for authorization independence and efficient querying.",
-          "params": [
-            {
-              "name": "studentProfileId",
-              "description": "The ID of the student profile to which this highlight belongs."
-            },
-            {
-              "name": "highlightId",
-              "description": "Unique identifier for a specific highlight document."
-            }
-          ]
+          "entityName": "WallMemory",
+          "schema": { "$ref": "#/backend/entities/WallMemory" },
+          "description": "Public wall reflections."
         }
       }
-    ],
-    "reasoning": "The Firestore data structure for 'Navodaya Memories' is designed to prioritize secure, scalable, and easily debuggable authorization, adhering to the core principles of Authorization Independence, Structural Segregation, and consistent Access Modeling.The primary entry point for user-specific data is the '/studentProfiles/{studentProfileId}' collection. Each document in this collection represents a unique student's profile, with the `{studentProfileId}` wildcard typically matching the authenticated user's UID (`request.auth.uid`). This path-based ownership simplifies rules for creating and editing a student's own profile while allowing general read access for other users, mimicking a public yearbook.\n\nGlobal, static data like academic years are stored in a top-level '/classYears/{classYearId}' collection. These documents are designed for universal read access, likely managed by an administrator or pre-populated.\n\nFor content like 'Memories', 'Quotes', and 'Highlights' which are conceptually owned by a student and associated with a specific class year, a hierarchical subcollection approach is used: '/studentProfiles/{studentProfileId}/memories/{memoryId}', '/studentProfiles/{studentProfileId}/quotes/{quoteId}', and '/studentProfiles/{studentProfileId}/highlights/{highlightId}'.\n\n**Authorization Independence (CRITICAL):** Each 'Memory', 'Quote', and 'Highlight' document explicitly denormalizes its parent `studentProfileId` and `classYearId` into its own fields. For instance, a 'Memory' document will contain `studentProfileId: '...'` and `classYearId: '...'`. This is crucial because it eliminates the need for `get()` calls in Firestore Security Rules to retrieve parent data for authorization checks. For example, to verify if a user can write to a memory, the rule simply checks `request.auth.uid == resource.data.studentProfileId` directly on the `Memory` document itself. This ensures atomic operations, improves performance, and greatly simplifies debugging as authorization logic is self-contained within the document's data context.\n\n**QAPs (Rules are not Filters):** This structure enables robust Query Access Patterns:\n*   **Listing all Student Profiles or Class Years:** The top-level collections `/studentProfiles` and `/classYears` allow straightforward `list` operations for all users, with read permissions set accordingly (e.g., `allow read: if request.auth != null;`).\n*   **Listing a specific student's content:** To view all memories for a particular student, a query like `/studentProfiles/{studentProfileId}/memories` can be executed. Read access to this subcollection can be granted to all, while write access is strictly tied to `request.auth.uid == request.resource.data.studentProfileId` (or `request.auth.uid == studentProfileId` from the path wildcard for `create` operations).\n*   **Listing content across all students for a specific Class Year:** To, for example, view all 'Memories' from 'Class 12' across all students, a collection group query on `memories` (or `quotes`, `highlights`) can be performed, filtering by the `classYearId` field (e.g., `db.collectionGroup('memories').where('classYearId', '==', 'class12Id')`). Since `classYearId` is denormalized within each document, this query is efficient and the results are directly secure based on the explicit denormalized fields. Write operations within such collection groups would still be protected by `resource.data.studentProfileId` ownership."
+    ]
   }
 }
