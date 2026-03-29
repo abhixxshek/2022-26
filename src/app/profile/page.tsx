@@ -11,11 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus, Mail, User, RefreshCw } from "lucide-react";
+import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus, Mail, User, RefreshCw, Crop } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
 import { EmojiPicker } from "@/components/EmojiPicker";
+import { ImageAdjuster } from "@/components/ImageAdjuster";
 
 export default function ProfilePage() {
   const { user, isUserLoading } = useUser();
@@ -38,6 +39,8 @@ export default function ProfilePage() {
   const [house, setHouse] = useState("");
   const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
   const [isReading, setIsReading] = useState(false);
+  const [tempImageUrl, setTempImageUrl] = useState<string | null>(null);
+  const [isAdjusterOpen, setIsAdjusterOpen] = useState(false);
   const [batchId] = useState("batch-2018-2025");
 
   useEffect(() => {
@@ -60,14 +63,6 @@ export default function ProfilePage() {
 
   const isNewStudent = !studentData?.name;
 
-  const addEmojiToShortBio = (emoji: string) => {
-    setShortBio(prev => prev + emoji);
-  };
-
-  const addEmojiToFullBio = (emoji: string) => {
-    setFullBio(prev => prev + emoji);
-  };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -84,14 +79,24 @@ export default function ProfilePage() {
     setIsReading(true);
     const reader = new FileReader();
     reader.onload = (event) => {
-      setProfilePhotoUrl(event.target?.result as string);
+      const dataUri = event.target?.result as string;
+      setTempImageUrl(dataUri);
+      setIsAdjusterOpen(true);
       setIsReading(false);
-      toast({
-        title: "Visual Identity Adjusted",
-        description: "Your new archive portrait has been prepared."
-      });
     };
     reader.readAsDataURL(file);
+    // Reset file input
+    e.target.value = '';
+  };
+
+  const handleSaveAdjustedImage = (adjustedImage: string) => {
+    setProfilePhotoUrl(adjustedImage);
+    setIsAdjusterOpen(false);
+    setTempImageUrl(null);
+    toast({
+      title: "Visual Adjusted",
+      description: "Your archival portrait has been perfectly framed."
+    });
   };
 
   const handleSave = () => {
@@ -148,6 +153,19 @@ export default function ProfilePage() {
     <div className="bg-[#050505] min-h-screen selection:bg-primary/20">
       <Navbar />
       
+      {tempImageUrl && (
+        <ImageAdjuster
+          image={tempImageUrl}
+          isOpen={isAdjusterOpen}
+          onClose={() => {
+            setIsAdjusterOpen(false);
+            setTempImageUrl(null);
+          }}
+          onSave={handleSaveAdjustedImage}
+          aspectRatio={4 / 5}
+        />
+      )}
+
       <main className="pt-40 pb-32 px-6">
         <div className="max-w-4xl mx-auto">
           <motion.div
@@ -256,7 +274,7 @@ export default function ProfilePage() {
                     <div className="relative">
                       <User className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                       <Input 
-                        placeholder="Archive Nickname (Adjust as you like)" 
+                        placeholder="Archive Nickname" 
                         className="bg-white/[0.03] border-white/10 h-16 rounded-2xl pl-14 pr-6 focus:ring-primary/20 transition-all text-white"
                         value={nickname}
                         onChange={(e) => setNickname(e.target.value)}
@@ -266,7 +284,7 @@ export default function ProfilePage() {
                     <div className="relative">
                       <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                       <Input 
-                        placeholder="Institutional Email Address" 
+                        placeholder="Email Address" 
                         className="bg-white/[0.03] border-white/10 h-16 rounded-2xl pl-14 pr-6 focus:ring-primary/20 transition-all text-white"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -297,7 +315,7 @@ export default function ProfilePage() {
                       <span className="h-[1px] w-8 bg-primary/40" />
                       <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Identity Statement</label>
                     </div>
-                    <EmojiPicker onEmojiSelect={addEmojiToShortBio} />
+                    <EmojiPicker onEmojiSelect={(emoji) => setShortBio(p => p + emoji)} />
                   </div>
                   <Input 
                     placeholder="Describe your JNV journey in one sentence..." 
@@ -313,10 +331,10 @@ export default function ProfilePage() {
                       <span className="h-[1px] w-8 bg-primary/40" />
                       <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">The Full Narrative</label>
                     </div>
-                    <EmojiPicker onEmojiSelect={addEmojiToFullBio} />
+                    <EmojiPicker onEmojiSelect={(emoji) => setFullBio(p => p + emoji)} />
                   </div>
                   <Textarea 
-                    placeholder="Share your favorite school memories, achievements, and final thoughts..." 
+                    placeholder="Share your favorite school memories..." 
                     className="bg-white/[0.03] border-white/10 min-h-[300px] rounded-[2rem] p-8 focus:ring-primary/20 transition-all text-base leading-relaxed font-light font-serif italic text-white"
                     value={fullBio}
                     onChange={(e) => setFullBio(e.target.value)}
