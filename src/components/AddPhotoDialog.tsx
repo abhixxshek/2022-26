@@ -6,102 +6,150 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Camera, ImageIcon, Loader2 } from "lucide-react";
+import { Plus, Camera, ImageIcon, Loader2, Trash2, Crop, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useUser } from "@/firebase";
 import { collection, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { ImageAdjuster } from "@/components/ImageAdjuster";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import Image from "next/image";
+
+interface PendingPhoto {
+  id: string;
+  url: string;
+  caption: string;
+}
 
 export function AddPhotoDialog() {
-  const [caption, setCaption] = useState("");
+  const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
   const [classYear, setClassYear] = useState("");
-  const [previewUrl, setPreviewUrl] = useState("");
-  const [tempImageUrl, setTempImageUrl] = useState<string | null>(null);
-  const [isAdjusterOpen, setIsAdjusterOpen] = useState(false);
   const [isReading, setIsReading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  
+  const [adjustingPhotoId, setAdjustingPhotoId] = useState<string | null>(null);
+  const [isAdjusterOpen, setIsAdjusterOpen] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useUser();
   const db = useFirestore();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) { 
-      toast({
-        variant: "destructive",
-        title: "File Too Large",
-        description: "Please select an image smaller than 5MB for the archive."
-      });
-      return;
-    }
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
     setIsReading(true);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUri = event.target?.result as string;
-      setTempImageUrl(dataUri);
-      setIsAdjusterOpen(true);
-      setIsReading(false);
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
+    const newPhotos: PendingPhoto[] = [];
+
+    for (const file of files) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          variant: "destructive",
+          title: "File Too Large",
+          description: `${file.name} exceeds the 5MB archival limit.`
+        });
+        continue;
+      }
+
+      const reader = new FileReader();
+      const promise = new Promise<string>((resolve) => {
+        reader.onload = (event) => resolve(event.target?.result as string);
+        reader.readAsDataURL(file);
+      });
+
+      const dataUri = await promise;
+      newPhotos.push({
+        id: Math.random().toString(36).substr(2, 9),
+        url: dataUri,
+        caption: ""
+      });
+    }
+
+    setPendingPhotos(prev => [...prev, ...newPhotos]);
+    setIsReading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleRemovePhoto = (id: string) => {
+    setPendingPhotos(prev => prev.filter(p => p.id !== id));
+  };
+
+  const updateCaption = (id: string, caption: string) => {
+    setPendingPhotos(prev => prev.map(p => p.id === id ? { ...p, caption } : p));
+  };
+
+  const openAdjuster = (id: string) => {
+    setAdjustingPhotoId(id);
+    setIsAdjusterOpen(true);
   };
 
   const handleSaveAdjustedImage = (adjustedImage: string) => {
-    setPreviewUrl(adjustedImage);
+    setPendingPhotos(prev => prev.map(p => p.id === adjustingPhotoId ? { ...p, url: adjustedImage } : p));
     setIsAdjusterOpen(false);
-    setTempImageUrl(null);
+    setAdjustingPhotoId(null);
     toast({
-      title: "Visual Framed",
-      description: "Photo has been adjusted for the archive vault."
+      title: "Visual Refined",
+      description: "Photo has been perfectly framed for the vault."
     });
   };
 
-  const handleUpload = () => {
-    if (!user) return;
-    if (!previewUrl || !caption || !classYear) {
+  const handleBulkUpload = async () => {
+    if (!user || !db) return;
+    if (pendingPhotos.length === 0 || !classYear) {
       toast({
         variant: "destructive",
-        title: "Incomplete Record",
-        description: "Please select a photo, choose a class, and add a caption."
+        title: "Incomplete Batch",
+        description: "Please select images and assign a class year."
       });
       return;
     }
 
+    setIsUploading(true);
     const photosRef = collection(db, "photos");
-    const photoData = {
-      url: previewUrl,
-      caption,
-      classYearLabel: `Class ${classYear}`,
-      uploadedByStudentId: user.uid,
-      uploadedAt: new Date().toISOString(),
-      createdAt: serverTimestamp(),
-    };
 
-    addDocumentNonBlocking(photosRef, photoData);
-    
-    toast({
-      title: "Committed to Vault",
-      description: `Your record for Class ${classYear} has been archived.`
-    });
-    
-    setCaption("");
-    setClassYear("");
-    setPreviewUrl("");
+    try {
+      pendingPhotos.forEach((photo) => {
+        const photoData = {
+          url: photo.url,
+          caption: photo.caption || "Archive Record",
+          classYearLabel: `Class ${classYear}`,
+          uploadedByStudentId: user.uid,
+          uploadedAt: new Date().toISOString(),
+          createdAt: serverTimestamp(),
+        };
+        addDocumentNonBlocking(photosRef, photoData);
+      });
+
+      toast({
+        title: "Batch Committed",
+        description: `${pendingPhotos.length} records have been added to the Class ${classYear} vault.`
+      });
+
+      setPendingPhotos([]);
+      setClassYear("");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Upload Failed",
+        description: "An error occurred during archival commitment."
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
+
+  const currentAdjustingUrl = pendingPhotos.find(p => p.id === adjustingPhotoId)?.url;
 
   return (
     <>
-      {tempImageUrl && (
+      {currentAdjustingUrl && (
         <ImageAdjuster
-          image={tempImageUrl}
+          image={currentAdjustingUrl}
           isOpen={isAdjusterOpen}
           onClose={() => {
             setIsAdjusterOpen(false);
-            setTempImageUrl(null);
+            setAdjustingPhotoId(null);
           }}
           onSave={handleSaveAdjustedImage}
           aspectRatio={4 / 3}
@@ -110,82 +158,131 @@ export function AddPhotoDialog() {
 
       <Dialog>
         <DialogTrigger asChild>
-          <button className="px-12 py-5 bg-white text-black rounded-full font-black text-sm uppercase tracking-widest hover:bg-primary transition-all">
-            <Plus className="w-4 h-4 inline-block mr-2" /> Upload Media
+          <button className="px-12 py-5 bg-white text-black rounded-full font-black text-sm uppercase tracking-widest hover:bg-primary transition-all shadow-xl shadow-white/5">
+            <Plus className="w-4 h-4 inline-block mr-2" /> Bulk Upload
           </button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[500px] bg-black/90 backdrop-blur-2xl border-white/10 text-white">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-serif italic">Add to Vault</DialogTitle>
-            <DialogDescription className="text-[10px] font-black uppercase tracking-widest text-white/30">
-              Select a photo and identify which class year it belongs to.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[700px] bg-black/90 backdrop-blur-3xl border-white/10 text-white max-h-[90vh] flex flex-col p-0">
+          <div className="p-8 border-b border-white/5">
+            <DialogHeader>
+              <DialogTitle className="text-3xl font-serif italic">Archive Vault Entry</DialogTitle>
+              <DialogDescription className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mt-2">
+                Commit multiple memories to the master vault. (5MB Limit)
+              </DialogDescription>
+            </DialogHeader>
+          </div>
 
-          <div className="space-y-6 py-4">
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden" 
-              accept="image/*" 
-              onChange={handleFileChange} 
-            />
-            
-            <div className="aspect-video relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 group">
-              {previewUrl ? (
-                <img src={previewUrl} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt="Preview" />
-              ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white/20 gap-4">
-                  {isReading ? <Loader2 className="w-10 h-10 animate-spin" /> : <Camera className="w-10 h-10" />}
-                  <p className="text-[10px] font-black uppercase tracking-widest">
-                    {isReading ? "Analyzing..." : "No Record Selected"}
-                  </p>
-                </div>
-              )}
-              {!isReading && (
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Button onClick={() => fileInputRef.current?.click()} className="bg-white text-black font-black uppercase text-[10px] tracking-widest rounded-full">
-                    <ImageIcon className="w-3 h-3 mr-2" /> Select Photo
-                  </Button>
-                </div>
-              )}
-            </div>
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <ScrollArea className="flex-1 p-8">
+              <div className="space-y-12">
+                <section className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-primary">Class Identification</label>
+                    <div className="w-48">
+                      <Select onValueChange={setClassYear} value={classYear}>
+                        <SelectTrigger className="bg-white/5 border-white/10 text-white h-12 rounded-xl">
+                          <SelectValue placeholder="Which Year?" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-black text-white border-white/10">
+                          {[6, 7, 8, 9, 10, 11, 12].map(y => (
+                            <SelectItem key={y} value={y.toString()}>Class {y}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </section>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-wider text-primary">Class Identification</label>
-                <Select onValueChange={setClassYear} value={classYear}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white h-12">
-                    <SelectValue placeholder="Which class year?" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-black text-white border-white/10">
-                    {[6, 7, 8, 9, 10, 11, 12].map(y => (
-                      <SelectItem key={y} value={y.toString()}>Class {y}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <section className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-primary">Media Selection ({pendingPhotos.length})</label>
+                    <Button 
+                      onClick={() => fileInputRef.current?.click()} 
+                      disabled={isReading || isUploading}
+                      className="bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-full h-10 px-6 text-[9px] font-black uppercase tracking-widest"
+                    >
+                      <ImageIcon className="w-3 h-3 mr-2" /> Select Files
+                    </Button>
+                  </div>
+
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    accept="image/*" 
+                    multiple
+                    onChange={handleFileChange} 
+                  />
+
+                  {pendingPhotos.length === 0 ? (
+                    <div className="aspect-[2/1] border border-dashed border-white/10 rounded-[2rem] flex flex-col items-center justify-center gap-4 text-white/10">
+                      {isReading ? <Loader2 className="w-10 h-10 animate-spin" /> : <Camera className="w-10 h-10" />}
+                      <p className="text-[10px] font-black uppercase tracking-widest">No Media in Queue</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-6">
+                      {pendingPhotos.map((photo) => (
+                        <div key={photo.id} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 flex flex-col md:flex-row gap-6 group">
+                          <div className="relative w-full md:w-48 aspect-[4/3] rounded-2xl overflow-hidden bg-black/40">
+                            <Image src={photo.url} alt="Preview" fill className="object-cover grayscale group-hover:grayscale-0 transition-all" />
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                              <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                onClick={() => openAdjuster(photo.id)}
+                                className="w-10 h-10 rounded-full bg-white text-black hover:bg-primary"
+                              >
+                                <Crop className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                size="icon" 
+                                variant="destructive" 
+                                onClick={() => handleRemovePhoto(photo.id)}
+                                className="w-10 h-10 rounded-full"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          <div className="flex-1 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Archival Caption</span>
+                              <EmojiPicker onEmojiSelect={(e) => updateCaption(photo.id, photo.caption + e)} />
+                            </div>
+                            <Textarea 
+                              placeholder="Describe this moment..." 
+                              className="bg-black/20 border-white/5 h-24 rounded-2xl text-sm font-serif italic text-white/60 focus:text-white transition-colors"
+                              value={photo.caption}
+                              onChange={(e) => updateCaption(photo.id, e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
               </div>
+            </ScrollArea>
+          </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-primary">Caption & Expression</label>
-                  <EmojiPicker onEmojiSelect={(e) => setCaption(p => p + e)} />
-                </div>
-                <Textarea 
-                  placeholder="Describe this moment..." 
-                  className="bg-white/5 border-white/10 h-24 rounded-xl p-4 focus:ring-primary/20 text-white font-serif italic"
-                  value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
-                />
-              </div>
-            </div>
-
+          <div className="p-8 border-t border-white/5 bg-black/40">
             <Button 
-              onClick={handleUpload} 
-              disabled={isReading || !previewUrl}
-              className="w-full bg-white text-black font-black uppercase tracking-[0.4em] py-8 rounded-full hover:bg-primary transition-all disabled:opacity-50"
+              onClick={handleBulkUpload} 
+              disabled={isUploading || isReading || pendingPhotos.length === 0 || !classYear}
+              className="w-full bg-white text-black font-black uppercase tracking-[0.4em] py-8 rounded-full hover:bg-primary transition-all disabled:opacity-50 shadow-2xl"
             >
-              Commit to Archive
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin mr-3" />
+                  ARCHIVING BATCH...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-5 h-5 mr-3" />
+                  COMMIT {pendingPhotos.length} RECORDS
+                </>
+              )}
             </Button>
           </div>
         </DialogContent>
