@@ -1,6 +1,8 @@
+
 export interface Student {
   id: string;
   name: string;
+  nickname?: string;
   bio: string;
   photo: string;
   classYear: string;
@@ -32,6 +34,7 @@ export const YEAR_DATA: YearSectionData[] = [
       {
         id: "aryan-sharma",
         name: "Aryan Sharma",
+        nickname: "Arry",
         bio: "The kid who always managed to get extra paneer from the mess. Our unofficial Aravalli House strategist.",
         photo: "https://picsum.photos/seed/student1/400/500",
         classYear: "6",
@@ -67,6 +70,7 @@ export const YEAR_DATA: YearSectionData[] = [
       {
         id: "rahul-das",
         name: "Rahul Das",
+        nickname: "RD",
         bio: "Shivalik's best singer. He learned to sing in three different regional languages during the Migration year.",
         photo: "https://picsum.photos/seed/student3/400/500",
         classYear: "9",
@@ -88,6 +92,7 @@ export const YEAR_DATA: YearSectionData[] = [
       {
         id: "priya-verma",
         name: "Priya Verma",
+        nickname: "Pree",
         bio: "Nilgiri's silent powerhouse. Her track records from Class 7 still stand today, even as she prepped for boards.",
         photo: "https://picsum.photos/seed/student2/400/500",
         classYear: "10",
@@ -116,6 +121,7 @@ export const YEAR_DATA: YearSectionData[] = [
       {
         id: "sneha-reddy",
         name: "Sneha Reddy",
+        nickname: "Snehu",
         bio: "Udaygiri's Head Girl. From the first roll call to the last, she led the batch with grace and strength.",
         photo: "https://picsum.photos/seed/student4/400/500",
         classYear: "12",

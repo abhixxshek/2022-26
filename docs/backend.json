@@ -19,6 +19,10 @@
           "type": "string",
           "description": "The full name of the student."
         },
+        "nickname": {
+          "type": "string",
+          "description": "A familiar or preferred nickname for the student."
+        },
         "email": {
           "type": "string",
           "description": "The email address of the student.",

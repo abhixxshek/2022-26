@@ -33,14 +33,14 @@ export function StudentCard({ student }: StudentCardProps) {
     Nilgiri: "text-nilgiri",
     Shivalik: "text-shivalik",
     Udaygiri: "text-udaygiri",
-  }[student.house];
+  }[student.house] || "text-primary";
 
   const houseBgClass = {
     Aravalli: "bg-aravalli",
     Nilgiri: "bg-nilgiri",
     Shivalik: "bg-shivalik",
     Udaygiri: "bg-udaygiri",
-  }[student.house];
+  }[student.house] || "bg-primary";
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -92,8 +92,9 @@ export function StudentCard({ student }: StudentCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-700" />
           
           <div className="absolute bottom-0 left-0 right-0 p-8 space-y-2">
-            <h3 className="text-2xl font-serif text-white tracking-tight group-hover:text-primary transition-colors duration-500">
+            <h3 className="text-xl font-serif text-white tracking-tight group-hover:text-primary transition-colors duration-500">
               {student.name}
+              {student.nickname && <span className="text-sm font-light text-white/60 ml-2">({student.nickname})</span>}
             </h3>
             
             <div className="flex flex-col gap-1">

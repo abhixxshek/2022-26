@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus, Mail } from "lucide-react";
+import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus, Mail, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
@@ -31,6 +31,7 @@ export default function ProfilePage() {
   const { data: studentData, isLoading: isDocLoading } = useDoc(studentRef);
 
   const [name, setName] = useState("");
+  const [nickname, setNickname] = useState("");
   const [email, setEmail] = useState("");
   const [shortBio, setShortBio] = useState("");
   const [fullBio, setFullBio] = useState("");
@@ -48,6 +49,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (studentData) {
       setName(studentData.name || "");
+      setNickname(studentData.nickname || "");
       setEmail(studentData.email || user?.email || "");
       setShortBio(studentData.shortBio || "");
       setFullBio(studentData.fullBio || "");
@@ -70,7 +72,6 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Increased to 5MB
     if (file.size > 5 * 1024 * 1024) {
       toast({
         variant: "destructive",
@@ -109,6 +110,7 @@ export default function ProfilePage() {
       id: user.uid,
       batchId,
       name,
+      nickname,
       email,
       shortBio,
       fullBio,
@@ -220,7 +222,10 @@ export default function ProfilePage() {
                   </div>
                   <CardContent className="pt-6 pb-8 text-center">
                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-2">ARCHIVE IDENTITY</p>
-                    <p className="text-xl font-bold text-white">{name || "Unnamed Navodayan"}</p>
+                    <p className="text-xl font-bold text-white">
+                      {name || "Unnamed Navodayan"}
+                      {nickname && <span className="text-primary/60 text-sm ml-2">({nickname})</span>}
+                    </p>
                     <p className="text-[9px] text-primary font-black uppercase tracking-[0.4em] mt-2">{house ? `${house} House` : "Unassigned House"}</p>
                   </CardContent>
                 </Card>
@@ -239,6 +244,16 @@ export default function ProfilePage() {
                         className="bg-white/[0.03] border-white/10 h-16 rounded-2xl px-6 focus:ring-primary/20 transition-all text-white"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="relative">
+                      <User className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                      <Input 
+                        placeholder="Archive Nickname (Optional)" 
+                        className="bg-white/[0.03] border-white/10 h-16 rounded-2xl pl-14 pr-6 focus:ring-primary/20 transition-all text-white"
+                        value={nickname}
+                        onChange={(e) => setNickname(e.target.value)}
                       />
                     </div>
                     

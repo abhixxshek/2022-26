@@ -1,18 +1,35 @@
+
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { ALL_STUDENTS } from "@/lib/data";
 import { Navbar } from "@/components/Navbar";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowLeft, Quote, Star, BookOpen, Home, Calendar } from "lucide-react";
+import { ArrowLeft, Quote, Star, BookOpen, Home, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useFirestore, useDoc, useMemoFirebase } from "@/firebase";
+import { doc } from "firebase/firestore";
 
 export default function StudentProfile() {
   const { id } = useParams();
   const router = useRouter();
-  const student = ALL_STUDENTS.find((s) => s.id === id);
+  const db = useFirestore();
+
+  const studentRef = useMemoFirebase(() => {
+    if (!db || !id) return null;
+    return doc(db, "students", id as string);
+  }, [db, id]);
+
+  const { data: student, isLoading } = useDoc(studentRef);
+
+  if (isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-[#050505]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!student) {
     return (
@@ -32,7 +49,7 @@ export default function StudentProfile() {
     Nilgiri: "text-nilgiri border-nilgiri/30 bg-nilgiri/5",
     Shivalik: "text-shivalik border-shivalik/30 bg-shivalik/5",
     Udaygiri: "text-udaygiri border-udaygiri/30 bg-udaygiri/5",
-  }[student.house];
+  }[student.house as string] || "text-primary border-primary/30 bg-primary/5";
 
   return (
     <div className="bg-[#050505] text-foreground min-h-screen">
@@ -40,7 +57,6 @@ export default function StudentProfile() {
 
       <main className="pt-48 pb-40 px-6">
         <div className="max-w-7xl mx-auto">
-          {/* Header Actions */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -65,7 +81,6 @@ export default function StudentProfile() {
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-32">
-            {/* Image & Quote Column */}
             <motion.div 
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -74,7 +89,7 @@ export default function StudentProfile() {
             >
               <div className="relative aspect-[4/5] rounded-3xl overflow-hidden border border-white/5 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] bg-[#080808]">
                 <Image
-                  src={student.photo}
+                  src={student.profilePhotoUrl || `https://picsum.photos/seed/${student.id}/400/500`}
                   alt={student.name}
                   fill
                   className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
@@ -84,15 +99,14 @@ export default function StudentProfile() {
               <div className="mt-24 relative">
                 <Quote className="absolute -top-16 -left-12 w-32 h-32 text-primary/5 -rotate-12 pointer-events-none" />
                 <h3 className="text-[9px] font-black flex items-center gap-4 text-primary uppercase tracking-[0.6em] mb-10">
-                  <span className="w-10 h-[1px] bg-primary/40" /> The Legacy Quote
+                  <span className="w-10 h-[1px] bg-primary/40" /> Archive Identity
                 </h3>
                 <p className="text-4xl md:text-6xl font-serif italic font-light leading-[1.1] text-white tracking-tight">
-                  "{student.quote}"
+                  "{student.shortBio || "A true Navodayan at heart."}"
                 </p>
               </div>
             </motion.div>
 
-            {/* Content Column */}
             <motion.div 
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -100,55 +114,47 @@ export default function StudentProfile() {
               className="lg:col-span-7 space-y-32"
             >
               <div>
-                <h1 className="text-7xl md:text-[9rem] font-black mb-12 leading-none tracking-tighter uppercase text-gradient">{student.name}</h1>
-                <p className="text-xl md:text-3xl text-white/40 font-light leading-relaxed max-w-2xl italic font-serif">
-                  {student.bio}
-                </p>
+                <h1 className="text-7xl md:text-[8rem] font-black mb-12 leading-none tracking-tighter uppercase text-gradient">
+                  {student.name}
+                  {student.nickname && <span className="text-3xl md:text-5xl font-serif font-light italic normal-case block mt-4 text-white/40">({student.nickname})</span>}
+                </h1>
+                <div className="space-y-8">
+                  <div className="flex items-center gap-4">
+                    <span className="h-[1px] w-8 bg-primary/40" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">The Narrative</span>
+                  </div>
+                  <p className="text-xl md:text-3xl text-white/60 font-light leading-relaxed max-w-2xl italic font-serif">
+                    {student.fullBio || "No full biography has been recorded in the archive yet."}
+                  </p>
+                </div>
               </div>
 
-              {/* Highlights */}
+              {/* Institutional Details */}
               <section>
                 <div className="flex items-center gap-6 mb-16">
                   <Star className="w-6 h-6 text-primary" />
-                  <h2 className="text-[10px] font-black uppercase tracking-[0.6em] text-white/40">Milestones & Achievements</h2>
+                  <h2 className="text-[10px] font-black uppercase tracking-[0.6em] text-white/40">Identity Records</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {student.highlights.map((highlight, idx) => (
-                    <div key={idx} className="bg-white/[0.02] border border-white/5 p-10 rounded-3xl group hover:border-primary/20 transition-all">
-                      <div className="text-[8px] font-black text-primary uppercase tracking-[0.5em] mb-6 opacity-30">Archive Entry {idx + 1}</div>
-                      <span className="text-xl font-serif italic text-white group-hover:text-primary transition-colors">{highlight}</span>
-                    </div>
-                  ))}
+                  <div className="bg-white/[0.02] border border-white/5 p-10 rounded-3xl">
+                    <div className="text-[8px] font-black text-primary uppercase tracking-[0.5em] mb-4 opacity-30">House Affiliation</div>
+                    <span className="text-2xl font-serif italic text-white">{student.house} House</span>
+                  </div>
+                  <div className="bg-white/[0.02] border border-white/5 p-10 rounded-3xl">
+                    <div className="text-[8px] font-black text-primary uppercase tracking-[0.5em] mb-4 opacity-30">Batch Record</div>
+                    <span className="text-2xl font-serif italic text-white">Batch 2018-2025</span>
+                  </div>
                 </div>
               </section>
 
-              {/* Personal Stories */}
+              {/* Placeholder for real memories if integrated later */}
               <section className="pt-16 border-t border-white/5">
-                <div className="flex items-center justify-between mb-16">
-                  <div className="flex items-center gap-6">
-                    <BookOpen className="w-6 h-6 text-primary" />
-                    <h2 className="text-[10px] font-black uppercase tracking-[0.6em] text-white/40">The Journey Logs</h2>
-                  </div>
+                <div className="flex items-center gap-6 mb-16">
+                  <BookOpen className="w-6 h-6 text-primary" />
+                  <h2 className="text-[10px] font-black uppercase tracking-[0.6em] text-white/40">Archive History</h2>
                 </div>
-                
-                <div className="space-y-24">
-                  {student.memories.map((memory, idx) => (
-                    <motion.div 
-                      key={idx}
-                      whileHover={{ x: 20 }}
-                      className="group border-l-[1px] border-white/10 pl-16 py-6 transition-all hover:border-primary/60"
-                    >
-                      <h3 className="text-3xl font-black mb-6 uppercase tracking-tight group-hover:text-primary transition-colors">{memory.title}</h3>
-                      <p className="text-xl text-white/30 font-light leading-relaxed mb-12 max-w-2xl">
-                        {memory.description}
-                      </p>
-                      {memory.image && (
-                        <div className="relative aspect-video rounded-3xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-1000 shadow-2xl border border-white/5">
-                          <Image src={memory.image} alt={memory.title} fill className="object-cover" />
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
+                <div className="p-12 rounded-3xl border border-dashed border-white/5 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/10">Personalized journey logs are currently being curated for the Batch '25 digital vault.</p>
                 </div>
               </section>
             </motion.div>
