@@ -182,11 +182,6 @@ export default function Home() {
                               fill
                               className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
                             />
-                            {isAuthorizedToEdit && (
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px] z-50">
-                                <EditJourneyDialog yearData={year} />
-                              </div>
-                            )}
                           </div>
                           <div className="polaroid-caption text-3xl py-12 tracking-tight">
                             {year.title} 🕊️
@@ -210,8 +205,8 @@ export default function Home() {
                               <EditJourneyDialog 
                                 yearData={year} 
                                 trigger={
-                                  <button className="p-2 rounded-full bg-primary/10 border border-primary/20 text-primary hover:bg-primary hover:text-black transition-all">
-                                    <Edit3 className="w-3 h-3" />
+                                  <button className="p-3 rounded-full bg-primary/10 border border-primary/20 text-primary hover:bg-primary hover:text-black transition-all shadow-[0_0_15px_rgba(255,191,0,0.2)]">
+                                    <Edit3 className="w-4 h-4" />
                                   </button>
                                 }
                               />
