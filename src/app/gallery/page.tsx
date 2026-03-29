@@ -66,8 +66,8 @@ function GalleryContent() {
     const docRef = doc(db, "photos", id);
     deleteDocumentNonBlocking(docRef);
     toast({ 
-      title: "Photo Removed", 
-      description: "The item has been successfully deleted by administrator." 
+      title: "Visual Purged", 
+      description: "The photo has been removed from the institutional vault by administrator." 
     });
   };
 
@@ -83,7 +83,7 @@ function GalleryContent() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-6xl md:text-8xl font-serif text-white mb-6">
-              The Archive
+              The Vault
             </h1>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
               <div className="space-y-4">
@@ -149,13 +149,13 @@ function GalleryContent() {
                       e.stopPropagation();
                       handleDelete(img.id);
                     }} 
-                    className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 shadow-2xl"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-5 h-5" />
                   </Button>
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 p-8 flex flex-col justify-end">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 p-8 flex flex-col justify-end">
                   <p className="text-primary text-[10px] font-black uppercase tracking-widest mb-2">
                     {img.classYearLabel || "ARCHIVE RECORD"}
                   </p>

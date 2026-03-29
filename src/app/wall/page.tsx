@@ -30,13 +30,13 @@ export default function WallPage() {
   const { data: memories, isLoading } = useCollection(memoriesQuery);
 
   const handleDelete = (id: string) => {
-    if (!confirm("Are you sure you want to remove this memory from the wall?")) return;
+    if (!confirm("Are you sure you want to permanently remove this memory from the wall?")) return;
     
     const docRef = doc(db, "memories", id);
     deleteDocumentNonBlocking(docRef);
     toast({ 
-      title: "Memory Removed", 
-      description: "The item has been successfully deleted by administrator." 
+      title: "Memory Erased", 
+      description: "The message has been removed from the public wall by administrator." 
     });
   };
 
@@ -63,7 +63,7 @@ export default function WallPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-5xl md:text-7xl font-bold text-white tracking-tight"
             >
-              Message Wall of Reflection
+              The Reflection Wall
             </motion.h1>
             
             <motion.p 
@@ -111,9 +111,9 @@ export default function WallPage() {
                         variant="ghost" 
                         size="icon" 
                         onClick={() => handleDelete(memory.id)} 
-                        className="absolute top-2 right-2 text-black/20 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-2 text-red-600/30 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-5 h-5" />
                       </Button>
                     )}
                     

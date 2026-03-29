@@ -26,7 +26,7 @@ export function StudentCard({ student }: StudentCardProps) {
     return doc(db, "students", user.uid);
   }, [db, user]);
 
-  const { data: studentData } = useDoc(studentRef);
+  const { data: currentUserData } = useDoc(studentRef);
 
   const houseColorClass = {
     Aravalli: "text-aravalli",
@@ -45,17 +45,17 @@ export function StudentCard({ student }: StudentCardProps) {
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!confirm(`Are you sure you want to remove ${student.name}'s record from the yearbook?`)) return;
+    if (!confirm(`Are you sure you want to permanently remove ${student.name}'s record from the archive?`)) return;
     
     const docRef = doc(db, "students", student.id);
     deleteDocumentNonBlocking(docRef);
     toast({ 
       title: "Record Removed", 
-      description: "The student record has been deleted by administrator." 
+      description: "The student identity has been purged from the master directory." 
     });
   };
 
-  const isAdmin = studentData?.role === "admin";
+  const isAdmin = currentUserData?.role === "admin";
 
   return (
     <motion.div
@@ -71,9 +71,9 @@ export function StudentCard({ student }: StudentCardProps) {
           variant="destructive" 
           size="icon" 
           onClick={handleDelete}
-          className="absolute top-4 right-4 z-30 w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 shadow-xl"
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-5 h-5" />
         </Button>
       )}
 
@@ -89,7 +89,7 @@ export function StudentCard({ student }: StudentCardProps) {
           
           <div className={cn("absolute top-0 left-0 w-full h-1 z-20 opacity-60 group-hover:opacity-100 transition-opacity", houseBgClass)} />
           
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-700" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-90 group-hover:opacity-70 transition-opacity duration-700" />
           
           <div className="absolute bottom-0 left-0 right-0 p-8 space-y-2">
             <h3 className="text-xl font-serif text-white tracking-tight group-hover:text-primary transition-colors duration-500">
@@ -107,8 +107,8 @@ export function StudentCard({ student }: StudentCardProps) {
             </div>
           </div>
 
-          <div className="absolute top-0 left-0 right-0 p-8 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-in-out bg-black/60 backdrop-blur-sm border-b border-white/10">
-            <p className="text-[10px] text-white/60 font-light leading-relaxed italic font-serif">
+          <div className="absolute top-0 left-0 right-0 p-8 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-in-out bg-black/80 backdrop-blur-md border-b border-white/10">
+            <p className="text-[10px] text-white/80 font-light leading-relaxed italic font-serif">
               "{student.bio || "A true Navodayan at heart."}"
             </p>
           </div>
