@@ -11,7 +11,8 @@ import { toast } from "@/hooks/use-toast";
 import { 
   signInAnonymously,
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword 
+  createUserWithEmailAndPassword,
+  signOut
 } from "firebase/auth";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { Lock, ArrowRight, ShieldCheck } from "lucide-react";
@@ -47,6 +48,9 @@ export default function AuthPage() {
 
     setIsSubmitting(true);
     try {
+      // Sign out any existing session to prevent conflicts
+      await signOut(auth);
+
       if (formattedKey === ADMIN_KEY) {
         // Admin: Sign in with fixed master account
         let userCredential;
@@ -54,9 +58,17 @@ export default function AuthPage() {
           userCredential = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
         } catch (err: any) {
           // If the account doesn't exist, create it (first time setup)
-          // Also handle generic credential errors if it's the master email
           if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-            userCredential = await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
+            try {
+              userCredential = await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
+            } catch (createErr: any) {
+              if (createErr.code === 'auth/email-already-in-use') {
+                // If it's already in use but we hit an error earlier, try one last sign-in
+                // or surface the specific error.
+                throw new Error("Administrative record conflict. Please contact support.");
+              }
+              throw createErr;
+            }
           } else {
             throw err;
           }

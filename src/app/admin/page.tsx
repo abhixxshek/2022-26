@@ -16,8 +16,7 @@ import {
   ChevronRight,
   Database,
   Trash2,
-  AlertTriangle,
-  Loader2
+  AlertTriangle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -54,20 +53,16 @@ export default function AdminDashboard() {
   }, [user, isUserLoading, router]);
 
   useEffect(() => {
-    // Wait for both user session and profile document to finish loading
-    if (!isUserLoading && !isDocLoading) {
+    if (!isUserLoading && !isDocLoading && user) {
       if (studentData && studentData.role === "admin") {
         setIsAuthorized(true);
-      } else {
-        // If data is fully loaded and no admin role is found, deny access
+      } else if (studentData && studentData.role !== "admin") {
         setIsAuthorized(false);
-        if (user) {
-          toast({
-            variant: "destructive",
-            title: "Access Denied",
-            description: "Master administrative credentials are required for this portal.",
-          });
-        }
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "Master administrative credentials are required.",
+        });
         router.replace("/");
       }
     }
@@ -101,7 +96,6 @@ export default function AdminDashboard() {
 
       <main className="pt-48 pb-32 px-6">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-20 gap-8">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -123,7 +117,6 @@ export default function AdminDashboard() {
             </Button>
           </div>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
             {stats.map((stat, i) => (
               <motion.div
@@ -148,7 +141,6 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* Management Sections */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <Card className="bg-white/[0.01] border-white/5 rounded-[2.5rem] overflow-hidden">
               <CardHeader className="p-10 border-b border-white/5">

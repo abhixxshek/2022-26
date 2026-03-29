@@ -14,7 +14,7 @@ import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
 
 interface StudentCardProps {
-  student: Student;
+  student: Student & { nickname?: string };
 }
 
 export function StudentCard({ student }: StudentCardProps) {
