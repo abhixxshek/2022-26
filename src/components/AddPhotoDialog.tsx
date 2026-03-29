@@ -13,7 +13,6 @@ import { collection, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { ImageAdjuster } from "@/components/ImageAdjuster";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
 
 interface PendingPhoto {
@@ -162,115 +161,116 @@ export function AddPhotoDialog() {
             <Plus className="w-4 h-4 inline-block mr-2" /> Bulk Upload
           </button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[700px] bg-black/90 backdrop-blur-3xl border-white/10 text-white max-h-[90vh] flex flex-col p-0">
-          <div className="p-8 border-b border-white/5">
+        <DialogContent className="sm:max-w-[700px] w-[95vw] bg-black/95 border-white/10 text-white max-h-[90vh] flex flex-col p-0 overflow-hidden rounded-[2.5rem]">
+          {/* Fixed Header */}
+          <div className="p-8 border-b border-white/5 shrink-0 bg-black/40 backdrop-blur-md z-10">
             <DialogHeader>
-              <DialogTitle className="text-3xl font-serif italic">Archive Vault Entry</DialogTitle>
+              <DialogTitle className="text-3xl font-serif italic text-white">Archive Vault Entry</DialogTitle>
               <DialogDescription className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mt-2">
                 Commit multiple memories to the master vault. (5MB Limit)
               </DialogDescription>
             </DialogHeader>
           </div>
 
-          <div className="flex-1 overflow-hidden flex flex-col">
-            <ScrollArea className="flex-1 p-8">
-              <div className="space-y-12">
-                <section className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-primary">Class Identification</label>
-                    <div className="w-48">
-                      <Select onValueChange={setClassYear} value={classYear}>
-                        <SelectTrigger className="bg-white/5 border-white/10 text-white h-12 rounded-xl">
-                          <SelectValue placeholder="Which Year?" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-black text-white border-white/10">
-                          {[6, 7, 8, 9, 10, 11, 12].map(y => (
-                            <SelectItem key={y} value={y.toString()}>Class {y}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+            <div className="space-y-12 pb-4">
+              <section className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-primary">Class Identification</label>
+                  <div className="w-full sm:w-48">
+                    <Select onValueChange={setClassYear} value={classYear}>
+                      <SelectTrigger className="bg-white/5 border-white/10 text-white h-12 rounded-xl">
+                        <SelectValue placeholder="Which Year?" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-black text-white border-white/10">
+                        {[6, 7, 8, 9, 10, 11, 12].map(y => (
+                          <SelectItem key={y} value={y.toString()}>Class {y}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </section>
+                </div>
+              </section>
 
-                <section className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-primary">Media Selection ({pendingPhotos.length})</label>
-                    <Button 
-                      onClick={() => fileInputRef.current?.click()} 
-                      disabled={isReading || isUploading}
-                      className="bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-full h-10 px-6 text-[9px] font-black uppercase tracking-widest"
-                    >
-                      <ImageIcon className="w-3 h-3 mr-2" /> Select Files
-                    </Button>
+              <section className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-primary">Media Selection ({pendingPhotos.length})</label>
+                  <Button 
+                    onClick={() => fileInputRef.current?.click()} 
+                    disabled={isReading || isUploading}
+                    className="bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-full h-10 px-6 text-[9px] font-black uppercase tracking-widest"
+                  >
+                    <ImageIcon className="w-3 h-3 mr-2" /> Select Files
+                  </Button>
+                </div>
+
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="hidden" 
+                  accept="image/*" 
+                  multiple
+                  onChange={handleFileChange} 
+                />
+
+                {pendingPhotos.length === 0 ? (
+                  <div className="aspect-[2/1] border border-dashed border-white/10 rounded-[2rem] flex flex-col items-center justify-center gap-4 text-white/10">
+                    {isReading ? <Loader2 className="w-10 h-10 animate-spin" /> : <Camera className="w-10 h-10" />}
+                    <p className="text-[10px] font-black uppercase tracking-widest">No Media in Queue</p>
                   </div>
-
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    className="hidden" 
-                    accept="image/*" 
-                    multiple
-                    onChange={handleFileChange} 
-                  />
-
-                  {pendingPhotos.length === 0 ? (
-                    <div className="aspect-[2/1] border border-dashed border-white/10 rounded-[2rem] flex flex-col items-center justify-center gap-4 text-white/10">
-                      {isReading ? <Loader2 className="w-10 h-10 animate-spin" /> : <Camera className="w-10 h-10" />}
-                      <p className="text-[10px] font-black uppercase tracking-widest">No Media in Queue</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 gap-6">
-                      {pendingPhotos.map((photo) => (
-                        <div key={photo.id} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 flex flex-col md:flex-row gap-6 group">
-                          <div className="relative w-full md:w-48 aspect-[4/3] rounded-2xl overflow-hidden bg-black/40">
-                            <Image src={photo.url} alt="Preview" fill className="object-cover grayscale group-hover:grayscale-0 transition-all" />
-                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                              <Button 
-                                size="icon" 
-                                variant="ghost" 
-                                onClick={() => openAdjuster(photo.id)}
-                                className="w-10 h-10 rounded-full bg-white text-black hover:bg-primary"
-                              >
-                                <Crop className="w-4 h-4" />
-                              </Button>
-                              <Button 
-                                size="icon" 
-                                variant="destructive" 
-                                onClick={() => handleRemovePhoto(photo.id)}
-                                className="w-10 h-10 rounded-full"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </div>
-                          
-                          <div className="flex-1 space-y-4">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Archival Caption</span>
-                              <EmojiPicker onEmojiSelect={(e) => updateCaption(photo.id, photo.caption + e)} />
-                            </div>
-                            <Textarea 
-                              placeholder="Describe this moment..." 
-                              className="bg-black/20 border-white/5 h-24 rounded-2xl text-sm font-serif italic text-white/60 focus:text-white transition-colors"
-                              value={photo.caption}
-                              onChange={(e) => updateCaption(photo.id, e.target.value)}
-                            />
+                ) : (
+                  <div className="grid grid-cols-1 gap-6">
+                    {pendingPhotos.map((photo) => (
+                      <div key={photo.id} className="bg-white/[0.02] border border-white/5 rounded-3xl p-6 flex flex-col md:flex-row gap-6 group transition-all hover:border-white/10">
+                        <div className="relative w-full md:w-48 aspect-[4/3] rounded-2xl overflow-hidden bg-black/40 shrink-0">
+                          <Image src={photo.url} alt="Preview" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <Button 
+                              size="icon" 
+                              variant="ghost" 
+                              onClick={() => openAdjuster(photo.id)}
+                              className="w-10 h-10 rounded-full bg-white text-black hover:bg-primary shadow-lg"
+                            >
+                              <Crop className="w-4 h-4" />
+                            </Button>
+                            <Button 
+                              size="icon" 
+                              variant="destructive" 
+                              onClick={() => handleRemovePhoto(photo.id)}
+                              className="w-10 h-10 rounded-full shadow-lg"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </section>
-              </div>
-            </ScrollArea>
+                        
+                        <div className="flex-1 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-white/20">Archival Caption</span>
+                            <EmojiPicker onEmojiSelect={(e) => updateCaption(photo.id, photo.caption + e)} />
+                          </div>
+                          <Textarea 
+                            placeholder="Describe this moment..." 
+                            className="bg-black/20 border-white/5 h-24 rounded-2xl text-sm font-serif italic text-white/60 focus:text-white transition-colors focus:ring-primary/20"
+                            value={photo.caption}
+                            onChange={(e) => updateCaption(photo.id, e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
           </div>
 
-          <div className="p-8 border-t border-white/5 bg-black/40">
+          {/* Fixed Footer */}
+          <div className="p-8 border-t border-white/5 bg-black/60 backdrop-blur-md shrink-0">
             <Button 
               onClick={handleBulkUpload} 
               disabled={isUploading || isReading || pendingPhotos.length === 0 || !classYear}
-              className="w-full bg-white text-black font-black uppercase tracking-[0.4em] py-8 rounded-full hover:bg-primary transition-all disabled:opacity-50 shadow-2xl"
+              className="w-full bg-white text-black font-black uppercase tracking-[0.4em] py-7 rounded-full hover:bg-primary transition-all disabled:opacity-50 shadow-2xl"
             >
               {isUploading ? (
                 <>
