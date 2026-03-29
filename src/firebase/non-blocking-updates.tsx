@@ -1,4 +1,3 @@
-
 'use client';
     
 import {
@@ -73,7 +72,11 @@ export function updateDocumentNonBlocking(docRef: DocumentReference, data: any) 
  * Shows a success toast ONLY after the operation completes.
  */
 export function deleteDocumentNonBlocking(docRef: DocumentReference, successTitle: string = "Record Removed") {
-  if (!docRef) return;
+  if (!docRef) {
+    toast({ variant: "destructive", title: "Reference Error", description: "Document record not found." });
+    return;
+  }
+
   deleteDoc(docRef)
     .then(() => {
       toast({
@@ -89,5 +92,10 @@ export function deleteDocumentNonBlocking(docRef: DocumentReference, successTitl
           operation: 'delete',
         })
       );
+      toast({
+        variant: "destructive",
+        title: "Purge Failed",
+        description: error.message || "Archive synchronization error."
+      });
     });
 }

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Navbar } from "@/components/Navbar";
@@ -9,6 +8,7 @@ import { Heart, Loader2, Trash2 } from "lucide-react";
 import { AddMemoryDialog } from "@/components/AddMemoryDialog";
 import { Button } from "@/components/ui/button";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { toast } from "@/hooks/use-toast";
 
 export default function WallPage() {
   const db = useFirestore();
@@ -32,6 +32,7 @@ export default function WallPage() {
     if (!id || !db) return;
     if (!confirm("Are you sure you want to permanently remove this memory from the wall?")) return;
     
+    toast({ title: "Initiating Removal", description: "Expunging record from the Reflection Wall..." });
     const memoryRef = doc(db, "memories", id);
     deleteDocumentNonBlocking(memoryRef, "Memory Erased");
   };

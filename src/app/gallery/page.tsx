@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Navbar } from "@/components/Navbar";
@@ -12,6 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AddPhotoDialog } from "@/components/AddPhotoDialog";
 import { Button } from "@/components/ui/button";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { toast } from "@/hooks/use-toast";
 
 function GalleryContent() {
   const db = useFirestore();
@@ -60,6 +60,7 @@ function GalleryContent() {
     if (!id || !db) return;
     if (!confirm("Are you sure you want to permanently remove this photo from the archive?")) return;
     
+    toast({ title: "Initiating Purge", description: "Connecting to the master vault..." });
     const photoRef = doc(db, "photos", id);
     deleteDocumentNonBlocking(photoRef, "Visual Purged");
   };

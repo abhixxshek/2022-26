@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Student } from "@/lib/data";
@@ -11,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useFirestore, useUser, useDoc, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { toast } from "@/hooks/use-toast";
 
 interface StudentCardProps {
   student: Student & { nickname?: string };
@@ -47,6 +47,7 @@ export function StudentCard({ student }: StudentCardProps) {
     if (!student.id || !db) return;
     if (!confirm(`Are you sure you want to permanently remove ${student.name}'s record from the archive?`)) return;
     
+    toast({ title: "Removing Record", description: "De-archiving identity from the vault..." });
     const recordRef = doc(db, "students", student.id);
     deleteDocumentNonBlocking(recordRef, "Record Removed");
   };
