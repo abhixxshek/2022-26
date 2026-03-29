@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Navbar } from "@/components/Navbar";
@@ -40,9 +39,7 @@ function GalleryContent() {
 
   const photosQuery = useMemoFirebase(() => {
     if (!db) return null;
-    
     const baseCollection = collection(db, "photos");
-    
     if (filterClass) {
       return query(
         baseCollection, 
@@ -50,7 +47,6 @@ function GalleryContent() {
         orderBy("uploadedAt", "desc")
       );
     }
-
     return query(baseCollection, orderBy("uploadedAt", "desc"));
   }, [db, filterClass]);
 
@@ -63,8 +59,8 @@ function GalleryContent() {
   const handleDelete = (id: string) => {
     if (!confirm("Are you sure you want to permanently remove this photo from the archive?")) return;
     
-    const docRef = doc(db, "photos", id);
-    deleteDocumentNonBlocking(docRef);
+    const photoRef = doc(db, "photos", id);
+    deleteDocumentNonBlocking(photoRef);
     toast({ 
       title: "Visual Purged", 
       description: "The photo has been removed from the institutional vault by administrator." 
@@ -140,12 +136,12 @@ function GalleryContent() {
                   className="object-cover transition-all duration-700 group-hover:scale-105"
                 />
                 
-                {/* Admin Delete Button */}
                 {isAdmin && (
                   <Button 
                     variant="destructive" 
                     size="icon" 
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
                       handleDelete(img.id);
                     }} 

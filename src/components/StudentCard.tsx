@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Student } from "@/lib/data";
@@ -33,22 +32,22 @@ export function StudentCard({ student }: StudentCardProps) {
     Nilgiri: "text-nilgiri",
     Shivalik: "text-shivalik",
     Udaygiri: "text-udaygiri",
-  }[student.house] || "text-primary";
+  }[student.house as string] || "text-primary";
 
   const houseBgClass = {
     Aravalli: "bg-aravalli",
     Nilgiri: "bg-nilgiri",
     Shivalik: "bg-shivalik",
     Udaygiri: "bg-udaygiri",
-  }[student.house] || "bg-primary";
+  }[student.house as string] || "bg-primary";
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!confirm(`Are you sure you want to permanently remove ${student.name}'s record from the archive?`)) return;
     
-    const docRef = doc(db, "students", student.id);
-    deleteDocumentNonBlocking(docRef);
+    const recordRef = doc(db, "students", student.id);
+    deleteDocumentNonBlocking(recordRef);
     toast({ 
       title: "Record Removed", 
       description: "The student identity has been purged from the master directory." 
@@ -65,7 +64,6 @@ export function StudentCard({ student }: StudentCardProps) {
       transition={{ duration: 0.5 }}
       className="group relative"
     >
-      {/* Admin Delete Button */}
       {isAdmin && (
         <Button 
           variant="destructive" 

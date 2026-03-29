@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Navbar } from "@/components/Navbar";
@@ -32,8 +31,8 @@ export default function WallPage() {
   const handleDelete = (id: string) => {
     if (!confirm("Are you sure you want to permanently remove this memory from the wall?")) return;
     
-    const docRef = doc(db, "memories", id);
-    deleteDocumentNonBlocking(docRef);
+    const memoryRef = doc(db, "memories", id);
+    deleteDocumentNonBlocking(memoryRef);
     toast({ 
       title: "Memory Erased", 
       description: "The message has been removed from the public wall by administrator." 
@@ -105,13 +104,12 @@ export default function WallPage() {
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-3 w-16 h-8 bg-white/10 backdrop-blur-sm z-20 shadow-sm opacity-80" />
                   
                   <div className="bg-[#f0e6d2] p-8 md:p-10 shadow-[5px_15px_30px_rgba(0,0,0,0.3)] transform transition-all duration-500 hover:-translate-y-2 hover:rotate-1 relative">
-                    {/* Admin Delete Button */}
                     {isAdmin && (
                       <Button 
                         variant="ghost" 
                         size="icon" 
                         onClick={() => handleDelete(memory.id)} 
-                        className="absolute top-2 right-2 text-red-600/30 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-2 text-red-600/30 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity z-30"
                       >
                         <Trash2 className="w-5 h-5" />
                       </Button>
