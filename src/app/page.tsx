@@ -171,7 +171,7 @@ export default function Home() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-100px" }}
                         transition={{ duration: 0.8 }}
-                        className={`flex justify-center ${isEven ? 'md:justify-end' : 'md:justify-start'}`}
+                        className={`flex justify-center ${isEven ? 'md:justify-end' : 'md:justify-start'} relative`}
                       >
                         <div className="polaroid -rotate-2 transition-all hover:rotate-0 duration-700 max-w-[800px] w-full group shadow-[0_30px_100px_-20px_rgba(0,0,0,0.7)]">
                           <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
@@ -181,6 +181,11 @@ export default function Home() {
                               fill
                               className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
                             />
+                            {isAdmin && (
+                              <div className="absolute top-6 right-6 z-30 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <EditJourneyDialog yearData={year} />
+                              </div>
+                            )}
                           </div>
                           <div className="polaroid-caption text-3xl py-12 tracking-tight">
                             {year.title} 🕊️
@@ -196,11 +201,6 @@ export default function Home() {
                         className={`text-center md:text-left ${!isEven && 'md:text-right'}`}
                       >
                         <div className="max-w-4xl mx-auto md:mx-0 relative">
-                          {isAdmin && (
-                            <div className="absolute -top-16 right-0 md:-left-12 z-20">
-                              <EditJourneyDialog yearData={year} />
-                            </div>
-                          )}
                           <h3 className="text-5xl md:text-8xl font-serif text-white mb-10 tracking-tighter leading-none">
                             {year.title}
                           </h3>
