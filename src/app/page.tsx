@@ -118,8 +118,11 @@ export default function Home() {
               <h2 className="text-xl md:text-3xl font-black uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-primary/60 drop-shadow-[0_0_15px_rgba(255,191,0,0.3)] px-4">
                 JAWAHAR NAVODAYA VIDYALAYA RATLAM
               </h2>
-              <div className="mt-8 space-y-2">
+              <div className="mt-8 space-y-4">
                 <p className="text-4xl md:text-7xl font-black text-white tracking-tighter drop-shadow-[0_10px_30px_rgba(255,255,255,0.4)]">
+                  हम ही नवोदय हो !!
+                </p>
+                <p className="text-2xl md:text-4xl font-black text-white/40 tracking-widest uppercase">
                   हम ही नवोदय हो 🤍
                 </p>
               </div>
@@ -209,7 +212,7 @@ export default function Home() {
                               <EditJourneyDialog 
                                 yearData={year} 
                                 trigger={
-                                  <button className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary text-black font-black uppercase text-[10px] tracking-[0.2em] shadow-[0_0_20px_rgba(255,191,0,0.4)] hover:bg-white transition-all animate-pulse hover:animate-none">
+                                  <button className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary text-black font-black uppercase text-[10px] tracking-[0.2em] shadow-[0_0_30px_rgba(255,191,0,0.6)] hover:bg-white transition-all animate-pulse hover:animate-none border-2 border-white/20">
                                     <Edit3 className="w-3.5 h-3.5" /> EDIT MILESTONE
                                   </button>
                                 }
