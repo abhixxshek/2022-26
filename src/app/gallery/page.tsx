@@ -12,7 +12,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AddPhotoDialog } from "@/components/AddPhotoDialog";
 import { Button } from "@/components/ui/button";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
-import { toast } from "@/hooks/use-toast";
 
 function GalleryContent() {
   const db = useFirestore();
@@ -62,11 +61,7 @@ function GalleryContent() {
     if (!confirm("Are you sure you want to permanently remove this photo from the archive?")) return;
     
     const photoRef = doc(db, "photos", id);
-    deleteDocumentNonBlocking(photoRef);
-    toast({ 
-      title: "Visual Purged", 
-      description: "The photo has been removed from the institutional vault by administrator." 
-    });
+    deleteDocumentNonBlocking(photoRef, "Visual Purged");
   };
 
   const isAdmin = studentData?.role === "admin";
@@ -135,7 +130,7 @@ function GalleryContent() {
                   src={img.url} 
                   alt={img.caption || "Archive Photo"}
                   fill
-                  className="object-cover transition-all duration-700 group-hover:scale-105"
+                  className="object-cover transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
                 />
                 
                 {isAdmin && (

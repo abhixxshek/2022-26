@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { useFirestore, useUser, useDoc, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
-import { toast } from "@/hooks/use-toast";
 
 interface StudentCardProps {
   student: Student & { nickname?: string };
@@ -49,11 +48,7 @@ export function StudentCard({ student }: StudentCardProps) {
     if (!confirm(`Are you sure you want to permanently remove ${student.name}'s record from the archive?`)) return;
     
     const recordRef = doc(db, "students", student.id);
-    deleteDocumentNonBlocking(recordRef);
-    toast({ 
-      title: "Record Removed", 
-      description: "The student identity has been purged from the master directory." 
-    });
+    deleteDocumentNonBlocking(recordRef, "Record Removed");
   };
 
   const isAdmin = currentUserData?.role === "admin";

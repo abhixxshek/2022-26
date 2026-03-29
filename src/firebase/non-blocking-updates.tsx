@@ -1,3 +1,4 @@
+
 'use client';
     
 import {
@@ -11,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * Initiates a setDoc operation for a document reference.
@@ -68,17 +70,24 @@ export function updateDocumentNonBlocking(docRef: DocumentReference, data: any) 
 
 /**
  * Initiates a deleteDoc operation for a document reference.
- * Does NOT await the write operation internally.
+ * Shows a success toast ONLY after the operation completes.
  */
-export function deleteDocumentNonBlocking(docRef: DocumentReference) {
+export function deleteDocumentNonBlocking(docRef: DocumentReference, successTitle: string = "Record Removed") {
   if (!docRef) return;
-  deleteDoc(docRef).catch(error => {
-    errorEmitter.emit(
-      'permission-error',
-      new FirestorePermissionError({
-        path: docRef.path,
-        operation: 'delete',
-      })
-    );
-  });
+  deleteDoc(docRef)
+    .then(() => {
+      toast({
+        title: successTitle,
+        description: "The record has been purged from the master archive."
+      });
+    })
+    .catch(error => {
+      errorEmitter.emit(
+        'permission-error',
+        new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'delete',
+        })
+      );
+    });
 }

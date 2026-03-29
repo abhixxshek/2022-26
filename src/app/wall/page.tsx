@@ -9,7 +9,6 @@ import { Heart, Loader2, Trash2 } from "lucide-react";
 import { AddMemoryDialog } from "@/components/AddMemoryDialog";
 import { Button } from "@/components/ui/button";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
-import { toast } from "@/hooks/use-toast";
 
 export default function WallPage() {
   const db = useFirestore();
@@ -34,11 +33,7 @@ export default function WallPage() {
     if (!confirm("Are you sure you want to permanently remove this memory from the wall?")) return;
     
     const memoryRef = doc(db, "memories", id);
-    deleteDocumentNonBlocking(memoryRef);
-    toast({ 
-      title: "Memory Erased", 
-      description: "The message has been removed from the public wall by administrator." 
-    });
+    deleteDocumentNonBlocking(memoryRef, "Memory Erased");
   };
 
   const isAdmin = studentData?.role === "admin";
