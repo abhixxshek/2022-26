@@ -10,8 +10,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { 
   signInAnonymously,
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
   signOut
 } from "firebase/auth";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
@@ -28,9 +26,8 @@ export default function AuthPage() {
   const STUDENT_KEY = "JNVRTM25";
   const ADMIN_KEY = "JNVRTM18";
   
-  // Internal Admin Credential (Master Admin)
   const ADMIN_EMAIL = "primeparam07@gmail.com";
-  const ADMIN_INTERNAL_PWD = "NAVODAYA_MASTER_ADMIN_SECRET_2025";
+  const ADMIN_NAME = "name param";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,37 +45,19 @@ export default function AuthPage() {
 
     setIsSubmitting(true);
     try {
-      // Sign out any existing session to prevent conflicts
+      // Sign out any existing session to start clean
       await signOut(auth);
 
-      if (formattedKey === ADMIN_KEY) {
-        // Admin: Sign in with fixed master account
-        let userCredential;
-        try {
-          // Attempt direct sign in first
-          userCredential = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
-        } catch (err: any) {
-          // If the account doesn't exist or we hit a generic credential error, attempt creation
-          if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email') {
-            try {
-              userCredential = await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
-            } catch (createErr: any) {
-              // If creation fails because it exists after all, try one last sign-in (race condition)
-              if (createErr.code === 'auth/email-already-in-use') {
-                userCredential = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_INTERNAL_PWD);
-              } else {
-                throw createErr;
-              }
-            }
-          } else {
-            throw err;
-          }
-        }
+      // Everyone enters via Anonymous Auth to avoid credential/password errors
+      const userCredential = await signInAnonymously(auth);
+      const uid = userCredential.user.uid;
+      const studentRef = doc(db, "students", uid);
 
-        const studentRef = doc(db, "students", userCredential.user.uid);
+      if (formattedKey === ADMIN_KEY) {
+        // Authorized as Admin via the secret key
         await setDoc(studentRef, {
-          id: userCredential.user.uid,
-          name: "Master Admin",
+          id: uid,
+          name: ADMIN_NAME,
           email: ADMIN_EMAIL,
           role: "admin",
           batchId: "batch-2018-2025",
@@ -91,12 +70,9 @@ export default function AuthPage() {
         });
         router.push("/admin");
       } else {
-        // Student: Anonymous Sign In
-        const userCredential = await signInAnonymously(auth);
-        
-        const studentRef = doc(db, "students", userCredential.user.uid);
+        // Authorized as Student via the batch key
         await setDoc(studentRef, {
-          id: userCredential.user.uid,
+          id: uid,
           role: "student",
           batchId: "batch-2018-2025",
           lastActive: serverTimestamp(),
