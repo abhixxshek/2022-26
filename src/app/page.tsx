@@ -4,7 +4,7 @@
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
-import { Loader2, Database, ShieldAlert } from "lucide-react";
+import { Loader2, Database, ShieldAlert, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { useFirestore, useCollection, useMemoFirebase, useUser, useDoc } from "@/firebase";
 import { collection, query, orderBy, writeBatch, doc } from "firebase/firestore";
@@ -56,6 +56,7 @@ export default function Home() {
 
   const displayData = journeyData && journeyData.length > 0 ? journeyData : YEAR_DATA;
   const isAdmin = studentData?.role === "admin";
+  const isAuthorizedToEdit = !!user; // Allow all logged in students to contribute to the journey as requested
 
   return (
     <div className="bg-[#050505] text-foreground min-h-screen selection:bg-primary/30 overflow-x-hidden font-body">
@@ -181,8 +182,8 @@ export default function Home() {
                               fill
                               className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
                             />
-                            {isAdmin && (
-                              <div className="absolute top-4 right-4 z-50">
+                            {isAuthorizedToEdit && (
+                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px] z-50">
                                 <EditJourneyDialog yearData={year} />
                               </div>
                             )}
@@ -201,11 +202,9 @@ export default function Home() {
                         className={`text-center md:text-left ${!isEven && 'md:text-right'}`}
                       >
                         <div className="max-w-4xl mx-auto md:mx-0 relative">
-                          {isAdmin && (
-                            <div className="mb-6 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#FFBF00]">
-                              <ShieldAlert className="w-3 h-3" /> Historical Record Verified
-                            </div>
-                          )}
+                          <div className="mb-6 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#FFBF00]">
+                            <Sparkles className="w-3 h-3" /> Historical Archive Record
+                          </div>
                           <h3 className="text-5xl md:text-8xl font-serif text-white mb-10 tracking-tighter leading-none">
                             {year.title}
                           </h3>

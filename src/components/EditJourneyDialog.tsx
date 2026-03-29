@@ -105,9 +105,9 @@ export function EditJourneyDialog({ yearData }: EditJourneyDialogProps) {
       <Dialog>
         <DialogTrigger asChild>
           <Button 
-            className="bg-[#FFBF00] text-black hover:bg-white transition-all rounded-full h-10 px-4 gap-2 font-black uppercase text-[9px] tracking-widest shadow-[0_0_20px_rgba(255,191,0,0.6)] border-2 border-white/20 animate-pulse hover:animate-none"
+            className="bg-[#FFBF00] text-black hover:bg-white transition-all rounded-full h-12 px-8 gap-3 font-black uppercase text-[10px] tracking-[0.2em] shadow-[0_0_30px_rgba(255,191,0,0.6)] border-2 border-white/20 animate-pulse hover:animate-none scale-110"
           >
-            <Edit3 className="w-3.5 h-3.5" /> EDIT ARCHIVE
+            <Edit3 className="w-4 h-4" /> EDIT HISTORY
           </Button>
         </DialogTrigger>
         <DialogContent className="bg-black/95 border-white/10 text-white backdrop-blur-2xl max-w-2xl rounded-[2.5rem] p-0 overflow-hidden">
