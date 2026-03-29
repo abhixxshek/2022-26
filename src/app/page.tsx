@@ -4,7 +4,7 @@
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { YEAR_DATA } from "@/lib/data";
-import { Loader2, Database, ShieldAlert, Sparkles } from "lucide-react";
+import { Loader2, Database, Sparkles, Edit3 } from "lucide-react";
 import Image from "next/image";
 import { useFirestore, useCollection, useMemoFirebase, useUser, useDoc } from "@/firebase";
 import { collection, query, orderBy, writeBatch, doc } from "firebase/firestore";
@@ -56,7 +56,7 @@ export default function Home() {
 
   const displayData = journeyData && journeyData.length > 0 ? journeyData : YEAR_DATA;
   const isAdmin = studentData?.role === "admin";
-  const isAuthorizedToEdit = !!user; // Allow all logged in students to contribute to the journey as requested
+  const isAuthorizedToEdit = !!user; // Allow all logged in students to contribute to the journey
 
   return (
     <div className="bg-[#050505] text-foreground min-h-screen selection:bg-primary/30 overflow-x-hidden font-body">
@@ -183,7 +183,7 @@ export default function Home() {
                               className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
                             />
                             {isAuthorizedToEdit && (
-                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px] z-50">
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px] z-50">
                                 <EditJourneyDialog yearData={year} />
                               </div>
                             )}
@@ -201,9 +201,21 @@ export default function Home() {
                         transition={{ duration: 0.8 }}
                         className={`text-center md:text-left ${!isEven && 'md:text-right'}`}
                       >
-                        <div className="max-w-4xl mx-auto md:mx-0 relative">
-                          <div className="mb-6 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#FFBF00]">
-                            <Sparkles className="w-3 h-3" /> Historical Archive Record
+                        <div className="max-w-4xl mx-auto md:mx-0 relative group">
+                          <div className="mb-6 flex items-center justify-center md:justify-start gap-4">
+                            <div className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#FFBF00]">
+                              <Sparkles className="w-3 h-3" /> Historical Archive Record
+                            </div>
+                            {isAuthorizedToEdit && (
+                              <EditJourneyDialog 
+                                yearData={year} 
+                                trigger={
+                                  <button className="p-2 rounded-full bg-primary/10 border border-primary/20 text-primary hover:bg-primary hover:text-black transition-all">
+                                    <Edit3 className="w-3 h-3" />
+                                  </button>
+                                }
+                              />
+                            )}
                           </div>
                           <h3 className="text-5xl md:text-8xl font-serif text-white mb-10 tracking-tighter leading-none">
                             {year.title}
