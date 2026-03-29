@@ -9,8 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Camera, ImageIcon, Loader2, Trash2, Crop, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useUser } from "@/firebase";
-import { collection, serverTimestamp } from "firebase/firestore";
-import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { collection, serverTimestamp, doc } from "firebase/firestore";
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { ImageAdjuster } from "@/components/ImageAdjuster";
 import Image from "next/image";
@@ -34,6 +34,33 @@ export function AddPhotoDialog() {
   const { user } = useUser();
   const db = useFirestore();
 
+  const compressImage = (dataUrl: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new (window as any).Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDim = 1200;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = (height / width) * maxDim;
+            width = maxDim;
+          } else {
+            width = (width / height) * maxDim;
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = dataUrl;
+    });
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -42,11 +69,11 @@ export function AddPhotoDialog() {
     const newPhotos: PendingPhoto[] = [];
 
     for (const file of files) {
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 10 * 1024 * 1024) {
         toast({
           variant: "destructive",
           title: "File Too Large",
-          description: `${file.name} exceeds the 5MB archival limit.`
+          description: `${file.name} exceeds the 10MB limit.`
         });
         continue;
       }
@@ -58,9 +85,11 @@ export function AddPhotoDialog() {
       });
 
       const dataUri = await promise;
+      const compressedUri = await compressImage(dataUri);
+      
       newPhotos.push({
         id: Math.random().toString(36).substr(2, 9),
-        url: dataUri,
+        url: compressedUri,
         caption: ""
       });
     }
@@ -111,11 +140,12 @@ export function AddPhotoDialog() {
     }
 
     setIsUploading(true);
-    const photosRef = collection(db, "photos");
 
     try {
       pendingPhotos.forEach((photo) => {
+        const photoRef = doc(collection(db, "photos"));
         const photoData = {
+          id: photoRef.id,
           url: photo.url,
           caption: photo.caption || "Archive Record",
           classYearLabel: `Class ${classYear}`,
@@ -123,7 +153,7 @@ export function AddPhotoDialog() {
           uploadedAt: new Date().toISOString(),
           createdAt: serverTimestamp(),
         };
-        addDocumentNonBlocking(photosRef, photoData);
+        setDocumentNonBlocking(photoRef, photoData, { merge: true });
       });
 
       toast({
@@ -172,12 +202,12 @@ export function AddPhotoDialog() {
             <DialogHeader>
               <DialogTitle className="text-3xl font-serif italic text-white">Archive Vault Entry</DialogTitle>
               <DialogDescription className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mt-2">
-                Commit multiple memories to the master vault. (5MB Limit)
+                Commit multiple memories to the master vault.
               </DialogDescription>
             </DialogHeader>
           </div>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+          <div className="flex-1 overflow-y-auto p-8">
             <div className="space-y-12 pb-4">
               <section className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

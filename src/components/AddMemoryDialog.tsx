@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useCallback } from "react";
@@ -10,8 +11,8 @@ import { generateMemoryPrompts } from "@/ai/flows/generate-memory-prompts";
 import { Sparkles, Plus, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useUser } from "@/firebase";
-import { collection, serverTimestamp } from "firebase/firestore";
-import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { collection, serverTimestamp, doc } from "firebase/firestore";
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { EmojiPicker } from "@/components/EmojiPicker";
 
 export function AddMemoryDialog() {
@@ -49,7 +50,7 @@ export function AddMemoryDialog() {
   };
 
   const handlePostMemory = () => {
-    if (!user) {
+    if (!user || !db) {
       toast({
         variant: "destructive",
         title: "Authentication Required",
@@ -67,8 +68,9 @@ export function AddMemoryDialog() {
       return;
     }
 
-    const memoriesRef = collection(db, "memories");
+    const memoryRef = doc(collection(db, "memories"));
     const memoryData = {
+      id: memoryRef.id,
       studentId: user.uid,
       studentName: user.displayName || user.email?.split('@')[0] || "A Navodayan",
       title,
@@ -78,7 +80,7 @@ export function AddMemoryDialog() {
       createdAt: serverTimestamp(),
     };
 
-    addDocumentNonBlocking(memoriesRef, memoryData);
+    setDocumentNonBlocking(memoryRef, memoryData, { merge: true });
     
     toast({
       title: "Memory Shared!",
