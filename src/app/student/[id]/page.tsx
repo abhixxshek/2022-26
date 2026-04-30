@@ -242,7 +242,7 @@ export default function StudentProfile() {
                     </div>
                   </div>
 
-                  <div className="relative group">
+                  <div id="message" className="relative group">
                     <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-transparent rounded-2xl blur opacity-0 group-focus-within:opacity-100 transition duration-1000" />
                     <div className="relative flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-6 bg-white/[0.03] border border-white/5 p-3 rounded-2xl backdrop-blur-md transition-all group-focus-within:border-primary/20">
                       <Textarea 

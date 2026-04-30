@@ -6,12 +6,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Trash2, ShieldAlert } from "lucide-react";
+import { Trash2, ShieldAlert, MessageSquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFirestore, useUser, useDoc, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +32,7 @@ interface StudentCardProps {
 export function StudentCard({ student }: StudentCardProps) {
   const { user } = useUser();
   const db = useFirestore();
+  const router = useRouter();
 
   const currentUserRef = useMemoFirebase(() => {
     if (!db || !user) return null;
@@ -40,7 +42,6 @@ export function StudentCard({ student }: StudentCardProps) {
   const { data: currentUserData } = useDoc(currentUserRef);
 
   const houseColorClass = "text-primary";
-
   const houseBgClass = "bg-primary";
 
   const handleConfirmDelete = () => {
@@ -58,7 +59,7 @@ export function StudentCard({ student }: StudentCardProps) {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      className="group relative"
+      className="group relative flex flex-col"
     >
       {isAdmin && (
         <div className="absolute top-4 right-4 z-40 opacity-100 transition-opacity">
@@ -99,8 +100,9 @@ export function StudentCard({ student }: StudentCardProps) {
         </div>
       )}
 
-      <Link href={`/student/${student.id}`}>
-        <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#080808] border border-white/5 transition-all duration-700 hover:border-white/20">
+      {/* Photo Card */}
+      <Link href={`/student/${student.id}`} className="block">
+        <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#080808] border border-white/5 transition-all duration-700 group-hover:border-white/20">
           <Image
             src={student.photo || `https://picsum.photos/seed/${student.id}/400/500`}
             alt={student.name}
@@ -113,7 +115,7 @@ export function StudentCard({ student }: StudentCardProps) {
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-90 group-hover:opacity-70 transition-opacity duration-700" />
 
-          <div className="absolute bottom-0 left-0 right-0 p-8 space-y-2">
+          <div className="absolute bottom-0 left-0 right-0 p-6 space-y-2">
             <h3 className="text-xl font-serif text-white tracking-tight group-hover:text-primary transition-colors duration-500">
               {student.name}
             </h3>
@@ -135,6 +137,17 @@ export function StudentCard({ student }: StudentCardProps) {
           </div>
         </div>
       </Link>
+
+      {/* Leave a Message Button */}
+      <motion.button
+        onClick={() => router.push(`/student/${student.id}#message`)}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.97 }}
+        className="mt-3 w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-primary/10 hover:border-primary/30 text-white/40 hover:text-primary transition-all duration-300 text-[10px] font-black uppercase tracking-[0.3em] group/btn"
+      >
+        <MessageSquarePlus className="w-3.5 h-3.5 transition-transform duration-300 group-hover/btn:-translate-y-0.5" />
+        Leave a Message
+      </motion.button>
     </motion.div>
   );
 }
