@@ -80,7 +80,7 @@ function GalleryContent() {
   const isAdmin = studentData?.role === "admin";
 
   return (
-    <main className="pt-40 pb-32 px-6">
+    <main className="pt-28 md:pt-40 pb-32 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col mb-24">
           <motion.div
@@ -88,17 +88,17 @@ function GalleryContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-6xl md:text-8xl font-serif text-white mb-6">
+            <h1 className="text-4xl md:text-6xl lg:text-8xl font-serif text-white mb-6">
               The Vault
             </h1>
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
               <div className="space-y-4">
                 <p className="text-lg text-white/40 max-w-xl font-light leading-relaxed">
                   A cinematic collection of fleeting moments, frozen in time. From the first lecture to the final goodbye of Batch '22.
                 </p>
 
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-3 md:gap-4">
                 <Button
                   variant="outline"
                   className="bg-transparent border-white/10 text-white/60 hover:text-white hover:bg-white/5 rounded-full px-6 h-12 text-[10px] font-black uppercase tracking-widest gap-3"

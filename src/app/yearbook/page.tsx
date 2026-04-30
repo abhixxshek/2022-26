@@ -36,16 +36,16 @@ export default function YearbookPage() {
     <div className="bg-[#050505] min-h-screen text-foreground selection:bg-primary/20">
       <Navbar />
 
-      <main className="pt-48 pb-32 px-6">
+      <main className="pt-28 md:pt-48 pb-32 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-24">
+          <div className="text-center mb-12 md:mb-24">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-5xl md:text-7xl font-serif text-white mb-6">The Batch of '22</h1>
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-serif text-white mb-6">The Batch of '22</h1>
               <p className="text-white/40 max-w-2xl mx-auto text-sm md:text-base font-light leading-relaxed">
                 Faces that defined our journey. Moments that became memories. Click a card to explore their legacy.
               </p>

@@ -96,9 +96,9 @@ export default function Home() {
               </div>
             </div>
             
-            <h1 className="text-8xl md:text-[14rem] font-black mb-4 leading-none tracking-tighter uppercase flex flex-col items-center">
+            <h1 className="text-6xl md:text-8xl lg:text-[14rem] font-black mb-4 leading-none tracking-tighter uppercase flex flex-col items-center">
               <span className="block">BATCH</span>
-              <span className="font-serif font-light text-white italic normal-case tracking-tight -mt-4 md:-mt-12 block">
+              <span className="font-serif font-light text-white italic normal-case tracking-tight -mt-2 md:-mt-4 lg:-mt-12 block">
                 2022—2026
               </span>
             </h1>
@@ -113,10 +113,10 @@ export default function Home() {
                 GOVERNMENT ENGINEERING COLLEGE IDUKKI
               </h2>
               <div className="mt-8 space-y-4">
-                <p className="text-4xl md:text-7xl font-black text-white tracking-tighter drop-shadow-[0_10px_30px_rgba(255,255,255,0.4)]">
+                <p className="text-2xl md:text-4xl lg:text-7xl font-black text-white tracking-tighter drop-shadow-[0_10px_30px_rgba(255,255,255,0.4)]">
                   MEMORIES STAY FOREVER
                 </p>
-                <p className="text-2xl md:text-4xl font-black text-white/40 tracking-widest uppercase">
+                <p className="text-lg md:text-2xl lg:text-4xl font-black text-white/40 tracking-widest uppercase">
                   A journey of a thousand stories 🤍
                 </p>
               </div>
@@ -126,9 +126,9 @@ export default function Home() {
       </section>
 
       {/* The Journey Section - Bold Archival Typography */}
-      <section id="journey" className="py-60 px-6 relative bg-background overflow-hidden">
-        <div className="max-w-[1600px] mx-auto relative px-12">
-          <div className="text-center mb-48 space-y-6">
+      <section id="journey" className="py-24 md:py-60 px-4 md:px-6 relative bg-background overflow-hidden">
+        <div className="max-w-[1600px] mx-auto relative px-4 md:px-12">
+          <div className="text-center mb-16 md:mb-48 space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-[8px] font-black uppercase tracking-widest">
               OFFICIAL CHRONICLES
             </div>
@@ -148,7 +148,7 @@ export default function Home() {
 
           <div className="timeline-line" />
 
-          <div className="space-y-[40rem] relative">
+          <div className="space-y-24 md:space-y-[40rem] relative">
             {isJourneyLoading ? (
               <div className="flex justify-center py-40">
                 <Loader2 className="w-12 h-12 animate-spin text-white/10" />
@@ -167,7 +167,7 @@ export default function Home() {
                       <span className="block text-[8px] opacity-40 mt-1">{academicYearRange}</span>
                     </div>
 
-                    <div className={`grid grid-cols-1 md:grid-cols-2 gap-24 md:gap-48 w-full items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                    <div className={`grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-48 w-full items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
                       <motion.div 
                         initial={{ opacity: 0, x: -50 }}
                         whileInView={{ opacity: 1, x: 0 }}

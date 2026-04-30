@@ -52,9 +52,9 @@ export default function WallPage() {
     <div className="bg-[#0a0a0b] min-h-screen text-foreground selection:bg-primary/20">
       <Navbar />
 
-      <main className="pt-48 pb-32 px-6">
+      <main className="pt-28 md:pt-48 pb-32 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-24 space-y-6">
+          <div className="text-center mb-12 md:mb-24 space-y-6">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -67,7 +67,7 @@ export default function WallPage() {
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-5xl md:text-7xl font-bold text-white tracking-tight"
+              className="text-4xl md:text-5xl lg:text-7xl font-bold text-white tracking-tight"
             >
               The Reflection Wall
             </motion.h1>

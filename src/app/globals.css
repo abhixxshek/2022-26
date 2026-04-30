@@ -58,11 +58,11 @@
 }
 
 .timeline-line {
-  @apply absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[1px] bg-white/10;
+  @apply hidden md:block absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[1px] bg-white/10;
 }
 
 .timeline-marker {
-  @apply absolute left-1/2 -translate-x-1/2 flex items-center justify-center w-12 h-12 rounded-full border border-white/10 bg-background text-[10px] font-bold text-primary z-10;
+  @apply hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center w-12 h-12 rounded-full border border-white/10 bg-background text-[10px] font-bold text-primary z-10;
 }
 
 ::-webkit-scrollbar {

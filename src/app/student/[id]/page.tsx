@@ -163,15 +163,15 @@ export default function StudentProfile() {
     <div className="bg-[#050505] text-foreground min-h-screen">
       <Navbar />
 
-      <main className="pt-20 pb-32 px-6">
+      <main className="pt-24 md:pt-20 pb-32 px-3 md:px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white/[0.01] border border-white/5 rounded-[3rem] p-8 md:p-16 shadow-2xl backdrop-blur-sm relative overflow-hidden">
+          <div className="bg-white/[0.01] border border-white/5 rounded-2xl md:rounded-[3rem] p-4 md:p-8 lg:p-16 shadow-2xl backdrop-blur-sm relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col md:flex-row items-center justify-between mb-12 gap-8"
+              className="flex flex-col items-start md:flex-row md:items-center justify-between mb-8 md:mb-12 gap-4 md:gap-8"
             >
               <button
                 onClick={() => router.back()}
@@ -183,22 +183,22 @@ export default function StudentProfile() {
                 Back to Archive
               </button>
 
-              <div className="flex flex-wrap items-center justify-center gap-6">
+              <div className="flex flex-wrap items-center justify-start md:justify-center gap-3 md:gap-6">
                 <Button
                   onClick={copyProfileLink}
-                  className="bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-full px-6 h-12 text-[9px] font-black uppercase tracking-widest gap-2"
+                  className="bg-white/5 border border-white/10 text-white hover:bg-white/10 rounded-full px-4 md:px-6 h-10 md:h-12 text-[9px] font-black uppercase tracking-widest gap-2"
                 >
                   <Share2 className="w-3 h-3" /> Share Record
                 </Button>
                 <Badge variant="outline" className="border-primary/20 text-primary px-6 py-2 uppercase font-black text-[9px] tracking-[0.5em] rounded-full">BATCH 2022-2026</Badge>
-                <div className={cn("flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.5em] px-6 py-2 rounded-full border", houseColorClass)}>
+                <div className={cn("hidden md:flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.5em] px-6 py-2 rounded-full border", houseColorClass)}>
                   <Home className="w-4 h-4" />
                   Information Technology
                 </div>
               </div>
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-16 lg:gap-24">
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -229,7 +229,7 @@ export default function StudentProfile() {
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="lg:col-span-8 space-y-16"
+                className="lg:col-span-8 space-y-8 md:space-y-16"
               >
                 <div className="space-y-10">
                   <div className="flex flex-col md:flex-row items-baseline justify-between gap-8">
@@ -244,14 +244,14 @@ export default function StudentProfile() {
 
                   <div className="relative group">
                     <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-transparent rounded-2xl blur opacity-0 group-focus-within:opacity-100 transition duration-1000" />
-                    <div className="relative flex items-center gap-6 bg-white/[0.03] border border-white/5 p-2 pr-4 rounded-2xl backdrop-blur-md transition-all group-focus-within:border-primary/20">
+                    <div className="relative flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-6 bg-white/[0.03] border border-white/5 p-3 rounded-2xl backdrop-blur-md transition-all group-focus-within:border-primary/20">
                       <Textarea 
                         className="bg-transparent border-none focus-visible:ring-0 min-h-[60px] h-[60px] text-white font-serif italic text-lg leading-tight p-4 placeholder:text-white/10 resize-none flex-1" 
                         placeholder={`Commit your entry to the permanent record of ${student.name.split(' ')[0]}...`}
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
                       />
-                      <div className="flex items-center gap-3 pr-2">
+                      <div className="flex items-center gap-2 md:gap-3 md:pr-2">
                         {!isArchiveUnlocked ? (
                           <>
                             <Input 
