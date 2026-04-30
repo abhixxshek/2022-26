@@ -25,11 +25,7 @@
     --ring: 45 100% 50%;
     --radius: 0.5rem;
 
-    /* JNV House Colors */
-    --house-aravalli: 217 91% 60%; /* Blue */
-    --house-nilgiri: 142 71% 45%;  /* Green */
-    --house-shivalik: 0 84% 60%;   /* Red */
-    --house-udaygiri: 48 96% 53%;  /* Yellow */
+
   }
 }
 
@@ -85,18 +81,4 @@
   background: radial-gradient(circle at center, rgba(45, 45, 45, 0.2) 0%, rgba(5, 5, 5, 1) 100%);
 }
 
-/* House Utilities */
-.bg-aravalli { background-color: hsl(var(--house-aravalli)); }
-.bg-nilgiri { background-color: hsl(var(--house-nilgiri)); }
-.bg-shivalik { background-color: hsl(var(--house-shivalik)); }
-.bg-udaygiri { background-color: hsl(var(--house-udaygiri)); }
 
-.text-aravalli { color: hsl(var(--house-aravalli)); }
-.text-nilgiri { color: hsl(var(--house-nilgiri)); }
-.text-shivalik { color: hsl(var(--house-shivalik)); }
-.text-udaygiri { color: hsl(var(--house-udaygiri)); }
-
-.border-aravalli { border-color: hsl(var(--house-aravalli)); }
-.border-nilgiri { border-color: hsl(var(--house-nilgiri)); }
-.border-shivalik { border-color: hsl(var(--house-shivalik)); }
-.border-udaygiri { border-color: hsl(var(--house-udaygiri)); }

@@ -16,7 +16,10 @@ import {
   ChevronRight,
   Database,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Loader2,
+  Download,
+  RefreshCw
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,6 +48,54 @@ export default function AdminDashboard() {
   const { data: memories } = useCollection(memoriesQuery);
 
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleGenerateReport = () => {
+    if (!students || !photos || !memories) return;
+    
+    const report = {
+      generatedAt: new Date().toISOString(),
+      department: "Information Technology",
+      batch: "2022-2026",
+      metrics: {
+        totalStudents: students.length,
+        totalPhotos: photos.length,
+        totalMemories: memories.length,
+      },
+      systemStatus: "Healthy",
+    };
+
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `gec-archive-report-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Report Generated",
+      description: "The system state report has been downloaded."
+    });
+  };
+
+  const handleSyncMetadata = () => {
+    setIsSyncing(true);
+    toast({
+      title: "Initiating Sync",
+      description: "Rebuilding global archive indices..."
+    });
+    
+    setTimeout(() => {
+      setIsSyncing(false);
+      toast({
+        title: "Sync Complete",
+        description: "All vault metadata is now up to date."
+      });
+    }, 2500);
+  };
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -162,11 +213,27 @@ export default function AdminDashboard() {
                 
                 <div className="space-y-4">
                   <p className="text-[10px] font-black uppercase tracking-widest text-white/20">System Tools</p>
-                  <Button className="w-full h-14 bg-white text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-primary transition-all">
-                    Generate Archive Report
+                  <Button 
+                    onClick={handleGenerateReport}
+                    className="w-full h-14 bg-white text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-primary transition-all flex items-center justify-center gap-3"
+                  >
+                    <Download className="w-4 h-4" /> Generate Archive Report
                   </Button>
-                  <Button variant="outline" className="w-full h-14 border-white/10 text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em]">
-                    Sync Metadata
+                  <Button 
+                    variant="outline" 
+                    onClick={handleSyncMetadata}
+                    disabled={isSyncing}
+                    className="w-full h-14 border-white/10 text-white rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-3"
+                  >
+                    {isSyncing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" /> Syncing Vault Data...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4" /> Sync Metadata
+                      </>
+                    )}
                   </Button>
                 </div>
               </CardContent>

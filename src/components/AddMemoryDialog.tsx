@@ -10,44 +10,36 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { generateMemoryPrompts } from "@/ai/flows/generate-memory-prompts";
 import { Sparkles, Plus, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useFirestore, useUser } from "@/firebase";
+import { useFirestore, useUser, useDoc, useMemoFirebase } from "@/firebase";
 import { collection, serverTimestamp, doc } from "firebase/firestore";
+import { cn } from "@/lib/utils";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { EmojiPicker } from "@/components/EmojiPicker";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { User, UserCheck } from "lucide-react";
 
 export function AddMemoryDialog() {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [prompts, setPrompts] = useState<string[]>([]);
-  const [classYear, setClassYear] = useState("");
-  const [theme, setTheme] = useState("");
   const [memoryText, setMemoryText] = useState("");
-  const [title, setTitle] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const { user } = useUser();
   const db = useFirestore();
 
-  const handleGeneratePrompts = async () => {
-    setIsGenerating(true);
-    try {
-      const result = await generateMemoryPrompts({ classYear, theme });
-      setPrompts(result.prompts);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to generate prompts. Please try again."
-      });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+  const studentRef = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return doc(db, "students", user.uid);
+  }, [db, user]);
+
+  const { data: studentData } = useDoc(studentRef);
+
+
 
   const addEmoji = useCallback((emoji: string) => {
     setMemoryText(prev => prev + emoji);
   }, []);
 
-  const handlePromptClick = (prompt: string) => {
-    setMemoryText(prev => prev ? prev + " " + prompt : prompt);
-  };
+
 
   const handlePostMemory = () => {
     if (!user || !db) {
@@ -59,11 +51,11 @@ export function AddMemoryDialog() {
       return;
     }
 
-    if (!title || !memoryText || !classYear) {
+    if (!memoryText) {
       toast({
         variant: "destructive",
-        title: "Incomplete Fields",
-        description: "Please provide a title, class year, and your memory."
+        title: "Empty Memory",
+        description: "Please share your story before posting."
       });
       return;
     }
@@ -72,10 +64,8 @@ export function AddMemoryDialog() {
     const memoryData = {
       id: memoryRef.id,
       studentId: user.uid,
-      studentName: user.displayName || user.email?.split('@')[0] || "A Navodayan",
-      title,
+      studentName: isAnonymous ? "someone❤️" : (studentData?.name || "A GECian"),
       description: memoryText,
-      classYearLabel: `Class ${classYear}`,
       uploadedAt: new Date().toISOString(),
       createdAt: serverTimestamp(),
     };
@@ -88,9 +78,8 @@ export function AddMemoryDialog() {
     });
     
     // Reset fields
-    setTitle("");
     setMemoryText("");
-    setPrompts([]);
+    setIsAnonymous(false);
   };
 
   return (
@@ -104,90 +93,49 @@ export function AddMemoryDialog() {
         <DialogHeader>
           <DialogTitle className="text-2xl font-serif italic text-white">Share a Memory</DialogTitle>
           <DialogDescription className="text-white/40 text-[10px] uppercase font-black tracking-widest">
-            Preserve your Navodaya journey for generations to come.
+            Preserve your GEC journey for generations to come.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-wider text-primary">Memory Title</label>
-            <Input 
-              placeholder="e.g. The Night we sneaked out..." 
-              className="bg-white/5 border-white/10 text-white focus:ring-primary/20 h-12"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-wider text-primary">Class Year</label>
-              <Select onValueChange={setClassYear} value={classYear}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white h-12">
-                  <SelectValue placeholder="Select Year" />
-                </SelectTrigger>
-                <SelectContent className="bg-black text-white border-white/10">
-                  {[6, 7, 8, 9, 10, 11, 12].map(y => (
-                    <SelectItem key={y} value={y.toString()}>Class {y}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-wider text-primary">Theme (Optional)</label>
-              <Input 
-                placeholder="e.g. Sports, Mess, Exam" 
-                className="bg-white/5 border-white/10 text-white focus:ring-primary/20 h-12"
-                value={theme}
-                onChange={(e) => setTheme(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-3">
+        <div className="space-y-8 py-6">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-[10px] font-black uppercase tracking-wider text-primary">Inspiration</label>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleGeneratePrompts}
-                disabled={isGenerating}
-                className="text-primary hover:text-primary/80 hover:bg-primary/10 h-auto py-1 text-[10px] uppercase font-black tracking-widest"
-              >
-                {isGenerating ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : <Sparkles className="w-3 h-3 mr-2" />}
-                Get AI Prompts
-              </Button>
-            </div>
-            
-            {prompts.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {prompts.map((p, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handlePromptClick(p)}
-                    className="text-left text-[11px] bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded-xl p-3 transition-colors text-primary italic font-serif"
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-[10px] font-black uppercase tracking-wider text-primary">Your Memory</label>
+              <label className="text-[11px] font-black uppercase tracking-wider text-primary">Your Story</label>
               <EmojiPicker onEmojiSelect={addEmoji} />
             </div>
             <Textarea 
-              className="bg-white/5 border-white/10 min-h-[150px] text-white focus:ring-primary/20 font-serif italic text-lg leading-relaxed p-6" 
-              placeholder="Write your story here..."
+              className="bg-white/5 border-white/10 min-h-[220px] text-white focus:ring-primary/20 font-serif italic text-xl leading-relaxed p-8 rounded-3xl" 
+              placeholder="What do you want to be remembered?"
               value={memoryText}
               onChange={(e) => setMemoryText(e.target.value)}
             />
           </div>
 
-          <Button onClick={handlePostMemory} className="w-full bg-white text-black font-black uppercase tracking-[0.4em] py-8 rounded-full hover:bg-primary transition-all">
+          <div className="flex items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+            <div className="flex items-center gap-4">
+              <div className={cn(
+                "p-3 rounded-full transition-colors",
+                isAnonymous ? "bg-white/5 text-white/20" : "bg-primary/10 text-primary"
+              )}>
+                {isAnonymous ? <User className="w-5 h-5" /> : <UserCheck className="w-5 h-5" />}
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-bold text-white uppercase tracking-wider">
+                  {isAnonymous ? "Posting Anonymously" : `Post as ${studentData?.name || "GECian"}`}
+                </p>
+                <p className="text-[10px] text-white/20 font-black uppercase tracking-widest">
+                  {isAnonymous ? "Your name will be hidden" : "Your name will be attached"}
+                </p>
+              </div>
+            </div>
+            <Switch 
+              checked={isAnonymous} 
+              onCheckedChange={setIsAnonymous}
+              className="data-[state=checked]:bg-primary"
+            />
+          </div>
+
+          <Button onClick={handlePostMemory} className="w-full bg-white text-black font-black uppercase tracking-[0.4em] py-10 rounded-full hover:bg-primary transition-all text-sm shadow-[0_20px_40px_-10px_rgba(255,255,255,0.1)]">
             Post to Reflection Wall
           </Button>
         </div>

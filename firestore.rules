@@ -8,14 +8,21 @@ service cloud.firestore {
              get(/databases/$(database)/documents/students/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Student identity records
+    // GECian identity records
     match /students/{userId} {
-      allow read: if request.auth != null;
+      allow read: if true;
       allow write: if request.auth != null && (request.auth.uid == userId || isAdmin());
       allow delete: if isAdmin();
+      
+      // Guestbook messages
+      match /messages/{messageId} {
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow delete: if request.auth != null && (request.auth.uid == userId || resource.data.senderId == request.auth.uid || isAdmin());
+      }
     }
 
-    // 7-Year Journey milestones
+    // 4-Year Journey milestones
     match /journey/{yearId} {
       allow read: if true;
       allow write: if request.auth != null;

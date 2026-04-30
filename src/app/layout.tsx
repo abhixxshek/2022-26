@@ -5,15 +5,15 @@ import { FirebaseClientProvider } from '@/firebase';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'JNV Memories | Batch 2018-2025',
-  description: 'The official digital archive and yearbook for Jawahar Navodaya Vidyalaya Batch of 2018-2025. Preserving a seven-year legacy of brotherhood and excellence.',
-  keywords: ['JNV Ratlam', 'Batch 2025', 'Navodaya Memories', 'Digital Yearbook', 'JNV Alumni'],
-  authors: [{ name: 'Batch 2025 Contributors' }],
+  title: 'GEC Idukki Memories | Batch 2022-2026',
+  description: 'The official digital archive and yearbook for Government Engineering College Idukki. Preserving the legacy of our journey together.',
+  keywords: ['GEC Idukki', 'Batch 2026', 'College Memories', 'Digital Yearbook', 'GEC Alumni'],
+  authors: [{ name: 'GEC Idukki Contributors' }],
   openGraph: {
-    title: 'JNV Memories | Batch 2018-2025',
-    description: 'The official digital archive for Jawahar Navodaya Vidyalaya Batch of 2018-2025. Once a Navodayan, Always a Navodayan.',
-    url: 'https://jnv-memories.web.app',
-    siteName: 'JNV Memories Archive',
+    title: 'GEC Idukki Memories | Batch 2022-2026',
+    description: 'The official digital archive for Government Engineering College Idukki. A journey worth remembering.',
+    url: 'https://gec-idukki-memories.web.app',
+    siteName: 'GEC Idukki Memories Archive',
     images: [
       {
         url: 'https://upload.wikimedia.org/wikipedia/en/d/d1/Navodaya_Vidyalaya_Samiti_logo.png',
@@ -27,9 +27,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'JNV Memories | Batch 2018-2025',
-    description: 'A seven-year legacy of Jawahar Navodaya Vidyalaya Ratlam Batch 2018-2025.',
-    images: ['https://upload.wikimedia.org/wikipedia/en/d/d1/Navodaya_Vidyalaya_Samiti_logo.png'],
+    title: 'GEC Idukki Memories | Batch 2022-2026',
+    description: 'The legacy of Government Engineering College Idukki.',
   },
 };
 

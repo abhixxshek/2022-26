@@ -53,8 +53,19 @@ export function ImageAdjuster({ image, isOpen, onClose, onSave, aspectRatio = 4 
 
     if (!ctx) return '';
 
-    canvas.width = pixelCrop.width;
-    canvas.height = pixelCrop.height;
+    // Scale down if the cropped area is too large to prevent Firestore 1MB limit issues
+    const MAX_WIDTH = 1200;
+    let finalWidth = pixelCrop.width;
+    let finalHeight = pixelCrop.height;
+
+    if (finalWidth > MAX_WIDTH) {
+      const ratio = MAX_WIDTH / finalWidth;
+      finalWidth = MAX_WIDTH;
+      finalHeight = pixelCrop.height * ratio;
+    }
+
+    canvas.width = finalWidth;
+    canvas.height = finalHeight;
 
     ctx.drawImage(
       image,
@@ -64,11 +75,11 @@ export function ImageAdjuster({ image, isOpen, onClose, onSave, aspectRatio = 4 
       pixelCrop.height,
       0,
       0,
-      pixelCrop.width,
-      pixelCrop.height
+      finalWidth,
+      finalHeight
     );
 
-    return canvas.toDataURL('image/jpeg', 0.9);
+    return canvas.toDataURL('image/jpeg', 0.7);
   };
 
   const handleSave = async () => {

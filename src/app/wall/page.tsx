@@ -153,7 +153,7 @@ export default function WallPage() {
                       
                       <div className="pt-6 border-t border-black/10">
                         <p className="text-[11px] font-black uppercase tracking-[0.2em] text-black">
-                          {memory.studentName || "Anonymous Navodayan"}
+                          {memory.studentName || "someone❤️"}
                         </p>
                         {memory.classYearLabel && (
                           <p className="text-[9px] font-bold text-black/40 uppercase tracking-widest mt-1">

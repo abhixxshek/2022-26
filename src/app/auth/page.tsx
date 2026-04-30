@@ -23,11 +23,11 @@ export default function AuthPage() {
   const db = useFirestore();
   const router = useRouter();
 
-  const STUDENT_KEY = "JNVRTM25";
-  const ADMIN_KEY = "JNVRTM18";
+  const STUDENT_KEY = "GECIDK26";
+  const ADMIN_KEY = "GECIDK22";
   
-  const ADMIN_EMAIL = "primeparam07@gmail.com";
-  const ADMIN_NAME = "name param";
+  const ADMIN_EMAIL = "admin@gecidukki.ac.in";
+  const ADMIN_NAME = "Admin GEC";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +60,7 @@ export default function AuthPage() {
           name: ADMIN_NAME,
           email: ADMIN_EMAIL,
           role: "admin",
-          batchId: "batch-2018-2025",
+          batchId: "batch-2022-2026",
           lastActive: serverTimestamp(),
         }, { merge: true });
 
@@ -74,13 +74,13 @@ export default function AuthPage() {
         await setDoc(studentRef, {
           id: uid,
           role: "student",
-          batchId: "batch-2018-2025",
+          batchId: "batch-2022-2026",
           lastActive: serverTimestamp(),
         }, { merge: true });
 
         toast({
           title: "Archive Entry Authorized",
-          description: "Welcome to the Batch '25 Archive.",
+          description: "Welcome to the Batch '26 Archive.",
         });
         router.push("/profile");
       }
@@ -115,13 +115,13 @@ export default function AuthPage() {
             
             <div className="pt-12 pb-8 text-center px-10">
               <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                {accessKey.toUpperCase() === "JNVRTM18" ? <ShieldCheck className="w-8 h-8" /> : <Lock className="w-8 h-8" />}
+                {accessKey.toUpperCase() === "GECIDK22" ? <ShieldCheck className="w-8 h-8" /> : <Lock className="w-8 h-8" />}
               </div>
               <h2 className="text-3xl font-serif italic text-white mb-2">
-                {accessKey.toUpperCase() === "JNVRTM18" ? "Admin Access" : "Archive Entry"}
+                {accessKey.toUpperCase() === "GECIDK22" ? "Admin Access" : "Archive Entry"}
               </h2>
               <p className="text-[10px] uppercase font-black tracking-[0.3em] text-white/30">
-                Official Batch '25 Digital Portal
+                Official Batch '26 Digital Portal
               </p>
             </div>
 

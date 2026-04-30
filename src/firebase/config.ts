@@ -1,8 +1,9 @@
 export const firebaseConfig = {
-  "projectId": "studio-438186544-8d037",
-  "appId": "1:934386290529:web:0f8d5b6798ec135e60ff20",
-  "apiKey": "AIzaSyCCRW6hJtOweWfI6emYuBNBE4tAtVBOWVs",
-  "authDomain": "studio-438186544-8d037.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "934386290529"
+  apiKey: "AIzaSyBfckH7wmUpEtsxIb6osLwN5WKt6yJGTDY",
+  authDomain: "farewell-cde71.firebaseapp.com",
+  projectId: "farewell-cde71",
+  storageBucket: "farewell-cde71.firebasestorage.app",
+  messagingSenderId: "431807484896",
+  appId: "1:431807484896:web:69483d53f78099cd1c5185",
+  measurementId: "G-Q8KYMFZ5SJ"
 };

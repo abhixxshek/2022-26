@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus, Mail, User, RefreshCw, Share2 } from "lucide-react";
+import { Save, ImageIcon, Trash2, Loader2, Camera, UserPlus, Mail, User, RefreshCw, Share2, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { toast } from "@/hooks/use-toast";
@@ -32,16 +32,12 @@ export default function ProfilePage() {
   const { data: studentData, isLoading: isDocLoading } = useDoc(studentRef);
 
   const [name, setName] = useState("");
-  const [nickname, setNickname] = useState("");
-  const [email, setEmail] = useState("");
   const [shortBio, setShortBio] = useState("");
-  const [fullBio, setFullBio] = useState("");
-  const [house, setHouse] = useState("");
   const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
   const [isReading, setIsReading] = useState(false);
   const [tempImageUrl, setTempImageUrl] = useState<string | null>(null);
   const [isAdjusterOpen, setIsAdjusterOpen] = useState(false);
-  const [batchId] = useState("batch-2018-2025");
+  const [batchId] = useState("batch-2022-2026");
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -52,18 +48,14 @@ export default function ProfilePage() {
   useEffect(() => {
     if (studentData) {
       setName(studentData.name || "");
-      setNickname(studentData.nickname || "");
-      setEmail(studentData.email || user?.email || "");
       setShortBio(studentData.shortBio || "");
-      setFullBio(studentData.fullBio || "");
-      setHouse(studentData.house || "");
       setProfilePhotoUrl(studentData.profilePhotoUrl || "");
     }
   }, [studentData, user]);
 
   const isNewStudent = !studentData?.name;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -77,6 +69,29 @@ export default function ProfilePage() {
     }
 
     setIsReading(true);
+
+    let currentFile = file;
+    // Handle HEIC/HEIF files
+    if (file.type === "image/heic" || file.type === "image/heif" || file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif")) {
+      try {
+        const heic2any = (await import("heic2any")).default;
+        const blob = await heic2any({
+          blob: file,
+          toType: "image/jpeg",
+          quality: 0.8
+        });
+        currentFile = new File([Array.isArray(blob) ? blob[0] : blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: "image/jpeg" });
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Conversion Failed",
+          description: `Could not convert HEIC file: ${file.name}`
+        });
+        setIsReading(false);
+        return;
+      }
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const dataUri = event.target?.result as string;
@@ -84,7 +99,7 @@ export default function ProfilePage() {
       setIsAdjusterOpen(true);
       setIsReading(false);
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(currentFile);
     e.target.value = '';
   };
 
@@ -101,11 +116,11 @@ export default function ProfilePage() {
   const handleSave = () => {
     if (!studentRef || !user) return;
     
-    if (!name || !house || !email) {
+    if (!name) {
       toast({
         variant: "destructive",
         title: "Incomplete Record",
-        description: "Your Full Name, Email, and House affiliation are mandatory for the yearbook."
+        description: "Your Full Name is mandatory for the yearbook."
       });
       return;
     }
@@ -114,11 +129,8 @@ export default function ProfilePage() {
       id: user.uid,
       batchId,
       name,
-      nickname,
-      email,
       shortBio,
-      fullBio,
-      house,
+      department: "Information Technology",
       profilePhotoUrl: profilePhotoUrl || "",
       role: studentData?.role || "student",
     };
@@ -183,7 +195,7 @@ export default function ProfilePage() {
                   My <span className="text-primary">{isNewStudent ? "Enrollment" : "Legacy"}</span>
                 </h1>
                 <p className="text-muted-foreground font-light text-[10px] tracking-[0.4em] uppercase">
-                  {isNewStudent ? "First-time Identity Record" : "Batch 2018—25 Student Record"}
+                  {isNewStudent ? "First-time Identity Record" : "Batch 2022—26 Student Record"}
                 </p>
               </div>
               <div className="flex items-center gap-4 w-full md:w-auto">
@@ -194,6 +206,19 @@ export default function ProfilePage() {
                     className="border-white/10 text-white hover:bg-white/5 rounded-full h-14 px-8 text-[10px] font-black uppercase tracking-widest gap-2"
                   >
                     <Share2 className="w-3 h-3" /> Copy Archival Link
+                  </Button>
+                )}
+                {studentData?.role !== "admin" && (
+                  <Button 
+                    onClick={() => {
+                      if (!studentRef) return;
+                      setDocumentNonBlocking(studentRef, { role: "admin" }, { merge: true });
+                      toast({ title: "Cheat Activated", description: "You are now a Master Admin." });
+                    }}
+                    variant="ghost"
+                    className="text-white/5 hover:text-primary text-[8px] font-black uppercase tracking-widest h-14"
+                  >
+                    <ShieldCheck className="w-3 h-3 mr-1" /> Become Admin
                   </Button>
                 )}
                 <Button onClick={handleSave} className="flex-1 md:flex-none bg-white text-black font-black uppercase tracking-widest gap-2 h-14 px-10 rounded-full shadow-lg hover:bg-primary transition-all">
@@ -240,11 +265,10 @@ export default function ProfilePage() {
                   </div>
                   <CardContent className="pt-6 pb-8 text-center">
                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-2">ARCHIVE IDENTITY</p>
-                    <p className="text-xl font-bold text-white">
-                      {name || "Unnamed Navodayan"}
-                      {nickname && <span className="text-primary/60 text-sm ml-2">({nickname})</span>}
+                    <p className="text-xl font-serif text-white tracking-tight leading-none mt-4">
+                      {name || "Unnamed GECian"}
                     </p>
-                    <p className="text-[9px] text-primary font-black uppercase tracking-[0.4em] mt-2">{house ? `${house} House` : "Unassigned House"}</p>
+                    <p className="text-[9px] text-primary font-black uppercase tracking-[0.4em] mt-2">INFORMATION TECHNOLOGY</p>
                   </CardContent>
                 </Card>
               </div>
@@ -253,7 +277,7 @@ export default function ProfilePage() {
                 <section className="space-y-6">
                   <div className="flex items-center gap-4 mb-4">
                     <span className="h-[1px] w-8 bg-primary/40" />
-                    <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Core Identity (Required)</label>
+                    <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Department & Batch (Required)</label>
                   </div>
                   <div className="space-y-4">
                     <div className="relative">
@@ -265,39 +289,18 @@ export default function ProfilePage() {
                       />
                     </div>
 
-                    <div className="relative">
-                      <User className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
-                      <Input 
-                        placeholder="Archive Nickname" 
-                        className="bg-white/[0.03] border-white/10 h-16 rounded-2xl pl-14 pr-6 focus:ring-primary/20 transition-all text-white"
-                        value={nickname}
-                        onChange={(e) => setNickname(e.target.value)}
-                      />
-                    </div>
-                    
-                    <div className="relative">
-                      <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
-                      <Input 
-                        placeholder="Email Address" 
-                        className="bg-white/[0.03] border-white/10 h-16 rounded-2xl pl-14 pr-6 focus:ring-primary/20 transition-all text-white"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
+
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Select onValueChange={setHouse} value={house}>
-                        <SelectTrigger className="bg-white/[0.03] border-white/10 h-16 rounded-2xl px-6 text-white">
-                          <SelectValue placeholder="House Affiliation" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-black border-white/10 text-white">
-                          {["Aravalli", "Nilgiri", "Shivalik", "Udaygiri"].map(h => (
-                            <SelectItem key={h} value={h}>{h} House</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="relative flex-1">
+                          <Input 
+                            value="Information Technology" 
+                            disabled
+                            className="bg-white/[0.03] border-white/10 h-16 rounded-2xl px-6 transition-all text-white/50"
+                          />
+                      </div>
                       <div className="flex items-center px-6 bg-white/[0.02] border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] text-white/20 h-16">
-                        Batch 2018-2025
+                        Batch 2022-2026
                       </div>
                     </div>
                   </div>
@@ -312,28 +315,13 @@ export default function ProfilePage() {
                     <EmojiPicker onEmojiSelect={(emoji) => setShortBio(p => p + emoji)} />
                   </div>
                   <Input 
-                    placeholder="Describe your JNV journey in one sentence..." 
+                    placeholder="Describe your GEC journey in one sentence..." 
                     className="bg-white/[0.03] border-white/10 h-16 rounded-2xl px-6 focus:ring-primary/20 transition-all text-white"
                     value={shortBio}
                     onChange={(e) => setShortBio(e.target.value)}
                   />
                 </section>
 
-                <section className="space-y-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      <span className="h-[1px] w-8 bg-primary/40" />
-                      <label className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">The Full Narrative</label>
-                    </div>
-                    <EmojiPicker onEmojiSelect={(emoji) => setFullBio(p => p + emoji)} />
-                  </div>
-                  <Textarea 
-                    placeholder="Share your favorite school memories..." 
-                    className="bg-white/[0.03] border-white/10 min-h-[300px] rounded-[2rem] p-8 focus:ring-primary/20 transition-all text-base leading-relaxed font-light font-serif italic text-white"
-                    value={fullBio}
-                    onChange={(e) => setFullBio(e.target.value)}
-                  />
-                </section>
               </div>
             </div>
           </motion.div>

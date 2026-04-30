@@ -42,7 +42,7 @@ export default function Home() {
         title: year.title,
         subtitle: year.subtitle,
         description: year.description,
-        imageUrl: year.students?.[0]?.memories?.[0]?.image || `https://picsum.photos/seed/${year.id}/1200/900`
+        imageUrl: year.imageUrl || year.students?.[0]?.memories?.[0]?.image || ""
       });
     });
 
@@ -87,25 +87,19 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="relative w-24 h-24 mb-6 filter brightness-150"
+                className="relative w-24 h-24 mb-6 flex items-center justify-center text-primary"
               >
-                <Image 
-                  src="https://upload.wikimedia.org/wikipedia/en/d/d1/Navodaya_Vidyalaya_Samiti_logo.png"
-                  alt="NVS Official Logo"
-                  fill
-                  className="object-contain"
-                  unoptimized
-                />
+                <Sparkles className="w-full h-full" />
               </motion.div>
               <div className="inline-block px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-[0.4em]">
-                A Seven Year Legacy
+                A Four Year Journey
               </div>
             </div>
             
             <h1 className="text-8xl md:text-[14rem] font-black mb-4 leading-none tracking-tighter uppercase flex flex-col items-center">
               <span className="block">BATCH</span>
               <span className="font-serif font-light text-white italic normal-case tracking-tight -mt-4 md:-mt-12 block">
-                2018—2025
+                2022—2026
               </span>
             </h1>
 
@@ -116,14 +110,14 @@ export default function Home() {
               className="mb-12"
             >
               <h2 className="text-xl md:text-3xl font-black uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-primary/60 drop-shadow-[0_0_15px_rgba(255,191,0,0.3)] px-4">
-                JAWAHAR NAVODAYA VIDYALAYA RATLAM
+                GOVERNMENT ENGINEERING COLLEGE IDUKKI
               </h2>
               <div className="mt-8 space-y-4">
                 <p className="text-4xl md:text-7xl font-black text-white tracking-tighter drop-shadow-[0_10px_30px_rgba(255,255,255,0.4)]">
-                  हम ही नवोदय हो !!
+                  MEMORIES STAY FOREVER
                 </p>
                 <p className="text-2xl md:text-4xl font-black text-white/40 tracking-widest uppercase">
-                  हम ही नवोदय हो 🤍
+                  A journey of a thousand stories 🤍
                 </p>
               </div>
             </motion.div>
@@ -162,13 +156,13 @@ export default function Home() {
             ) : (
               displayData.map((year: any, index: number) => {
                 const isEven = index % 2 === 0;
-                const academicYearRange = year.subtitle.split(' | ')[0];
-                const classNum = year.subtitle.match(/Class (\d+)/)?.[1];
+                const academicYearRange = year.subtitle.includes('|') ? year.subtitle.split('|')[0].trim() : year.subtitle;
+                const classNum = year.subtitle.match(/(?:Class|Year)\s*(\d+)/i)?.[1] || index + 1;
                 
                 return (
                   <div key={year.id} className="relative flex items-center justify-center">
                     <div className="timeline-marker w-28 h-28 text-[11px] leading-tight text-center px-1 flex flex-col items-center justify-center border-primary/20 shadow-[0_0_30px_rgba(255,191,0,0.1)]">
-                      <span className="block opacity-40 mb-1">Class</span>
+                      <span className="block opacity-40 mb-1">Year</span>
                       <span className="text-2xl font-black text-primary">{classNum}</span>
                       <span className="block text-[8px] opacity-40 mt-1">{academicYearRange}</span>
                     </div>
@@ -183,11 +177,15 @@ export default function Home() {
                       >
                         <div className="polaroid -rotate-2 transition-all hover:rotate-0 duration-700 max-w-[800px] w-full group shadow-[0_30px_100px_-20px_rgba(0,0,0,0.7)]">
                           <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
-                            <Image 
-                              src={year.imageUrl || `https://picsum.photos/seed/${year.id}/1200/900`}
+                            <img 
+                              key={year.imageUrl || 'default'}
+                              src={
+                                (year.imageUrl && !year.imageUrl.includes('picsum.photos')) 
+                                  ? year.imageUrl 
+                                  : (YEAR_DATA.find(y => y.id === year.id)?.imageUrl || `https://picsum.photos/seed/${year.id}/1200/900`)
+                              }
                               alt={year.title}
-                              fill
-                              className="object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
+                              className="w-full h-full object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110"
                             />
                           </div>
                           <div className="polaroid-caption text-3xl py-12 tracking-tight">
@@ -210,7 +208,10 @@ export default function Home() {
                             </div>
                             {isAuthorizedToEdit && (
                               <EditJourneyDialog 
-                                yearData={year} 
+                                yearData={{
+                                  ...year,
+                                  order: year.order !== undefined ? year.order : index
+                                }} 
                                 trigger={
                                   <button className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary text-black font-black uppercase text-[10px] tracking-[0.2em] shadow-[0_0_30px_rgba(255,191,0,0.6)] hover:bg-white transition-all animate-pulse hover:animate-none border-2 border-white/20">
                                     <Edit3 className="w-3.5 h-3.5" /> EDIT MILESTONE
@@ -239,11 +240,11 @@ export default function Home() {
       <footer className="py-24 px-12 border-t border-white/5 bg-black/50">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
           <div className="flex flex-col items-center md:items-start gap-4">
-            <span className="font-serif italic text-lg text-white">Batch '25 Archive</span>
-            <p className="text-[8px] font-black uppercase tracking-[0.5em] text-white/10 italic">Once a Navodayan, Always a Navodayan</p>
+            <span className="font-serif italic text-lg text-white">Batch '22 Archive</span>
+            <p className="text-[8px] font-black uppercase tracking-[0.5em] text-white/10 italic">Once a GECian, Always a GECian</p>
           </div>
           <div className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20">
-            © 2025 MASTER ARCHIVE • BATCH 2018—2025
+            © 2026 MASTER ARCHIVE • BATCH 2022—2026
           </div>
         </div>
       </footer>

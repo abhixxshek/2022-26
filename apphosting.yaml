@@ -3,7 +3,7 @@
 # https://firebase.google.com/docs/app-hosting/configure
 
 runConfig:
-  # Optimized for Batch '25 Archive performance
+  # Optimized for Batch '26 Archive performance
   minInstances: 0
   maxInstances: 10
   memory: 512Mi
@@ -11,4 +11,4 @@ runConfig:
 
 env:
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    value: studio-438186544-8d037
+    value: farewell-cde71

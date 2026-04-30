@@ -47,12 +47,12 @@ const generateMemoryPromptsPrompt = ai.definePrompt({
   name: 'generateMemoryPromptsPrompt',
   input: { schema: GenerateMemoryPromptsInputSchema },
   output: { schema: GenerateMemoryPromptsOutputSchema },
-  prompt: `You are an AI assistant designed to help students recall and articulate their memories from their school years for a digital yearbook platform called 'Navodaya Memories'.
+  prompt: `You are an AI assistant designed to help students recall and articulate their memories from their college years for a digital yearbook platform called 'GEC Idukki Memories'.
 
 Generate 3-5 distinct, personalized, and inspiring memory prompts that will help the student recall specific experiences and feelings. Focus on helping them articulate their unique journey.
 
 Context for prompt generation:
-{{#if classYear}}Class Year: Class {{{classYear}}}. Focus these prompts specifically on memories from this academic year.{{/if}}
+{{#if classYear}}Year: Year {{{classYear}}}. Focus these prompts specifically on memories from this academic year.{{/if}}
 {{#if theme}}Theme: {{{theme}}}. Emphasize this theme in the generated prompts.{{else}}Default Themes: friendships, teachers, significant school events, challenges overcome, academic achievements, daily school life, extracurricular activities, personal growth.{{/if}}
 
 Combine the class year and theme (if provided) to make the prompts as specific and relevant as possible.
@@ -61,9 +61,9 @@ Return the prompts as a JSON array of strings.
 
 Example Output:
 [
-  "Describe your most cherished memory with a friend during Class {{classYear}}.",
-  "What was a major challenge you faced in Class {{classYear}} and how did you overcome it?",
-  "Recount a special event or festival celebrated at Navodaya that year, focusing on your feelings and experiences."
+  "Describe your most cherished memory with a friend during Year {{classYear}}.",
+  "What was a major challenge you faced in Year {{classYear}} and how did you overcome it?",
+  "Recount a special event or festival celebrated at GEC Idukki that year, focusing on your feelings and experiences."
 ]
 `,
 });

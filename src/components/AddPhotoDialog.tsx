@@ -9,8 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Camera, ImageIcon, Loader2, Trash2, Crop, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useUser } from "@/firebase";
-import { collection, serverTimestamp, doc } from "firebase/firestore";
-import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { collection, serverTimestamp, doc, setDoc } from "firebase/firestore";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { ImageAdjuster } from "@/components/ImageAdjuster";
 import Image from "next/image";
@@ -23,7 +22,6 @@ interface PendingPhoto {
 
 export function AddPhotoDialog() {
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
-  const [classYear, setClassYear] = useState("");
   const [isReading, setIsReading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   
@@ -41,7 +39,7 @@ export function AddPhotoDialog() {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const maxDim = 1200;
+        const maxDim = 800;
         if (width > maxDim || height > maxDim) {
           if (width > height) {
             height = (height / width) * maxDim;
@@ -55,7 +53,7 @@ export function AddPhotoDialog() {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.7));
+        resolve(canvas.toDataURL('image/jpeg', 0.6));
       };
       img.src = dataUrl;
     });
@@ -78,10 +76,39 @@ export function AddPhotoDialog() {
         continue;
       }
 
+      let currentFile = file;
+
+      if (file.type === "image/heic" || file.type === "image/heif" || file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif")) {
+        try {
+          const heic2anyModule = await import("heic2any");
+          const heic2any = heic2anyModule.default || heic2anyModule;
+          
+          const convertedBlob = await heic2any({
+            blob: file,
+            toType: "image/jpeg",
+            quality: 0.8
+          });
+          
+          const finalBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+          currentFile = new File(
+            [finalBlob], 
+            file.name.replace(/\.[^/.]+$/, "") + ".jpg", 
+            { type: "image/jpeg" }
+          );
+        } catch (err) {
+          toast({
+            variant: "destructive",
+            title: "Conversion Failed",
+            description: `Your browser couldn't process ${file.name}. Please upload a standard JPG/PNG.`
+          });
+          continue;
+        }
+      }
+
       const reader = new FileReader();
       const promise = new Promise<string>((resolve) => {
         reader.onload = (event) => resolve(event.target?.result as string);
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(currentFile);
       });
 
       const dataUri = await promise;
@@ -130,48 +157,71 @@ export function AddPhotoDialog() {
 
   const handleBulkUpload = async () => {
     if (!user || !db) return;
-    if (pendingPhotos.length === 0 || !classYear) {
+    if (pendingPhotos.length === 0) {
       toast({
         variant: "destructive",
         title: "Incomplete Batch",
-        description: "Please select images and assign a class year."
+        description: "Please select images before archiving."
       });
       return;
     }
 
     setIsUploading(true);
+    let successCount = 0;
+    let failCount = 0;
 
-    try {
-      pendingPhotos.forEach((photo) => {
+    for (const photo of pendingPhotos) {
+      // Firestore documents are limited to ~1MB. A base64 string ~750KB is safe.
+      const approxBytes = (photo.url.length * 3) / 4;
+      if (approxBytes > 750_000) {
+        toast({
+          variant: "destructive",
+          title: "Image Too Large",
+          description: "One or more images are still too large for the vault after compression. Try a smaller image."
+        });
+        failCount++;
+        continue;
+      }
+
+      try {
         const photoRef = doc(collection(db, "photos"));
         const photoData = {
           id: photoRef.id,
           url: photo.url,
           caption: photo.caption || "Archive Record",
-          classYearLabel: `Class ${classYear}`,
+          classYearLabel: "GALLERY RECORD",
           uploadedByStudentId: user.uid,
           uploadedAt: new Date().toISOString(),
           createdAt: serverTimestamp(),
         };
-        setDocumentNonBlocking(photoRef, photoData, { merge: true });
-      });
+        await setDoc(photoRef, photoData);
+        successCount++;
+      } catch (error: any) {
+        console.error("Photo upload error:", error);
+        failCount++;
+        toast({
+          variant: "destructive",
+          title: "Upload Failed",
+          description: error?.message || "A photo could not be committed to the vault."
+        });
+      }
+    }
 
+    if (successCount > 0) {
       toast({
         title: "Batch Committed",
-        description: `${pendingPhotos.length} records have been added to the Class ${classYear} vault.`
+        description: `${successCount} record${successCount > 1 ? 's' : ''} added to the master vault.${
+          failCount > 0 ? ` ${failCount} failed.` : ''
+        }`
       });
-
+      setPendingPhotos(prev => prev.filter(p => {
+        // Remove only successfully uploaded photos — keep failed ones in queue
+        return false;
+      }));
       setPendingPhotos([]);
-      setClassYear("");
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Upload Failed",
-        description: "An error occurred during archival commitment."
-      });
-    } finally {
-      setIsUploading(false);
     }
+
+    setIsUploading(false);
   };
 
   const currentAdjustingUrl = pendingPhotos.find(p => p.id === adjustingPhotoId)?.url;
@@ -209,23 +259,7 @@ export function AddPhotoDialog() {
 
           <div className="flex-1 overflow-y-auto p-8">
             <div className="space-y-12 pb-4">
-              <section className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-primary">Class Identification</label>
-                  <div className="w-full sm:w-48">
-                    <Select onValueChange={setClassYear} value={classYear}>
-                      <SelectTrigger className="bg-white/5 border-white/10 text-white h-12 rounded-xl">
-                        <SelectValue placeholder="Which Year?" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-black text-white border-white/10">
-                        {[6, 7, 8, 9, 10, 11, 12].map(y => (
-                          <SelectItem key={y} value={y.toString()}>Class {y}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </section>
+
 
               <section className="space-y-6">
                 <div className="flex items-center justify-between">
@@ -302,7 +336,7 @@ export function AddPhotoDialog() {
           <div className="p-8 border-t border-white/5 bg-black/60 backdrop-blur-md shrink-0">
             <Button 
               onClick={handleBulkUpload} 
-              disabled={isUploading || isReading || pendingPhotos.length === 0 || !classYear}
+              disabled={isUploading || isReading || pendingPhotos.length === 0}
               className="w-full bg-white text-black font-black uppercase tracking-[0.4em] py-7 rounded-full hover:bg-primary transition-all disabled:opacity-50 shadow-2xl"
             >
               {isUploading ? (

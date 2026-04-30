@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { User, LogOut, ShieldCheck } from "lucide-react";
+import { User, LogOut, ShieldCheck, Sparkles } from "lucide-react";
 import { useUser, useAuth, initiateSignOut, useDoc, useMemoFirebase, useFirestore } from "@/firebase";
 import Image from "next/image";
 import { doc } from "firebase/firestore";
@@ -56,17 +56,11 @@ export function Navbar() {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-4 group">
-          <div className="relative w-8 h-8 filter brightness-200">
-            <Image 
-              src="https://upload.wikimedia.org/wikipedia/en/d/d1/Navodaya_Vidyalaya_Samiti_logo.png"
-              alt="JNV Logo"
-              fill
-              className="object-contain"
-              unoptimized
-            />
+          <div className="relative w-8 h-8 flex items-center justify-center text-primary">
+            <Sparkles className="w-full h-full" />
           </div>
           <span className="font-serif italic text-white text-lg tracking-tight">
-            Batch '25
+            Batch '22
           </span>
         </Link>
 
@@ -75,13 +69,13 @@ export function Navbar() {
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
-                <Link 
-                  key={link.href} 
-                  href={link.href} 
+                <Link
+                  key={link.href}
+                  href={link.href}
                   className={cn(
                     "text-[10px] font-bold uppercase tracking-widest transition-all",
-                    isActive 
-                      ? "text-primary border-b border-primary pb-1" 
+                    isActive
+                      ? "text-primary border-b border-primary pb-1"
                       : "text-white/60 hover:text-white"
                   )}
                 >
@@ -89,10 +83,10 @@ export function Navbar() {
                 </Link>
               );
             })}
-            
+
             {isAdmin && (
-              <Link 
-                href="/admin" 
+              <Link
+                href="/admin"
                 className={cn(
                   "text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2",
                   pathname === "/admin" ? "text-primary" : "text-primary/60 hover:text-primary"
@@ -102,14 +96,14 @@ export function Navbar() {
               </Link>
             )}
           </div>
-          
+
           <div className="flex items-center gap-4">
-            <Link 
-              href={user ? "/profile" : "/auth"} 
+            <Link
+              href={user ? "/profile" : "/auth"}
               className={cn(
                 "px-8 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border flex items-center gap-2",
                 pathname === "/auth" || pathname === "/profile"
-                  ? "bg-primary text-black border-primary" 
+                  ? "bg-primary text-black border-primary"
                   : "bg-white/10 hover:bg-white/20 border-white/20 text-white"
               )}
             >
