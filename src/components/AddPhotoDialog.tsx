@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Camera, ImageIcon, Loader2, Trash2, Crop, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useFirestore, useUser } from "@/firebase";
-import { collection, serverTimestamp, doc, setDoc } from "firebase/firestore";
+import { collection, serverTimestamp, doc } from "firebase/firestore";
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { ImageAdjuster } from "@/components/ImageAdjuster";
 import Image from "next/image";
@@ -39,7 +40,7 @@ export function AddPhotoDialog() {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const maxDim = 800;
+        const maxDim = 1200;
         if (width > maxDim || height > maxDim) {
           if (width > height) {
             height = (height / width) * maxDim;
@@ -53,7 +54,7 @@ export function AddPhotoDialog() {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.6));
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
       };
       img.src = dataUrl;
     });
@@ -167,23 +168,9 @@ export function AddPhotoDialog() {
     }
 
     setIsUploading(true);
-    let successCount = 0;
-    let failCount = 0;
 
-    for (const photo of pendingPhotos) {
-      // Firestore documents are limited to ~1MB. A base64 string ~750KB is safe.
-      const approxBytes = (photo.url.length * 3) / 4;
-      if (approxBytes > 750_000) {
-        toast({
-          variant: "destructive",
-          title: "Image Too Large",
-          description: "One or more images are still too large for the vault after compression. Try a smaller image."
-        });
-        failCount++;
-        continue;
-      }
-
-      try {
+    try {
+      pendingPhotos.forEach((photo) => {
         const photoRef = doc(collection(db, "photos"));
         const photoData = {
           id: photoRef.id,
@@ -194,34 +181,24 @@ export function AddPhotoDialog() {
           uploadedAt: new Date().toISOString(),
           createdAt: serverTimestamp(),
         };
-        await setDoc(photoRef, photoData);
-        successCount++;
-      } catch (error: any) {
-        console.error("Photo upload error:", error);
-        failCount++;
-        toast({
-          variant: "destructive",
-          title: "Upload Failed",
-          description: error?.message || "A photo could not be committed to the vault."
-        });
-      }
-    }
+        setDocumentNonBlocking(photoRef, photoData, { merge: true });
+      });
 
-    if (successCount > 0) {
       toast({
         title: "Batch Committed",
-        description: `${successCount} record${successCount > 1 ? 's' : ''} added to the master vault.${
-          failCount > 0 ? ` ${failCount} failed.` : ''
-        }`
+        description: `${pendingPhotos.length} records have been added to the master vault.`
       });
-      setPendingPhotos(prev => prev.filter(p => {
-        // Remove only successfully uploaded photos — keep failed ones in queue
-        return false;
-      }));
-      setPendingPhotos([]);
-    }
 
-    setIsUploading(false);
+      setPendingPhotos([]);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Upload Failed",
+        description: "An error occurred during archival commitment."
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const currentAdjustingUrl = pendingPhotos.find(p => p.id === adjustingPhotoId)?.url;
